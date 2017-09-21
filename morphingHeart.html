@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" style="height:100%">
+	<head>
+		<title>Myocardium morphing heart</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+		
+			.play {
+			  width:64px;
+			  height:64px;
+			  right: 10px;
+			  background-image: url(./styles/images/play_small.png);
+			}
+			
+			.play:hover {
+			  background-image: url(./styles/images/play_hover_small.png);
+			}
+			
+			.pause {
+			  width:64px;
+			  height:64px;
+			  right: 10px;
+			  background-image: url(./styles/images/pause_small.png);
+			}
+			
+			.pause:hover {
+			  background-image: url(./styles/images/pause_hover_small.png);
+			}
+		
+			
+			.slider_style {
+				position: absolute;
+				width:50%;
+				left:25%;
+				background-color: #FFF;
+				opacity: 1.0;
+			}
+			
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	</head>
+
+	<body style="height:100%">
+		<div class="row">
+			<div class="col-sm-3">
+			</div>
+			<div class="col-sm-1">
+				<div id="playToggle" class="pause" onclick="triggerAnimation()"></div>
+			</div>	
+			<div class="col-sm-4">
+			<input id="slider" type="range" min="0" max="100" value ="0" step="1" oninput="sliderChanged(this.value)" style="height: 64px;width:100%;"/>
+			</div>
+			<div class="col-sm-4">
+			</div>
+		</div>
+
+		<script src="js/three.min.js"></script>
+		<script src="js/zinc_threejs_control.js"></script>
+		<script src="js/zinc_3js_renderer.js"></script>
+		<script>
+			var currentModel = undefined;
+		
+			container = document.createElement( 'div' );
+			document.body.appendChild( container );
+			container.style.height = "100%"
+
+			zincRenderer = new Zinc.Renderer(container, window);
+			Zinc.defaultMaterialColor = 0xFFFF9C
+			zincRenderer.initialiseVisualisation();
+			zincRenderer.playAnimation = true;	
+			zincRenderer.setPlayRate(100);
+			var displayScene = undefined;
+		
+		    function sliderChanged(slideAmount) {
+				displayScene.setMorphsTime(slideAmount * 30);
+    		}
+
+													
+			function load() {
+				var scene = zincRenderer.getCurrentScene();
+				scene.loadViewURL("morphing/morphingHeart_view.json");
+				scene.loadMetadataURL("morphing/morphingHeart_metadata.json");
+				displayScene=scene;
+				var directionalLight = zincRenderer.getCurrentScene().directionalLight;
+				directionalLight.intensity = 1.2;
+				 zincRenderer.getCurrentScene().ambient.intensity = 1.5;
+			}
+			
+			var triggerAnimation = function() {
+				var playElement = document.getElementById("playToggle");
+					if (playElement.className == "play") {
+						playElement.className = "pause";
+						zincRenderer.playAnimation = true;
+					} else {
+						playElement.className = "play";
+						zincRenderer.playAnimation = false;
+					}
+			}
+
+			
+			function resetView()
+			{
+				zincRenderer.resetView();
+			}
+			
+			function viewAll()
+			{
+				zincRenderer.viewAll();
+			}
+			
+			var updateTimeSlider = function() {
+				return function() {
+					if (zincRenderer.playAnimation == true)
+					{
+						var currentTime = zincRenderer.getCurrentTime();
+						var sliderElement = document.getElementById("slider");
+						var sliderValue = currentTime / 30.0;
+						sliderElement.value = sliderValue;
+					}
+				}	
+			}
+			
+			load();
+			zincRenderer.addPreRenderCallbackFunction(updateTimeSlider());
+			zincRenderer.animate();
+			
+
+		</script>
+
+	</body>
+</html>

@@ -1,0 +1,27 @@
+[
+   {
+      "GroupName" : "heart",
+      "MorphColours" : false,
+      "MorphNormals" : false,
+      "MorphVertices" : false,
+      "Type" : "Surfaces",
+      "URL" : "reference/reference_2.json"
+   },
+   {
+      "GroupName" : "heart",
+      "MorphColours" : false,
+      "MorphNormals" : false,
+      "MorphVertices" : false,
+      "Type" : "Surfaces",
+      "URL" : "reference/reference_3.json"
+   },
+   {
+      "GlyphGeometriesURL" : "reference/reference_5.json",
+      "GroupName" : "terminal",
+      "MorphColours" : false,
+      "MorphNormals" : false,
+      "MorphVertices" : false,
+      "Type" : "Glyph",
+      "URL" : "reference/reference_4.json"
+   }
+]
