@@ -5,7 +5,7 @@ var rtTexture, transferTexture;
 var cubeTextures = ['collagen', 'crop', 'collagen_large', 'crop'];
 var materialFirstPass;
 var materialSecondPass;
-var myRenderer, renderer;
+var volumeRenderer;
 var sphere, sphere2, pickerSphere, pickerSphere2;
 var volumeScene;
 var meshFirstPass, meshSecondPass;
@@ -33,10 +33,8 @@ var hideCellTooltip = function() {
 var openCellModelUI = function(id) {
 	var titleDisplay = document.getElementById('CellTitle');
 	titleDisplay.innerHTML = "<strong>Cell:<span style='color:#FF4444'>" + id + "</span>";
-	var text_display = document.getElementById('text_display2');
-	text_display.innerHTML = "<strong>Click the following to view the model.</strong> ";
+	openCell();
 	openModel();
-	document.getElementById("modelsContainer").style.visibility = "visible";
 }
 
 
@@ -67,18 +65,18 @@ function changeModels(value) {
 	materialSecondPass.uniforms.cubeTex.value =  cubeTextures[value];
 	if (value.includes('crop')) {
 		materialSecondPass.uniforms.black_flip.value = false;
-		myRenderer.getThreeJSRenderer().setClearColor( 0x000000, 1 );
+		volumeRenderer.getThreeJSRenderer().setClearColor( 0x000000, 1 );
 	} else {
 		materialSecondPass.uniforms.black_flip.value = true;
-		myRenderer.getThreeJSRenderer().setClearColor( 0xffffff, 1 );
+		volumeRenderer.getThreeJSRenderer().setClearColor( 0xffffff, 1 );
 	}
-}myRenderer
+}
 
 
 var renderFirstPass = function() {
 	return function() {
 		//Render first pass and store the world space coords of the back face fragments into the texture.
-		myRenderer.getThreeJSRenderer().render( sceneFirstPass, myRenderer.getCurrentScene().camera, rtTexture, true );
+		volumeRenderer.getThreeJSRenderer().render( sceneFirstPass, volumeRenderer.getCurrentScene().camera, rtTexture, true );
 	}	
 }
 
@@ -174,12 +172,12 @@ function volumeRenderInit() {
 	document.getElementById("referenceDisplayArea").appendChild( container );
 	container.style.height = "100%"
 	container.style.backgroundColor = "white";
-	myRenderer = new Zinc.Renderer(container, window);
-	myRenderer.initialiseVisualisation();
-	myRenderer.playAnimation = false;
+	volumeRenderer = new Zinc.Renderer(container, window);
+	volumeRenderer.initialiseVisualisation();
+	volumeRenderer.playAnimation = false;
 	
-	volumeScene = myRenderer.getCurrentScene();
-	var renderer = myRenderer.getThreeJSRenderer();
+	volumeScene = volumeRenderer.getCurrentScene();
+	var renderer = volumeRenderer.getThreeJSRenderer();
 	renderer.setClearColor( 0xffffff, 1 );
 	var camera = volumeScene.camera;
 	camera.near = 0.01;
@@ -329,7 +327,7 @@ function volumeRenderInit() {
 	
 	materialSecondPass.visible = false;
 	
-	myRenderer.addPreRenderCallbackFunction(renderFirstPass());
+	volumeRenderer.addPreRenderCallbackFunction(renderFirstPass());
 
 }
 
@@ -347,10 +345,12 @@ function makeCollagenVisible() {
 	sphere2.visible = true;
 	pickerSphere.visible = true;
 	pickerSphere2.visible = true;
+	var colour = new THREE.Color(backgroundColourString);
+	volumeRenderer.getThreeJSRenderer().setClearColor( colour, 1 );
 }
 
 function volumeRenderAnimate() {
-	myRenderer.animate();
+	volumeRenderer.animate();
 }
 
 

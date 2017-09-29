@@ -39,7 +39,7 @@
     	</script>
 	</head>
 
-	<body style="height:100%;">
+	<body style="height:100%;" id="mainBody">
 		<div style="position:absolute;height:100%;width:100%">
 				
 			<div id="tooltipcontainer">
@@ -88,7 +88,7 @@
 				</div>
 				<div id="cellButtonContainer">
 					<div style="padding-left:10%;float:left;text-align: center;">
-					<input class="cellSelectionButton" id="cellButton1" type="button" onclick="openCellModelUI('Cardiomyocytes')" value="Cardiomyocytes"</input>
+					<input class="cellSelectionButton" id="cellButton1" type="button" onclick="openCellModelUI('Cardiomyocyte')" value="Cardiomyocyte"</input>
 					</div>
 					<div style="padding-right:10%;float:right"text-align: center;">
 					<input class="cellSelectionButton" id="cellButton2" type="button" onclick="openCellModelUI('Cardiac fibroblast')" value="Cardiac fibroblast"</input>
@@ -106,7 +106,6 @@
 					</div>
 					<div class="textContainer">
 						<p style="text-align: center;">&nbsp;</p>
-						<p class="selectionText" id="text_display2" ><strong>You have not selected a cell model yet.</strong></p>
 						<p style="text-align: center;">&nbsp;</p>
 						<p style="text-align: center;">&nbsp;</p>
 					</div>
@@ -129,12 +128,13 @@
 					<div class="textContainer">
 						<p style="text-align: center;">&nbsp;</p>
 						<p style="text-align: center;">&nbsp;</p>
-						<p class="selectionText" id="model_text_display" ></p>
 					</div>
 				</div>
-				<p style="text-align: center;">&nbsp;</p>
 
 				<div id="modelsContainer" style="text-align:center;width:80%;height:100%;left:10%;bottom:1%; visibility: hidden;position: relative;">
+					<input class="modelButton" type="button" onclick="runModel(this, 'opencor://openFile/https://models.cellml.org/workspace/noble_1962/rawfile/c70f8962407db00673f1fdcac9f35a2593781c17/noble_1962.sedml')" value="Run Simulation"></input>
+					<p style="text-align: center;">&nbsp;</p>
+					<p style="text-align: center;">&nbsp;</p>
 					<object id="testsvg" align="middle" type="image/svg+xml" data="svg/Myocyte_v4_Grouped_v2.svg">Your browser does not support SVGs</object>
 				<!--
 					<p style="text-align: center;">&nbsp;</p>

@@ -5,6 +5,8 @@ var bodyPartsGui;
 var currentHoveredMaterial = undefined;
 var currentSelectedMaterial = undefined;
 var systemGuiFolder = new Array();
+var backgroundColourString = "rgb(255, 255, 255)";
+
 systemGuiFolder["Musculo-skeletal"] = undefined;
 systemGuiFolder["Cardiovascular"] = undefined;
 systemGuiFolder["Respiratory"] = undefined;
@@ -31,6 +33,11 @@ systemPartsGuiControls["Endocrine"] = function() {};
 systemPartsGuiControls["Female Reproductive"] = function() {};
 systemPartsGuiControls["Male Reproductive"] = function() {};
 systemPartsGuiControls["Special sense organs"] = function() {};
+
+var GeneralControl = function() {
+	  this.Background = [ 255, 255, 255 ]; // RGB array
+};
+
 
 var transformationMatrix = new THREE.Matrix4();
 transformationMatrix.set(0.493844, -0.823957, 0.277871, 30,
@@ -267,9 +274,30 @@ var addSystemFolder = function() {
 	}
 }
 
+var backGroundChanged = function() {
+	return function(value) {
+		var redValue = parseInt(value[0]);
+		var greenValue = parseInt(value[1]);
+		var blueValue = parseInt(value[2]);
+		
+		backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
+		document.getElementById("mainBody").style.backgroundColor = backgroundColourString;
+		var colour = new THREE.Color(backgroundColourString);
+		var internalRenderer = bodyRenderer.getThreeJSRenderer();
+		internalRenderer.setClearColor( colour, 1 );
+		internalRenderer = zincRenderer.getThreeJSRenderer();
+		internalRenderer.setClearColor( colour, 1 );
+		internalRenderer = volumeRenderer.getThreeJSRenderer();
+		internalRenderer.setClearColor( colour, 1 );
+	}
+}
+
 function initialiseBodyPanel() {
+	var control = new GeneralControl();
 	bodyGui = new dat.GUI({autoPlace: false});
 	bodyGui.domElement.id = 'gui';
+	var controller = bodyGui.addColor(control, 'Background');
+	controller.onChange(backGroundChanged());
 	bodyGui.close();
 	addSystemFolder();
 	var customContainer = document.getElementById("bodyGui").append(bodyGui.domElement);
