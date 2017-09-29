@@ -1,4 +1,4 @@
-var Zinc = { REVISION: '25' };
+var Zinc = { REVISION: '26' };
 
 Zinc.Glyph = function(geometry, materialIn, idIn)  {
 	var material = materialIn.clone();
@@ -476,13 +476,10 @@ Zinc.Geometry = function () {
 	}
 	
 	this.setMorphTime = function(time){
-		console.log(time);
-		if (_this.clipAction){
+		if (_this.clipAction) {
 			var ratio = time / _this.duration;
 			var actualDuration = _this.clipAction._clip.duration;
-			console.log(_this.clipAction._clip.tracks);
 			_this.clipAction.time = ratio * actualDuration;
-			console.log(_this.clipAction.time);
 			if (_this.clipAction.time > actualDuration)
 				_this.clipAction.time = actualDuration;
 			if (_this.clipAction.time < 0.0)
@@ -854,7 +851,8 @@ Zinc.Scene = function ( containerIn, rendererIn) {
         	} else if (fileFormat == "OBJ") {
         		loader = new THREE.OBJLoader( );
         		loader.load( url, objloader(modelId, colour, opacity, localTimeEnabled,
-        			localMorphColour, groupName, finishCallback), _this.onProgress(i), _this.onError); 
+        			localMorphColour, groupName, finishCallback), _this.onProgress(i), _this.onError);
+        		return;
         	}
         }
         loader.load( url, meshloader(modelId, colour, opacity, localTimeEnabled,
@@ -988,8 +986,7 @@ Zinc.Scene = function ( containerIn, rendererIn) {
 		var geometry = mesh.geometry;
 		if (geometry.animations && geometry.animations[0] != undefined)
 		{
-			var action = THREE.AnimationClip.CreateFromMorphTargetSequence( 'zinc_animations', geometry.morphTargets, 30 );
-			var clipAction = mixer.clipAction( action ).setDuration(duration).play();
+			var clipAction = mixer.clipAction( geometry.animations[0] ).setDuration(duration).play();			
 		}
 		newGeometry.duration = 3000;
 		newGeometry.geometry = geometry;
@@ -1048,28 +1045,6 @@ Zinc.Scene = function ( containerIn, rendererIn) {
 		var mesh = undefined;
 		mesh = new THREE.Mesh( geometry, material );
 		var newGeometry = addMeshToZincGeometry(mesh, modelId, localTimeEnabled, localMorphColour);
-
-
-		/*
-		var newGeometry = new Zinc.Geometry();
-		scene.add( mesh );
-		var mixer = new THREE.AnimationMixer(mesh);
-		var clipAction = undefined;
-		if (geometry.animations && geometry.animations[0] != undefined)
-		{
-			var action = THREE.AnimationClip.CreateFromMorphTargetSequence( 'zinc_animations', geometry.morphTargets, 30 );
-			var clipAction = mixer.clipAction( action ).setDuration(duration).play();
-		}
-		newGeometry.duration = 3000;
-		newGeometry.geometry = geometry;
-		newGeometry.timeEnabled = localTimeEnabled;
-		newGeometry.morphColour = localMorphColour;
-		newGeometry.modelId = modelId;
-		newGeometry.morph = mesh;
-		newGeometry.mixer = mixer;
-		newGeometry.clipAction = clipAction;
-		zincGeometries.push ( newGeometry ) ;
-		*/
 		
 		if (finishCallback != undefined && (typeof finishCallback == 'function'))
 			finishCallback(newGeometry);
@@ -1259,7 +1234,15 @@ Zinc.Renderer = function (containerIn, window) {
 	}
 	
 	this.initialiseVisualisation = function() {
-		renderer = new THREE.WebGLRenderer({ antialias: true });
+        var onMobile = false;
+        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+                onMobile = true;
+        }
+        if (onMobile)
+                renderer = new THREE.WebGLRenderer({ antialias: false});
+        else {
+                renderer = new THREE.WebGLRenderer({ antialias: true});
+        }
 		container.appendChild( renderer.domElement );
 		renderer.setClearColor( 0xffffff, 1);
 		var scene = _this.createScene("default");

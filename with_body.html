@@ -51,7 +51,7 @@
 			<div id="bodyDisplayPort" class="bodyDisplayPortCollapse">
 				<div style="position:absolute;width:100%;">
 					<div class="titleContainer">
-						<p class="titleText"><strong>BODY</strong></p>
+						<p class="titleText"><strong>Body</strong></p>
 					</div>
 					<input class="screenButton" id="bodyScreenButton" type="button" onclick="expandCollapse(this, 'bodyDisplayPort')" value="Expand"></input>
 					<div  id="bodyGui">
@@ -64,7 +64,7 @@
 			<div id="organsDisplayPort" class="organsDisplayPortCollapse">
 				<div style="position:absolute;width:100%;">
 					<div class="titleContainer">
-						<p class="titleText" id="OrganTitle"><strong>ORGAN</strong></p>
+						<p class="titleText" id="OrganTitle"><strong>Organ</strong></p>
 					</div>
 					<input class="screenButton" id="organsScreenButton" type="button" onclick="expandCollapse(this, 'organsDisplayPort')" value="Expand"</input>
 					<div  id="organGui">
@@ -78,7 +78,7 @@
 			<div id="referenceDisplayPort" class="referenceDisplayPortCollapse">
 				<div style="position:absolute;width:100%;">
 					<div class="titleContainer" style="bottom:2%;">
-						<p class="titleText" id="TissueTitle"><strong>TISSUE</strong></p>
+						<p class="titleText" id="TissueTitle"><strong>Tissue</strong></p>
 					</div>
 					<input class="screenButton" id="referenceScreenButton" type="button" onclick="expandCollapse(this, 'referenceDisplayPort')" value="Expand"</input>
 					<div id="tissueGui">
@@ -88,10 +88,10 @@
 				</div>
 				<div id="cellButtonContainer">
 					<div style="padding-left:10%;float:left;text-align: center;">
-					<input class="cellSelectionButton" id="cellButton1" type="button" onclick="openCellModelUI('Cardiacmyocytes')" value="Cardiacmyocytes"</input>
+					<input class="cellSelectionButton" id="cellButton1" type="button" onclick="openCellModelUI('Cardiomyocytes')" value="Cardiomyocytes"</input>
 					</div>
 					<div style="padding-right:10%;float:right"text-align: center;">
-					<input class="cellSelectionButton" id="cellButton2" type="button" onclick="openCellModelUI('Cardiac Fibroblast')" value="Cardiac Fibroblast"</input>
+					<input class="cellSelectionButton" id="cellButton2" type="button" onclick="openCellModelUI('Cardiac fibroblast')" value="Cardiac fibroblast"</input>
 					</div>
 				</div>
 			</div>
@@ -99,7 +99,7 @@
 			<div id="cellDisplayPort" class="cellDisplayPortCollapse">
 				<div style="width:100%;">
 					<div class="titleContainer" style="bottom:5%;">
-						<p class="titleText" id="CellTitle"><strong>CELL</strong></p>
+						<p class="titleText" id="CellTitle"><strong>Cell</strong></p>
 					</div>
 					<input class="screenButton" id="cellScreenButton" type="button" onclick="expandCollapse(this, 'cellDisplayPort')" value="Expand"</input>
 					<div id="cellGui">
@@ -121,9 +121,9 @@
 			<div id="modelDisplayPort" class="modelDisplayPortCollapse">
 				<div style="width:100%;">
 					<div class="titleContainer">
-						<p class="titleText" id="ModelTitle"><strong>MODELS</strong></p>
+						<p class="titleText" id="ModelTitle"><strong>Models</strong></p>
 					</div>
-					<input class="screenButton" id="modelScreenButton" type="button" onclick="expandCollapse(this, 'modelDisplayPort')" value="Expand"</input>
+					<input class="screenButton" id="modelScreenButton" type="button" onclick="expandSVGCollapse(this, 'modelDisplayPort')" value="Expand"</input>
 					<div id="modelGui">
 					</div>
 					<div class="textContainer">
@@ -135,12 +135,13 @@
 				<p style="text-align: center;">&nbsp;</p>
 
 				<div id="modelsContainer" style="text-align:center;width:80%;height:100%;left:10%;bottom:1%; visibility: hidden;position: relative;">
-					<object id="testsvg" align="middle" type="image/svg+xml" data="svg/test2.svg">Your browser does not support SVGs</object>
+					<object id="testsvg" align="middle" type="image/svg+xml" data="svg/Myocyte_v4_Grouped_v2.svg">Your browser does not support SVGs</object>
+				<!--
 					<p style="text-align: center;">&nbsp;</p>
 					<input class="modelButton" type="button" onclick="svgElemenToggle('testsvg', 'cls-5')" value="Green"></input>
 					<input class="modelButton" type="button" onclick="svgElemenToggle('testsvg', 'cls-6')" value="Orange"></input>
 					<input class="modelButton" type="button" onclick="svgElemenToggle('testsvg', 'cls-7')" value="Pink"></input>					
-					<!--
+
 					<div style="height:20%;border-top: 2px solid #000000;">
 						<div style="height:100%;left:0%;width:50%;float:left;border-right: 2px solid #000000;border-bottom: 2px solid #000000;">
 							<p style="text-align: center;">Electrophysiology</p>
@@ -169,7 +170,6 @@
 				</div>
 			</div>
 		</div>
-
 
 		<script src="js/three.min.js"></script>
 		<script src="js/OBJLoader.js"></script>
