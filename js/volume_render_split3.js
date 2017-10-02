@@ -360,8 +360,6 @@ function makeCollagenVisible() {
 	sphere2.visible = true;
 	pickerSphere.visible = true;
 	pickerSphere2.visible = true;
-	var colour = new THREE.Color(backgroundColourString);
-	volumeRenderer.getThreeJSRenderer().setClearColor( colour, 1 );
 }
 
 function volumeRenderAnimate() {
