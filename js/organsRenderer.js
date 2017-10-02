@@ -11,6 +11,11 @@ var organPartGuiControls = function() {
 };
 var timeSlider = undefined;
 
+var organsControl = function() {
+	  this.Background = [ 255, 255, 255 ]; // RGB array
+};
+
+
 var organsFileMap = new Array();
 
 organsFileMap["Cardiovascular"] = new Array();
@@ -113,12 +118,29 @@ var changeOrganPartsVisibility = function(name) {
 	}
 }
 
-						
+var organsBackGroundChanged = function() {
+	return function(value) {
+		var redValue = parseInt(value[0]);
+		var greenValue = parseInt(value[1]);
+		var blueValue = parseInt(value[2]);
+		
+		var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
+		//document.getElementById("mainBody").style.backgroundColor = backgroundColourString;
+		var colour = new THREE.Color(backgroundColourString);
+		var internalRenderer = zincRenderer.getThreeJSRenderer();
+		internalRenderer.setClearColor( colour, 1 );
+	}
+}
+
+
 function initialiseOrgansVisualisation() {
 	defaultScene = zincRenderer.getCurrentScene();
 	organGui = new dat.GUI({autoPlace: false});
 	organGui.domElement.id = 'gui';
 	organGui.close();
+	var control = new organsControl();
+	var controller = organGui.addColor(control, 'Background');
+	controller.onChange(organsBackGroundChanged());
 	var customContainer = document.getElementById("organGui").append(organGui.domElement);
 	var resetViewButton = { 'Reset View':function(){ zincRenderer.resetView() }};
 	var playButton = { 'Play/Pause':function(){ triggerAnimation() }};

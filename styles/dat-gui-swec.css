@@ -64,6 +64,10 @@
 	background-size: 10%;
 }
 
+.dg .selector {
+	position: relative;
+}
+
 .dg li.folder li.title  {
 	background-image: url("images/open.png");
 	background-repeat: no-repeat;

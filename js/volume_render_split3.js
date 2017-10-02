@@ -11,6 +11,7 @@ var volumeScene;
 var meshFirstPass, meshSecondPass;
 var cellPickerScene;
 var gui;
+var guiControls;
 
 var showCellTooltip = function(id, x, y) {
 	tiptextElement.innerHTML = "Cell model " + id;
@@ -65,13 +66,10 @@ function changeModels(value) {
 	materialSecondPass.uniforms.cubeTex.value =  cubeTextures[value];
 	if (value.includes('crop')) {
 		materialSecondPass.uniforms.black_flip.value = false;
-		volumeRenderer.getThreeJSRenderer().setClearColor( 0x000000, 1 );
 	} else {
 		materialSecondPass.uniforms.black_flip.value = true;
-		volumeRenderer.getThreeJSRenderer().setClearColor( 0xffffff, 1 );
 	}
 }
-
 
 var renderFirstPass = function() {
 	return function() {
@@ -151,6 +149,20 @@ var changeBoundary = function(name) {
 	}	
 }
 
+var volumeRenderBackGroundChanged = function() {
+	return function(value) {
+		var redValue = parseInt(value[0]);
+		var greenValue = parseInt(value[1]);
+		var blueValue = parseInt(value[2]);
+		
+		var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
+		//document.getElementById("mainBody").style.backgroundColor = backgroundColourString;
+		var colour = new THREE.Color(backgroundColourString);
+		var renderer = volumeRenderer.getThreeJSRenderer();
+		renderer.setClearColor( colour, 1 );
+	}
+}
+
 
 function volumeRenderInit() {
 
@@ -164,6 +176,7 @@ function volumeRenderInit() {
 		this.max_y = 0.99;
 		this.min_z = 0.01;
 		this.max_z = 0.99;
+		this.Background = [ 255, 255, 255 ]; // RGB array
 	};
 	
 	activated = false;
@@ -309,6 +322,8 @@ function volumeRenderInit() {
 	gui.domElement.id = 'gui';
 	gui.close();
 	var customContainer = document.getElementById("tissueGui").append(gui.domElement);
+	var controller = gui.addColor(guiControls, 'Background');
+	controller.onChange(volumeRenderBackGroundChanged());
 	var modelSelected = gui.add(guiControls, 'model', [ 'collagen', 'crop', 'collagen_large', 'crop_large'] );
 	var resetSliderButton = { 'Reset':function(){ resetSlider() }};
 	gui.add(guiControls, 'min_x', 0.00, 0.99).step(0.01).onChange(changeBoundary("min_x"));
