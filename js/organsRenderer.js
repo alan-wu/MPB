@@ -51,19 +51,19 @@ var setOrgansString = function(name) {
 	text_display.innerHTML = "<strong>Organ: <span style='color:#FF4444'>" + name + "</span></strong>";
 }
 
-var showTooltip = function(id, x, y) {
-	if (currentHoverId != id) {
-		tiptextElement.innerHTML = "Node " + id;
-		tooltipcontainerElement.style.left = x +"px";
-		tooltipcontainerElement.style.top = (y - 20) + "px";
-		tipElement.style.visibility = "visible";
-		tipElement.style.opacity = 1;
-		tiptextElement.style.visibility = "visible";
-		tiptextElement.style.opacity = 1;
-		currentHoverId = id;
-
-	}
+var setToolTipText = function(text) {
+	tiptextElement.innerHTML = text;
 }
+
+var showTooltip = function(x, y) {
+	tooltipcontainerElement.style.left = x +"px";
+	tooltipcontainerElement.style.top = (y - 20) + "px";
+	tipElement.style.visibility = "visible";
+	tipElement.style.opacity = 1;
+	tiptextElement.style.visibility = "visible";
+	tiptextElement.style.opacity = 1;
+}
+
 
 var hideTooltip = function() {
 	currentHoverId = -1;
@@ -76,11 +76,22 @@ var hideTooltip = function() {
 var _pickingCallback = function() {
 	return function(intersects, window_x, window_y) {
 		if (intersects[0] !== undefined) {
-			var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
-			showTooltip(id, window_x, window_y);
-			setTissueTitleString(id);
-			document.getElementById("cellButtonContainer").style.visibility = "visible";
-			makeCollagenVisible();
+			if (displayScene.sceneName == "Cardiovascular/Heart") {
+				var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
+				setToolTipText("Node " + id);
+				currentHoverId = id;
+				showTooltip(window_x, window_y);
+				var tissueTitle = "<strong>Tissue: <span style='color:#FF4444'>" + id + "</span></strong>";
+				setTissueTitleString(tissueTitle);
+				document.getElementById("cellButtonContainer").style.visibility = "visible";
+				showCollagenVisible(true);
+			} else if (displayScene.sceneName.includes("Cardiovascular/")) {
+				setToolTipText("Click to show vascular model");
+				showTooltip(window_x, window_y);
+				resetTissuePanel();
+				resetCellPanel();
+				openModel("BG_Circulation_Model.svg");
+			}
 		}
 	}	
 };
@@ -88,9 +99,17 @@ var _pickingCallback = function() {
 var _hoverCallback = function() {
 	return function(intersects, window_x, window_y) {
 		if (intersects[0] !== undefined) {
-			var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
-			document.getElementById("organsDisplayArea").style.cursor = "pointer";
-			showTooltip(id, window_x, window_y);
+			if (displayScene.sceneName == "Cardiovascular/Heart") {
+				var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
+				setToolTipText("Node " + id);
+				currentHoverId = id;
+				document.getElementById("organsDisplayArea").style.cursor = "pointer";
+				showTooltip(window_x, window_y);
+			} else if (displayScene.sceneName.includes("Cardiovascular/")) {
+				document.getElementById("organsDisplayArea").style.cursor = "pointer";
+				setToolTipText("Click to show vascular model");
+				showTooltip(window_x, window_y);
+			}
 		}
 		else {
 			hideTooltip();
@@ -226,7 +245,9 @@ function loadOrgans(systemName, partName) {
 					organScene.loadSTL(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
 				else if (item["FileFormat"] == "OBJ") 
 					organScene.loadOBJ(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
-				zincRenderer.setCurrentScene(organScene);			
+				zincRenderer.setCurrentScene(organScene);
+				var zincCameraControl = organScene.getZincCameraControls();
+				zincCameraControl.enableRaycaster(organScene, _pickingCallback(), _hoverCallback());
 			}
 			var directionalLight = organScene.directionalLight;
 			directionalLight.intensity = 1.4;

@@ -32,12 +32,11 @@ var hideCellTooltip = function() {
 }
 
 var openCellModelUI = function(id) {
-	var titleDisplay = document.getElementById('CellTitle');
-	titleDisplay.innerHTML = "<strong>Cell:<span style='color:#FF4444'>" + id + "</span>";
+	var cellTitle = "<strong>Cell: <span style='color:#FF4444'>" + id + "</span></strong>";
+	setCellPanelTitle(cellTitle);
 	openCell();
-	openModel();
+	openModel("Myocyte_v4_Grouped_v2.svg");
 }
-
 
 var _pickingCellCallback = function() {
 	return function(intersects, window_x, window_y) {
@@ -339,31 +338,35 @@ function volumeRenderInit() {
 	} );
 	
 	resetSlider();
-	
 	materialSecondPass.visible = false;
-	
 	volumeRenderer.addPreRenderCallbackFunction(renderFirstPass());
-
 }
 
-var setTissueTitleString = function(id) {
+var setTissueTitleString = function(text) {
  	var text_display = document.getElementById('TissueTitle');
- 	TissueTitle.innerHTML = "<strong>Tissue: <span style='color:#FF4444'>" + id + "</span></strong>";
+ 	text_display.innerHTML = "<strong>Tissue: <span style='color:#FF4444'>" + id + "</span></strong>";
 }
 
 
-function makeCollagenVisible() {
+function showCollagenVisible(flag) {
 	changeModels(guiControls.model);
-	materialSecondPass.visible = true;
+	materialSecondPass.visible = flag;
 	volumeScene.getZincCameraControls().updateDirectionalLight();
-	sphere.visible = true;
-	sphere2.visible = true;
-	pickerSphere.visible = true;
-	pickerSphere2.visible = true;
+	sphere.visible = flag;
+	sphere2.visible = flag;
+	pickerSphere.visible = flag;
+	pickerSphere2.visible = flag;
 }
 
 function volumeRenderAnimate() {
 	volumeRenderer.animate();
+}
+
+var resetTissuePanel = function() {
+ 	var text_display = document.getElementById('TissueTitle');
+ 	TissueTitle.innerHTML = "<strong>Tissue</strong>";
+ 	showCollagenVisible(false);
+	document.getElementById("cellButtonContainer").style.visibility = "hidden";
 }
 
 

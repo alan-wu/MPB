@@ -5,8 +5,20 @@ var modelControl = function() {
 	  this.Background = [ 255, 255, 255 ]; // RGB array
 };
 
-var openModel = function() {
-	svgLoaded();
+var openModel = function(svgName) {
+	var svgObject = document.getElementById("testsvg");
+	var svgFullName = "svg/" + svgName;
+	
+
+	if (svgName == "Myocyte_v4_Grouped_v2.svg") {
+		svgObject.onload = function() {
+			svgLoaded();
+		}
+	} else {
+		svgObject.onload = undefined;
+	}
+	
+	svgObject.setAttribute('data', svgFullName );
 	document.getElementById("modelsContainer").style.visibility = "visible";
 }
 

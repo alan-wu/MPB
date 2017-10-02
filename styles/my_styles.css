@@ -247,3 +247,8 @@ img.model {
 	text-align: center;
 	visibility: hidden;
 }
+
+.svgContainer {
+	max-height:100%;
+	max-width:100%;
+}
