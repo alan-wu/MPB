@@ -36,7 +36,7 @@ function volumeRenderInit() {
 	
 	container = document.createElement( 'div' );
 	container.style.height = "100%"
-	document.getElementById("referenceDisplayArea").appendChild( container );
+	document.getElementById("tissueDisplayArea").appendChild( container );
 	
 	camera = new THREE.PerspectiveCamera( 40, container.clientWidth / container.clientHeight, 0.01, 3000.0 );
 	camera.position.z = 3.0;

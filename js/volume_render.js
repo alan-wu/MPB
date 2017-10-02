@@ -45,11 +45,11 @@ var _hoverCellCallback = function() {
 		if (intersects[0] !== undefined && intersects[0].object !== undefined &&
 				(intersects[0].object.geometry instanceof THREE.SphereGeometry)) {
 			showCellTooltip(1, window_x, window_y);
-			document.getElementById("referenceDisplayPort").style.cursor = "pointer";
+			document.getElementById("tissueDisplayPort").style.cursor = "pointer";
 		}
 		else {
 			hideCellTooltip();
-			document.getElementById("referenceDisplayPort").style.cursor = "auto";
+			document.getElementById("tissueDisplayPort").style.cursor = "auto";
 		}
 	}	
 };
@@ -162,7 +162,7 @@ function volumeRenderInit() {
 	activated = false;
 	
 	container = document.createElement( 'div' );
-	document.getElementById("referenceDisplayPort").appendChild( container );
+	document.getElementById("tissueDisplayPort").appendChild( container );
 	container.style.height = "100%"
 	container.style.backgroundColor = "white";
 	myRenderer = new Zinc.Renderer(container, window);

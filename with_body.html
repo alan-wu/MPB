@@ -75,16 +75,16 @@
 
 			</div>
 			
-			<div id="referenceDisplayPort" class="referenceDisplayPortCollapse">
+			<div id="tissueDisplayPort" class="tissueDisplayPortCollapse">
 				<div style="position:absolute;width:100%;">
 					<div class="titleContainer" style="bottom:2%;">
 						<p class="titleText" id="TissueTitle"><strong>Tissue</strong></p>
 					</div>
-					<input class="screenButton" id="referenceScreenButton" type="button" onclick="expandCollapse(this, 'referenceDisplayPort')" value="Expand"</input>
+					<input class="screenButton" id="tissueScreenButton" type="button" onclick="expandCollapse(this, 'tissueDisplayPort')" value="Expand"</input>
 					<div id="tissueGui">
 					</div>
 				</div>
-				<div id="referenceDisplayArea" style="height:100%;">
+				<div id="tissueDisplayArea" style="height:100%;">
 				</div>
 				<div id="cellButtonContainer">
 					<div style="padding-left:10%;float:left;text-align: center;">
@@ -441,7 +441,7 @@
 			var tiptextElement = document.getElementById('tiptext');
 			
 			var toggleSplitDisplay = function(displayStyle) {
-				var portArrays = ["bodyDisplayPort", "organsDisplayPort", "referenceDisplayPort", "cellDisplayPort", "modelDisplayPort"];
+				var portArrays = ["bodyDisplayPort", "organsDisplayPort", "tissueDisplayPort", "cellDisplayPort", "modelDisplayPort"];
 				for (var i = 0; i < portArrays.length; i++) {
 					var portElement = document.getElementById(portArrays[i]);
 					portElement.className = portArrays[i] + "Collapse";

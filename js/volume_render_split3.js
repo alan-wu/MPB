@@ -5,7 +5,7 @@ var rtTexture, transferTexture;
 var cubeTextures = ['collagen', 'crop', 'collagen_large', 'crop'];
 var materialFirstPass;
 var materialSecondPass;
-var volumeRenderer;
+var tissueRenderer;
 var sphere, sphere2, pickerSphere, pickerSphere2;
 var volumeScene;
 var meshFirstPass, meshSecondPass;
@@ -51,11 +51,11 @@ var _hoverCellCallback = function() {
 		if (intersects[0] !== undefined && intersects[0].object !== undefined &&
 				(intersects[0].object.geometry instanceof THREE.SphereGeometry)) {
 			showCellTooltip(1, window_x, window_y);
-			document.getElementById("referenceDisplayArea").style.cursor = "pointer";
+			document.getElementById("tissueDisplayArea").style.cursor = "pointer";
 		}
 		else {
 			hideCellTooltip();
-			document.getElementById("referenceDisplayArea").style.cursor = "auto";
+			document.getElementById("tissueDisplayArea").style.cursor = "auto";
 		}
 	}	
 };
@@ -73,7 +73,7 @@ function changeModels(value) {
 var renderFirstPass = function() {
 	return function() {
 		//Render first pass and store the world space coords of the back face fragments into the texture.
-		volumeRenderer.getThreeJSRenderer().render( sceneFirstPass, volumeRenderer.getCurrentScene().camera, rtTexture, true );
+		tissueRenderer.getThreeJSRenderer().render( sceneFirstPass, tissueRenderer.getCurrentScene().camera, rtTexture, true );
 	}	
 }
 
@@ -157,7 +157,7 @@ var volumeRenderBackGroundChanged = function() {
 		var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
 		//document.getElementById("mainBody").style.backgroundColor = backgroundColourString;
 		var colour = new THREE.Color(backgroundColourString);
-		var renderer = volumeRenderer.getThreeJSRenderer();
+		var renderer = tissueRenderer.getThreeJSRenderer();
 		renderer.setClearColor( colour, 1 );
 	}
 }
@@ -181,15 +181,15 @@ function volumeRenderInit() {
 	activated = false;
 	
 	var container = document.createElement( 'div' );
-	document.getElementById("referenceDisplayArea").appendChild( container );
+	document.getElementById("tissueDisplayArea").appendChild( container );
 	container.style.height = "100%"
 	container.style.backgroundColor = "white";
-	volumeRenderer = new Zinc.Renderer(container, window);
-	volumeRenderer.initialiseVisualisation();
-	volumeRenderer.playAnimation = false;
+	tissueRenderer = new Zinc.Renderer(container, window);
+	tissueRenderer.initialiseVisualisation();
+	tissueRenderer.playAnimation = false;
 	
-	volumeScene = volumeRenderer.getCurrentScene();
-	var renderer = volumeRenderer.getThreeJSRenderer();
+	volumeScene = tissueRenderer.getCurrentScene();
+	var renderer = tissueRenderer.getThreeJSRenderer();
 	renderer.setClearColor( 0xffffff, 1 );
 	var camera = volumeScene.camera;
 	camera.near = 0.01;
@@ -339,12 +339,12 @@ function volumeRenderInit() {
 	
 	resetSlider();
 	materialSecondPass.visible = false;
-	volumeRenderer.addPreRenderCallbackFunction(renderFirstPass());
+	tissueRenderer.addPreRenderCallbackFunction(renderFirstPass());
 }
 
 var setTissueTitleString = function(text) {
  	var text_display = document.getElementById('TissueTitle');
- 	text_display.innerHTML = "<strong>Tissue: <span style='color:#FF4444'>" + id + "</span></strong>";
+ 	text_display.innerHTML = text;
 }
 
 
@@ -359,7 +359,7 @@ function showCollagenVisible(flag) {
 }
 
 function volumeRenderAnimate() {
-	volumeRenderer.animate();
+	tissueRenderer.animate();
 }
 
 var resetTissuePanel = function() {
