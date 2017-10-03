@@ -8,9 +8,8 @@ var modelControl = function() {
 var openModel = function(svgName) {
 	var svgObject = document.getElementById("testsvg");
 	var svgFullName = "svg/" + svgName;
-	
 
-	if (svgName == "Myocyte_v4_Grouped_v2.svg") {
+	if (svgName == "Myocyte_v4_Grouped_v4.svg") {
 		svgObject.onload = function() {
 			svgLoaded();
 		}

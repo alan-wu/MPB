@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" style="height:100%">
 	<head>
-		<title>Myocardium WebGL Demo</title>
+		<title>Physiome Portal</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>			
@@ -86,12 +86,19 @@
 				</div>
 				<div id="tissueDisplayArea" style="height:100%;">
 				</div>
-				<div id="cellButtonContainer">
-					<div style="padding-left:10%;float:left;text-align: center;">
-					<input class="cellSelectionButton" id="cellButton1" type="button" onclick="openCellModelUI('Cardiomyocyte')" value="Cardiomyocyte"</input>
+				<div id="cellButtonContainer" style="visibility:hidden;">
+					<div id="cellButtonDivider" style="positon:relative;bottom:10%;">
+						<div style="padding-left:10%;float:left;text-align: center;">
+							<input class="cellSelectionButton" id="cellButton1" type="button" onclick="openCellModelUI('Cardiomyocyte')" value="Cardiomyocyte"</input>
+						</div>
+						<div style="padding-right:10%;float:right"text-align: center;">
+							<a target="_blank" href="https://models.physiomeproject.org/mechanical_constitutive_laws">Constitutive laws</a>
+						</div>
 					</div>
-					<div style="padding-right:10%;float:right"text-align: center;">
-					<input class="cellSelectionButton" id="cellButton2" type="button" onclick="openCellModelUI('Cardiac fibroblast')" value="Cardiac fibroblast"</input>
+					<div id="cellButtonDivider" style="bottom:4%;">
+						<div style="padding-left:10%;float:left;text-align: center;">
+							<input class="cellSelectionButton" id="cellButton2" type="button" onclick="openCellModelUI('Cardiac fibroblast')" value="Cardiac fibroblast"</input>
+						</div>
 					</div>
 				</div>
 			</div>

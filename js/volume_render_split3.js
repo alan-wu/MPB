@@ -35,7 +35,7 @@ var openCellModelUI = function(id) {
 	var cellTitle = "<strong>Cell: <span style='color:#FF4444'>" + id + "</span></strong>";
 	setCellPanelTitle(cellTitle);
 	openCell();
-	openModel("Myocyte_v4_Grouped_v2.svg");
+	openModel("Myocyte_v4_Grouped_v4.svg");
 }
 
 var _pickingCellCallback = function() {

@@ -159,7 +159,7 @@ input:checked + .switchSlider:before {
 	display: block;
 }
 
-.referenceDisplayPortCollapse {
+.tissueDisplayPortCollapse {
 	position:absolute;
 	width:25%;
 	left:50%;top:0%;
@@ -237,15 +237,13 @@ img.model {
 
 .cellSelectionButton {
 	text-align: center;
-    z-index:2;
+	z-index:2;
 }
 
-#cellButtonContainer {
+#cellButtonDivider {
 	position:absolute;
 	width:100%;
-	bottom:10%;
 	text-align: center;
-	visibility: hidden;
 }
 
 .svgContainer {
