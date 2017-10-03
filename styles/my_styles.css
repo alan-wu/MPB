@@ -187,7 +187,7 @@ input:checked + .switchSlider:before {
 }
 
 .fullPortDisplay {
-	position:absolute;
+	position:relative;
 	height:100%;
 	width:100%;
 	left:0%;
@@ -247,6 +247,6 @@ img.model {
 }
 
 .svgContainer {
-	max-height:100%;
+	max-height:85%;
 	max-width:100%;
 }
