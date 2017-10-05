@@ -22,7 +22,7 @@ var openModel = function(svgName) {
 }
 
 var runModel = function(source, url) {
-	window.open(url);
+	window.open(url,'_self');
 }
 
 var modelBackGroundChanged = function() {

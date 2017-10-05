@@ -163,7 +163,7 @@ var volumeRenderBackGroundChanged = function() {
 }
 
 
-function volumeRenderInit() {
+function volumeRenderStart(shaderText) {
 
 	guiControls = new function() {
 		this.model = 'collagen';
@@ -238,8 +238,8 @@ function volumeRenderInit() {
 
 
 	materialFirstPass = new THREE.ShaderMaterial( {
-		vertexShader: document.getElementById( 'vertexShaderFirstPass' ).textContent,
-		fragmentShader: document.getElementById( 'fragmentShaderFirstPass' ).textContent,
+		vertexShader: shaderText[0],
+		fragmentShader: shaderText[1],
 		side: THREE.BackSide,
 		uniforms: {	min_x : {type: "1f" , value: guiControls.min_x },
 			max_x : {type: "1f" , value: guiControls.max_x },
@@ -250,8 +250,8 @@ function volumeRenderInit() {
 	} );
 
 	materialSecondPass = new THREE.ShaderMaterial( {
-		vertexShader: document.getElementById( 'vertexShaderSecondPass' ).textContent,
-		fragmentShader: document.getElementById( 'fragmentShaderSecondPass' ).textContent,
+		vertexShader: shaderText[2],
+		fragmentShader: shaderText[3],
 		transparent: true,
 		depthTest: true,
 		side: THREE.FrontSide,
@@ -340,6 +340,16 @@ function volumeRenderInit() {
 	resetSlider();
 	materialSecondPass.visible = false;
 	tissueRenderer.addPreRenderCallbackFunction(renderFirstPass());
+	tissueRenderer.animate();
+}
+
+function volumeRenderInit() {
+	loadExternalFiles(['shaders/tissueShaderFirstPass.vs', 'shaders/tissueShaderFirstPass.fs',
+	                   'shaders/tissueShaderSecondPass.vs', 'shaders/tissueShaderSecondPass.fs'], 
+	                   function (shaderText) {
+							volumeRenderStart(shaderText);
+						}, function (url) {
+						alert('Failed to download "' + url + '"');});
 }
 
 var setTissueTitleString = function(text) {
@@ -356,10 +366,6 @@ function showCollagenVisible(flag) {
 	sphere2.visible = flag;
 	pickerSphere.visible = flag;
 	pickerSphere2.visible = flag;
-}
-
-function volumeRenderAnimate() {
-	tissueRenderer.animate();
 }
 
 var resetTissuePanel = function() {

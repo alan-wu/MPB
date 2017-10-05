@@ -97,7 +97,7 @@
 			}
 			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
 		</style>
-		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link rel="stylesheet" href="styles/bootstrap.min.css">
 	</head>
 
 	<body style="height:100%">
@@ -120,6 +120,8 @@
 			</div>
 		</div>
 
+		<script src="js/dat.gui.js"></script>
+		<link rel="stylesheet" type="text/css" href="styles/dat-gui-swec.css">
 		<script src="js/three.min.js"></script>
 		<script src="js/zinc_threejs_control.js"></script>
 		<script src="js/zinc_3js_renderer.js"></script>
@@ -140,9 +142,110 @@
 			var tiptextElement = document.getElementById('tiptext');
 			var pickerScene = undefined;
 			var displayScene = undefined;
+			
+			var gui;
+			
+			var guiControls = new function() {
+				this.min_x = 0.01;
+				this.max_x = 0.99;
+				this.min_y = 0.01;
+				this.max_y = 0.99;
+				this.min_z = 0.01;
+				this.max_z = 0.99;
+				this.Background = [ 255, 255, 255 ]; // RGB array
+			};
+			
+			var cutUniforms = function() {
+	  			this.value = THREE.UniformsUtils.merge( [
+				{
+					"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
+					"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
+					"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
+					"shininess": { type: "f", value: 100 },
+					"diffuse": { type: "c", value: new THREE.Color( 0xeecaa2 ) },
+					"ambientLightColor": { type: "c", value: new THREE.Color( 0x444444 ) },
+					"directionalLightColor": { type: "c", value: new THREE.Color( 0xBBBBBB ) },
+					"directionalLightDirection": { type: "v3", value: new THREE.Vector3()  },
+					"surfaceAlpha": { type: "f", value: 0.5 },
+					min_x : {type: "1f" , value: guiControls.min_x },
+					max_x : {type: "1f" , value: guiControls.max_x },
+					min_y : {type: "1f" , value: guiControls.min_y },
+					max_y : {type: "1f" , value: guiControls.max_y },
+					min_z : {type: "1f" , value: guiControls.min_z },
+					max_z : {type: "1f" , value: guiControls.max_z }
+				} ] );
+			}
+
+			function updateDatGui()	{
+				for (var i in gui.__controllers) {
+					gui.__controllers[i].updateDisplay();
+				}
+			}
+			
+			var updateUniforms = function() {
+				for (var i = 0; i < shadersMaterialArray.length; i++) {
+					shadersMaterialArray[i].uniforms.min_x.value = guiControls.min_x;
+					shadersMaterialArray[i].uniforms.max_x.value = guiControls.max_x;
+					shadersMaterialArray[i].uniforms.min_y.value = guiControls.min_y;
+					shadersMaterialArray[i].uniforms.max_y.value = guiControls.max_y;
+					shadersMaterialArray[i].uniforms.min_z.value = guiControls.min_z;
+					shadersMaterialArray[i].uniforms.max_z.value = guiControls.max_z;
+				}		
+			}
+			
+			var changeBoundary = function(name) {
+				return function(value) {
+					if (name == "min_x")
+					{
+						if (guiControls.min_x >= guiControls.max_x)
+							guiControls.max_x = guiControls.min_x + 0.01;
+					}
+					if (name == "min_y")
+					{
+						if (guiControls.min_y >= guiControls.max_y)
+							guiControls.max_y = guiControls.min_y + 0.01;
+					}
+					if (name == "min_z")
+					{
+						if (guiControls.min_z >= guiControls.max_z)
+							guiControls.max_z = guiControls.min_z + 0.01;
+					}
+					if (name == "max_x")
+					{
+						if (guiControls.max_x <= guiControls.min_x)
+							guiControls.min_x = guiControls.max_x - 0.01;
+					}
+					if (name == "max_y")
+					{
+						if (guiControls.max_y <= guiControls.min_y)
+							guiControls.min_y = guiControls.max_y - 0.01;
+					}
+					if (name == "max_z")
+					{
+						if (guiControls.max_z <= guiControls.min_z)
+							guiControls.min_z = guiControls.max_z - 0.01;
+					}
+					updateUniforms();		
+					updateDatGui();
+				}
+			}
+			
+					
+			function initGUI() {
+				gui = new dat.GUI();
+				gui.close();
+				var resetSliderButton = { 'Reset':function(){ resetSlider() }};
+				min_x_control = gui.add(guiControls, 'min_x', 0.00, 0.99).step(0.01).onChange(changeBoundary("min_x"));
+				max_x_control = gui.add(guiControls, 'max_x', 0.01, 1.0).step(0.01).onChange(changeBoundary("max_x"));
+				min_y_control = gui.add(guiControls, 'min_y', 0.00, 0.99).step(0.01).onChange(changeBoundary("min_y"));
+				max_y_control = gui.add(guiControls, 'max_y', 0.01, 1.0).step(0.01).onChange(changeBoundary("max_y"));
+				min_z_control = gui.add(guiControls, 'min_z', 0.00, 0.99).step(0.01).onChange(changeBoundary("min_z"));
+				max_z_control = gui.add(guiControls, 'max_z', 0.01, 1.0).step(0.01).onChange(changeBoundary("max_z"));
+				gui.add(resetSliderButton,'Reset');
+			}
 		
 		    function sliderChanged(slideAmount) {
-				pickerScene.setMorphsTime(slideAmount * 30);
+				//pickerScene.setMorphsTime(slideAmount * 30);
 				displayScene.setMorphsTime(slideAmount * 30);
     		}
 
@@ -194,16 +297,15 @@
 													
 			function load() {
 				var scene = zincRenderer.getCurrentScene();
-				scene.loadViewURL("animated/heart_view.json");
-				scene.loadMetadataURL("animated/animated_nerve_1.json");
+				scene.loadViewURL("models/organsViewerModels/cardiovascular/heart/heart_view.json");
+				scene.loadMetadataURL("models/organsViewerModels/cardiovascular/heart/animated_nerve_1.json");
 				displayScene=scene;
 				var directionalLight = zincRenderer.getCurrentScene().directionalLight;
 				directionalLight.intensity = 1.8;
 				pickerScene = zincRenderer.createScene("picker_scene");
-				pickerScene.loadMetadataURL("animated/picking_node_1.json");
+				pickerScene.loadMetadataURL("models/organsViewerModels/cardiovascular/heart/picking_node_1.json");
 				var zincCameraControl = scene.getZincCameraControls();
 				zincCameraControl.enableRaycaster(pickerScene, _pickingCallback(), _hoverCallback());
-				
 			}
 			
 			var triggerAnimation = function() {
@@ -228,23 +330,90 @@
 				zincRenderer.viewAll();
 			}
 			
-			var updateTimeSlider = function() {
+			var shadersMaterialArray = new Array();
+			
+			var updateTimeSliderAndLightDirection = function() {
 				return function() {
+					var directionalLight = zincRenderer.getCurrentScene().directionalLight;
+					for (var i = 0; i < shadersMaterialArray.length; i++) {
+						shadersMaterialArray[i].uniforms["directionalLightDirection"].value.set(directionalLight.position.x,
+							directionalLight.position.y,
+							directionalLight.position.z);
+					}
 					if (zincRenderer.playAnimation == true)
 					{
 						var currentTime = zincRenderer.getCurrentTime();
 						var sliderElement = document.getElementById("slider");
 						var sliderValue = currentTime / 30.0;
 						sliderElement.value = sliderValue;
-						pickerScene.setMorphsTime(currentTime);
+						//pickerScene.setMorphsTime(currentTime);
 					}
 				}	
 			}
 			
-			load();
-			zincRenderer.addPreRenderCallbackFunction(updateTimeSlider());
-			zincRenderer.animate();
+			function meshReady(shaderText) {
+				return function(mygeometry) {
+					if (mygeometry instanceof Zinc.Geometry) {
+						var myUniforms = new cutUniforms();
+						var meshMaterial = new THREE.ShaderMaterial( {
+							vertexShader: shaderText[0],
+							fragmentShader: shaderText[1],
+							transparent: mygeometry.morph.material.transparent,
+							morphTargets: mygeometry.morph.material.morphTargets,
+							uniforms: myUniforms.value
+						} );						
+					
+					
+						meshMaterial.uniforms["diffuse"].value = mygeometry.morph.material.color;
+						meshMaterial.uniforms["surfaceAlpha"].value = mygeometry.morph.material.opacity;
+						meshMaterial.side = THREE.DoubleSide;
+						mygeometry.setMaterial(meshMaterial);
+						shadersMaterialArray.push(meshMaterial);
+					}
+					viewAll();
+					var boundingBox = zincRenderer.getCurrentScene().getBoundingBox();
+					min_x_control.__min = boundingBox.min.x;
+					min_x_control.__max = boundingBox.max.x;
+
+					max_x_control.__min = boundingBox.min.x;
+					max_x_control.__max = boundingBox.max.x;
+					min_y_control.__min = boundingBox.min.y;
+					min_y_control.__max = boundingBox.max.y;
+					max_y_control.__min = boundingBox.min.y;
+					max_y_control.__max = boundingBox.max.y;
+					min_z_control.__min = boundingBox.min.z;
+					min_z_control.__max = boundingBox.max.z;
+					max_z_control.__min = boundingBox.min.z;
+					max_z_control.__max = boundingBox.max.z;
+					guiControls.min_x = min_x_control.__min;
+					guiControls.max_x = max_x_control.__max;
+					guiControls.min_y = min_y_control.__min;
+					guiControls.max_y = max_y_control.__max;
+					guiControls.min_z = min_z_control.__min;
+					guiControls.max_z = max_z_control.__max;														
+					updateUniforms();		
+					updateDatGui();														
+				}
+			}
 			
+			function init3Dmodels() {
+				var scene = zincRenderer.getCurrentScene();
+				displayScene = scene;
+				scene.loadViewURL("models/organsViewerModels/cardiovascular/heart/heart_view.json");
+				loadExternalFiles(['shaders/cutHeart.vs', 'shaders/cutHeart.fs'], function (shaderText) {
+						scene.loadMetadataURL("models/organsViewerModels/cardiovascular/heart/simple_heart_meta.json", meshReady(shaderText));
+					}, function (url) {
+					    alert('Failed to download "' + url + '"');
+				});
+				
+				zincRenderer.setPlayRate(500);
+				zincRenderer.playAnimation = false;
+				zincRenderer.addPreRenderCallbackFunction(updateTimeSliderAndLightDirection());
+				zincRenderer.animate();
+			}
+
+			initGUI();
+			init3Dmodels();		
 
 		</script>
 
