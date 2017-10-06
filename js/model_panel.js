@@ -1,5 +1,6 @@
 var modelGui = undefined;
 var otherModelControls = undefined;
+var runModelURL = undefined;
 
 var modelControl = function() {
 	  this.Background = [ 255, 255, 255 ]; // RGB array
@@ -12,17 +13,21 @@ var openModel = function(svgName) {
 	if (svgName == "Myocyte_v4_Grouped_v4.svg") {
 		svgObject.onload = function() {
 			svgLoaded();
+			runModelURL = 'https://models.cellml.org/workspace/noble_1962/rawfile/c70f8962407db00673f1fdcac9f35a2593781c17/noble_1962.sedml';
 		}
 	} else {
 		svgObject.onload = undefined;
+		runModelURL = 'https://models.physiomeproject.org/workspace/4ac/rawfile/99f626ad282c900cf3665f2119ab70f61ec2ba3c/Circulation_Model.sedml';
 	}
 	
 	svgObject.setAttribute('data', svgFullName );
 	document.getElementById("modelsContainer").style.visibility = "visible";
 }
 
-var runModel = function(source, url) {
-	window.open(url,'_self');
+var runModel = function(source) {
+	var opencorURL = 'opencor://openFile/' + runModelURL;
+	
+	window.open(opencorURL, '_self');
 }
 
 var modelBackGroundChanged = function() {
