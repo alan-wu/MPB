@@ -267,3 +267,40 @@ img.model {
 	max-height:unset;
 	max-width:unset;
 }
+
+#systemToggle {
+	position:absolute;
+	top:20%;
+	left:5%;
+}
+
+.systemToggleButton {
+	text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+	width:45px;
+	height:45px;
+	color:#fff!important;
+}
+
+.systemToggleButtonOn {
+	border-color: #00ff00;
+}
+
+.systemToggleButtonOff {
+	border-color: #ff0000;
+}
+
+.systemToggleButtonPartial {
+	border-color: #0000ff;
+}
+
+.systemToggleButtonOn:hover {
+	background-color: RED !important;
+}
+
+.systemToggleButtonPartial:hover {
+	background-color: GREEN !important;
+}
+
+.systemToggleButtonOff:hover {
+	background-color: GREEN !important;
+}

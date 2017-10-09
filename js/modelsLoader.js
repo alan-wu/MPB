@@ -27,7 +27,6 @@ var setGeometryColour = function(geometry, systemName, partName) {
 	}
 }
 
-
 var readMetaFile = function(systemName, partMap) {
 	systemMeta[systemName] = partMap;
 	readBodyRenderModel(systemName, partMap);
@@ -41,7 +40,7 @@ var loadSystemMetaURL = function(url) {
 	        readMetaFile(metadata["System"], metadata["Part"]);
 	    }
 	}
-	var requestURL = bodyDirectoryPrefix + "/" + url;
+	var requestURL = url;
 	xmlhttp.open("GET", requestURL, true);
 	xmlhttp.send();	
 }

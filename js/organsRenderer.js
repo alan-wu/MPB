@@ -85,7 +85,7 @@ var _pickingCallback = function() {
 				setTissueTitleString(tissueTitle);
 				document.getElementById("cellButtonContainer").style.visibility = "visible";
 				showCollagenVisible(true);
-			} else if (displayScene.sceneName.includes("Cardiovascular/")) {
+			} else if (displayScene.sceneName.includes("Cardiovascular/Arterial")) {
 				setToolTipText("Click to show vascular model");
 				showTooltip(window_x, window_y);
 				resetTissuePanel();
@@ -238,7 +238,7 @@ function loadOrgans(systemName, partName) {
 				}
 			} else {
 				organScene.loadViewURL(bodyDirectoryPrefix + "/body_view.json");
-				var downloadPath = bodyDirectoryPrefix + "/" + metaItem["BodyURL"];
+				var downloadPath = metaItem["BodyURL"];
 				if (item["FileFormat"] == "JSON")
 					organScene.loadMetadataURL(downloadPath, _addOrganPartCallback(systemName, partName, false));
 				else if (item["FileFormat"] == "STL")

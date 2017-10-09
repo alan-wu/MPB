@@ -13,7 +13,7 @@ systemGuiFolder["Digestive"] = undefined;
 systemGuiFolder["Skin (integument)"] = undefined;
 systemGuiFolder["Urinary"] = undefined;
 systemGuiFolder["Brain & Central Nervous"] = undefined;
-systemGuiFolder["Lymphoid"] = undefined;
+systemGuiFolder["Immunological"] = undefined;
 systemGuiFolder["Endocrine"] = undefined;
 systemGuiFolder["Female Reproductive"] = undefined;
 systemGuiFolder["Male Reproductive"] = undefined;
@@ -27,7 +27,7 @@ systemPartsGuiControls["Digestive"] = function() {};
 systemPartsGuiControls["Skin (integument)"] = function() {};
 systemPartsGuiControls["Urinary"] = function() {};
 systemPartsGuiControls["Brain & Central Nervous"] = function() {};
-systemPartsGuiControls["Lymphoid"] = function() {};
+systemPartsGuiControls["Immunological"] = function() {};
 systemPartsGuiControls["Endocrine"] = function() {};
 systemPartsGuiControls["Female Reproductive"] = function() {};
 systemPartsGuiControls["Male Reproductive"] = function() {};
@@ -158,18 +158,31 @@ var changeBodyPartsVisibility = function(name, systemName) {
 		if (systemMeta[systemName].hasOwnProperty(name) && systemMeta[systemName][name].geometry) {
 			systemMeta[systemName][name].geometry.setVisibility(value);
 		}
+		var isPartial = false;
 		if (value == false) {
 			systemPartsGuiControls[systemName].All = false;
+			for (var partName in systemPartsGuiControls[systemName]) {
+				if (partName != "All" && systemPartsGuiControls[systemName].hasOwnProperty(partName)) {
+					if (systemPartsGuiControls[systemName][partName] == true) {
+						isPartial = true;
+						break;
+					}
+				}
+			}
+			updateSystemButtons(systemName, false, isPartial);
 		} else {
 			readModel(systemName, name, false);
 			for (var partName in systemPartsGuiControls[systemName]) {
 				if (partName != "All" && systemPartsGuiControls[systemName].hasOwnProperty(partName)) {
-					if (systemPartsGuiControls[systemName][partName] == false)
+					if (systemPartsGuiControls[systemName][partName] == false) {
+						updateSystemButtons(systemName, false, true);
 						return;
+					}
 				}
 			}
 			systemPartsGuiControls[systemName].All = true;
 		}
+		updateSystemButtons(systemName, systemPartsGuiControls[systemName].All, isPartial);
 		for (var i = 0; i < systemGuiFolder[systemName].__controllers.length; i++) {
 			if (systemGuiFolder[systemName].__controllers[i].property == "All") {
 				systemGuiFolder[systemName].__controllers[i].updateDisplay();
@@ -181,29 +194,45 @@ var changeBodyPartsVisibility = function(name, systemName) {
 	}
 }
 
-var toggleSystem = function(systemName) {
-	return function(value) { 
-		for (var partName in systemPartsGuiControls[systemName]) {
-			if (partName != "All" && systemPartsGuiControls[systemName].hasOwnProperty(partName)) {
-				if (systemPartsGuiControls[systemName][partName] != value) {
-					if (systemMeta[systemName].hasOwnProperty(partName)) {
-						systemPartsGuiControls[systemName][partName] = value;
-						if (systemMeta[systemName][partName].geometry)
-							systemMeta[systemName][partName].geometry.setVisibility(value);
-						if (value == true) {
-							readModel(systemName, partName, false);
-						}
+var updateSystemButtons = function(systemName, value, isPartial) {
+	var element = document.getElementById(systemName);
+	if (value == true)
+		element.className = "w3-circle systemToggleButton systemToggleButtonOn";
+	else {
+		if (isPartial)
+			element.className = "w3-circle systemToggleButton systemToggleButtonPartial";
+		else
+			element.className = "w3-circle systemToggleButton systemToggleButtonOff";
+	}
+}
+
+var toggleSystem = function(systemName, value) {
+	systemPartsGuiControls[systemName]["All"] = value;
+	for (var partName in systemPartsGuiControls[systemName]) {
+		if (partName != "All" && systemPartsGuiControls[systemName].hasOwnProperty(partName)) {
+			if (systemPartsGuiControls[systemName][partName] != value) {
+				if (systemMeta[systemName].hasOwnProperty(partName)) {
+					systemPartsGuiControls[systemName][partName] = value;
+					if (systemMeta[systemName][partName].geometry)
+						systemMeta[systemName][partName].geometry.setVisibility(value);
+					if (value == true) {
+						readModel(systemName, partName, false);
 					}
 				}
 			}
 		}
-		for (var i = 0; i < systemGuiFolder[systemName].__controllers.length; i++) {
-			if (systemGuiFolder[systemName].__controllers[i].property != "All") {
-				systemGuiFolder[systemName].__controllers[i].updateDisplay();
-				systemGuiFolder[systemName].__controllers[i].__prev = 
-					systemGuiFolder[systemName].__controllers[i].__checkbox.checked;
-			}
-		}
+	}
+	for (var i = 0; i < systemGuiFolder[systemName].__controllers.length; i++) {
+		systemGuiFolder[systemName].__controllers[i].updateDisplay();
+		systemGuiFolder[systemName].__controllers[i].__prev = 
+			systemGuiFolder[systemName].__controllers[i].__checkbox.checked;
+	}
+	updateSystemButtons(systemName, value, false);
+}
+
+var toggleSystemCallback = function(systemName) {
+	return function(value) { 
+		toggleSystem(systemName, value);
 	}
 }
 
@@ -214,22 +243,34 @@ var _addSystemPartGuiControl = function(systemName, partName, item, geometry, vi
 			if (!systemGuiFolder[systemName].hasOwnProperty(partName)) {
 				systemPartsGuiControls[systemName][partName] = visible;
 				systemGuiFolder[systemName].add(systemPartsGuiControls[systemName], partName).onChange(changeBodyPartsVisibility(partName, systemName));
-				if (visible == false) {
-					if (systemPartsGuiControls[systemName]["All"] != false) {
-						systemPartsGuiControls[systemName]["All"] = false;
-						for (var i = 0; i < systemGuiFolder[systemName].__controllers.length; i++) {
-							if (systemGuiFolder[systemName].__controllers[i].property == "All") {
-								systemGuiFolder[systemName].__controllers[i].updateDisplay();
-								systemGuiFolder[systemName].__controllers[i].__prev = 
-									systemGuiFolder[systemName].__controllers[i].__checkbox.checked;
+				if (visible == true) {
+					for (var partName in systemPartsGuiControls[systemName]) {
+						if (partName != "All" && systemPartsGuiControls[systemName].hasOwnProperty(partName)) {
+							if (systemPartsGuiControls[systemName][partName] == false) {
+								updateSystemButtons(systemName, false, true);
 								return;
 							}
+						}
+					}
+					systemPartsGuiControls[systemName].All = true;
+					updateSystemButtons(systemName, true, false);
+					for (var i = 0; i < systemGuiFolder[systemName].__controllers.length; i++) {
+						if (systemGuiFolder[systemName].__controllers[i].property == "All") {
+							systemGuiFolder[systemName].__controllers[i].updateDisplay();
+							systemGuiFolder[systemName].__controllers[i].__prev = 
+								systemGuiFolder[systemName].__controllers[i].__checkbox.checked;
+							return;
 						}
 					}
 				}
 			}
 		}
 	}
+}
+
+var systemButtonPress = function(receivedElement) {
+	var systemName = receivedElement.id;
+	toggleSystem(systemName, !(systemPartsGuiControls[systemName]["All"]));
 }
 
 var _transformBodyPart = function(key, geometry) {
@@ -267,8 +308,8 @@ var addSystemFolder = function() {
 		if (systemGuiFolder.hasOwnProperty(key) && systemPartsGuiControls.hasOwnProperty(key)) {
 			systemGuiFolder[key] = bodyGui.addFolder(key);
 			systemGuiFolder[key].close();
-			systemPartsGuiControls[key]["All"] = true;
-			systemGuiFolder[key].add(systemPartsGuiControls[key], "All").onChange(toggleSystem(key));
+			systemPartsGuiControls[key]["All"] = false;
+			systemGuiFolder[key].add(systemPartsGuiControls[key], "All").onChange(toggleSystemCallback(key));
 		}
 	}
 }
@@ -311,7 +352,7 @@ function initialiseBodyPanel() {
 var readModel = function(systemName, partName, startup) {
 	item = systemMeta[systemName][partName];
 	if (item["loaded"] == ITEM_LOADED.FALSE) {
-		var downloadPath = bodyDirectoryPrefix + "/" + item["BodyURL"];
+		var downloadPath = item["BodyURL"];
 		var scaling = false;
 		item["loaded"] = ITEM_LOADED.DOWNLOADING;
 		if (item["FileFormat"] == "JSON") {
@@ -329,7 +370,7 @@ var readModel = function(systemName, partName, startup) {
 var readBodyRenderModel = function(systemName, partMap) {
 	for (var partName in partMap) {
 		if (partMap.hasOwnProperty(partName)) {
-			var item = partMap[partName]; 
+			var item = partMap[partName]; toggleSystem
 			item["loaded"] = ITEM_LOADED.FALSE;
 			if (item["loadAtStartup"] == true) {
 				readModel(systemName, partName, true);
