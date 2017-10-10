@@ -75,14 +75,12 @@ var hideBodyTooltip = function() {
 	tiptextElement.style.opacity = 0;
 }
 
-
 var _pickingBodyCallback = function() {
 	return function(intersects, window_x, window_y) {
 		var bodyClicked = false;
 		for (var i = 0; i < intersects.length; i++) {
 			if (intersects[i] !== undefined && (intersects[ i ].object.name !== undefined)) {
 				if (!intersects[ i ].object.name.includes("Body")) {
-					console.log(intersects[ i ].object.userData[0], intersects[ i ].object.name);
 					loadOrgans(intersects[ i ].object.userData[0], intersects[ i ].object.name);
 					if (currentSelectedMaterial && currentSelectedMaterial != intersects[ i ].object.material) {
 						if (currentSelectedMaterial == currentHoveredMaterial)

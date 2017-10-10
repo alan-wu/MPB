@@ -239,11 +239,13 @@ function loadOrgans(systemName, partName) {
 			} else {
 				organScene.loadViewURL(bodyDirectoryPrefix + "/body_view.json");
 				var downloadPath = metaItem["BodyURL"];
-				if (item["FileFormat"] == "JSON")
+				if (metaItem["FileFormat"] == "JSON") {
+
 					organScene.loadMetadataURL(downloadPath, _addOrganPartCallback(systemName, partName, false));
-				else if (item["FileFormat"] == "STL")
+				}
+				else if (metaItem["FileFormat"] == "STL")
 					organScene.loadSTL(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
-				else if (item["FileFormat"] == "OBJ") 
+				else if (metaItem["FileFormat"] == "OBJ") 
 					organScene.loadOBJ(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
 				zincRenderer.setCurrentScene(organScene);
 				var zincCameraControl = organScene.getZincCameraControls();
