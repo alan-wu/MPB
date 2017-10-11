@@ -20,11 +20,24 @@ var organsFileMap = new Array();
 
 organsFileMap["Cardiovascular"] = new Array();
 organsFileMap["Respiratory"] = new Array();
-
 organsFileMap["Cardiovascular"]["Heart"] = {
 		view: "cardiovascular/heart/heart_view.json",
 		meta: "cardiovascular/heart/animated_nerve_1.json",
 		picker: "cardiovascular/heart/picking_node_1.json"};
+organsFileMap["Cardiovascular"]["Aorta"] = {
+		view: undefined,
+		meta: "cardiovascular/arteries/arteries_1.json",
+		picker: undefined,
+		sceneName: "Cardiovascular/Arterial System",
+		data: [{SystemName: "Cardiovascular", PartName: "Aorta"},
+		       {SystemName: "Cardiovascular", PartName: "Left Upper Limb"},
+		       {SystemName: "Cardiovascular", PartName: "Left Lower Limb"},
+		       {SystemName: "Cardiovascular", PartName: "Right Upper Limb"},
+		       {SystemName: "Cardiovascular", PartName: "Right Lower Limb"}]};
+organsFileMap["Cardiovascular"]["Left Upper Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
+organsFileMap["Cardiovascular"]["Left Lower Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
+organsFileMap["Cardiovascular"]["Right Upper Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
+organsFileMap["Cardiovascular"]["Right Lower Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
 organsFileMap["Respiratory"]["Lungs"] = {
 		view: "respiratory/lungs_view.json",
 		meta: "respiratory/lungs_1.json",
@@ -129,7 +142,7 @@ function updateOrganPartsVisibilty(name, flag) {
 var changeOrganPartsVisibility = function(name) {
 	return function(value) {
 		displayScene.forEachGeometry(updateOrganPartsVisibilty(name, value));
-		displayScene.forEachGlyphset(updateOrganPartsVisibilty(name, value));
+		displayScene.forEachGlyphset(updateOrganPartsVisibilty(name, value));Left
 		if (pickerScene) {
 			pickerScene.forEachGeometry(updateOrganPartsVisibilty(name, value))
 			pickerScene.forEachGlyphset(updateOrganPartsVisibilty(name, value));
@@ -141,7 +154,7 @@ var organsBackGroundChanged = function() {
 	return function(value) {
 		var redValue = parseInt(value[0]);
 		var greenValue = parseInt(value[1]);
-		var blueValue = parseInt(value[2]);
+		var blueValue = parseInt(value[2]);Left
 		
 		var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
 		//document.getElementById("mainBody").style.backgroundColor = backgroundColourString;
@@ -213,6 +226,9 @@ function loadOrgans(systemName, partName) {
 	if (systemName && partName) {
 		var metaItem = systemMeta[systemName][partName];
 		var name = systemName + "/" + partName;
+		var organsDetails = getOrganDetails(systemName, partName);
+		if (organsDetails !== undefined && organsDetails.sceneName !== undefined)
+			name = organsDetails.sceneName;
 		var organScene = zincRenderer.getSceneByName(name);
 		if (organScene == undefined) {
 			resetOrganSpecificGui();
@@ -220,7 +236,6 @@ function loadOrgans(systemName, partName) {
 			displayScene = organScene;
 			var directionalLight = organScene.directionalLight;
 			directionalLight.intensity = 1.4;
-			var organsDetails = getOrganDetails(systemName, partName);
 			if (organsDetails != undefined) {
 				if (organsDetails.view !== undefined)
 					organScene.loadViewURL(organsDirectoryPrefix + "/" + organsDetails.view);
