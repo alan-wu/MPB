@@ -249,7 +249,7 @@ img.model {
 #modelsContainer {
 	text-align:center;
 	width:100%;
-	height:85%;
+	height:75%;
 	right:0%;
 	bottom:1%;
 	visibility: hidden;
@@ -259,13 +259,21 @@ img.model {
 }
 
 .svgContainer {
-	max-height:85%;
-	max-width:100%;
+	height:90%;
+	width:100%;
 }
 
 .fullPortDisplay .svgContainer {
-	max-height:unset;
-	max-width:unset;
+	height:90%;
+	width:100%;
+}
+
+#ZoomControl{
+	visibility: hidden;
+}
+
+.fullPortDisplay #ZoomControl{
+	visibility: visible;
 }
 
 #systemToggle {

@@ -163,11 +163,17 @@
 						<p style="text-align: center;">&nbsp;</p>
 					</div>
 				</div>
-
+				<div id="modelsController" style="position:relative;text-align:center;visibility:hidden;">
+						<input class="modelButton" type="button" onclick="runModel(this)" value="Run Simulation"></input>
+						<p style="text-align: center;">&nbsp;</p>
+						<div id="ZoomControl">
+						<input id="svgZoomOut" title="Zoom Out" class="w3-circle w3-white w3-hover-white" style="width:30px;height:30px;" type="button" value="-" onclick="svgZoomOut();">
+						<input  title="Reset" class="w3-circle w3-white w3-hover-white" style="height:30px;" type="button" value="Reset" onclick="resetZoom();">
+						<input id="svgZoomIn" title="Zoom In" class="w3-circle w3-white w3-hover-white" style="width:30px;height:30px;" type="button" value="+"  onclick="svgZoomIn();">
+						</div>
+				</div>
+				<p style="text-align: center;">&nbsp;</p>
 				<div id="modelsContainer">
-					<input class="modelButton" type="button" onclick="runModel(this)" value="Run Simulation"></input>
-					<p style="text-align: center;">&nbsp;</p>
-					<p style="text-align: center;">&nbsp;</p>
 					<object class="svgContainer" id="testsvg" align="middle" type="image/svg+xml">SVGs not loaded yet.</object>
 				<!--
 					<p style="text-align: center;">&nbsp;</p>

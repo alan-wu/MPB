@@ -35,8 +35,38 @@ var svgElementIdToggle = function(svgElementId, id) {
 	  }
 }
 
+var currentZoom = 1.0;
+
+var svgZoom = function() {
+	 var object = document.getElementById("testsvg");
+	 var heightZoom = 90 *currentZoom;
+	 var widthZoom = 100 *currentZoom;
+	 var heightString = heightZoom + "%";
+	 var widthString = widthZoom + "%";
+	 object.style.height = heightString;
+	 object.style.width = widthString;
+}
+
+var svgZoomIn = function() {
+	currentZoom = currentZoom + 0.25;
+	svgZoom();
+}
+
+var svgZoomOut = function() {
+	currentZoom = currentZoom - 0.25;
+	svgZoom();
+}
+
+var resetZoom = function() {
+	currentZoom = 1.0;
+	var object = document.getElementById("testsvg");
+	object.style.height = "90%";
+	object.style.width = "100%";
+}
+
 var expandSVGCollapse = function(source, portName) {
 	expandCollapse(source, portName);
+	resetZoom();
 	for (var key in svgLayoutCallbacksElement) {
 		if (svgLayoutCallbacksElement.hasOwnProperty(key)) {
 			svgElementIdToggle("testsvg",key);

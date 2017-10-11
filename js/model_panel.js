@@ -21,6 +21,7 @@ var openModel = function(svgName) {
 	}
 	
 	svgObject.setAttribute('data', svgFullName );
+	document.getElementById("modelsController").style.visibility = "visible";
 	document.getElementById("modelsContainer").style.visibility = "visible";
 }
 
