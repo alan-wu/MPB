@@ -4,17 +4,20 @@ var defaultScene = undefined;
 var windowWidth, windowHeight;
 var organGui;
 var organGuiControls = new function() {
-	this.Time = 0.1;
+	this.Time = 0.0;
+	this.Speed = 500;
 };
+var associateData = undefined;
+var dataFields = undefined;
+
 var organPartsGui;
 var organPartGuiControls = function() {
 };
 var timeSlider = undefined;
-
+var speedSlider = undefined;
 var organsControl = function() {
 	  this.Background = [ 255, 255, 255 ]; // RGB array
 };
-
 
 var organsFileMap = new Array();
 
@@ -23,17 +26,38 @@ organsFileMap["Respiratory"] = new Array();
 organsFileMap["Cardiovascular"]["Heart"] = {
 		view: "cardiovascular/heart/heart_view.json",
 		meta: "cardiovascular/heart/animated_nerve_1.json",
-		picker: "cardiovascular/heart/picking_node_1.json"};
+		picker: "cardiovascular/heart/picking_node_1.json",
+		associateData: undefined};
+organsFileMap["Cardiovascular"]["Arterial Flow"] = {
+		view: undefined,
+		meta: "cardiovascular/arteries/arterial_flow_1.json",
+		picker: undefined,
+		associateData: undefined};
+organsFileMap["Cardiovascular"]["Arterial Pressure"] = {
+		view: undefined,
+		meta: "cardiovascular/arteries/arterial_pressure_1.json",
+		picker: undefined,
+		associateData: undefined};
+organsFileMap["Cardiovascular"]["Arterial Velocity"] = {
+		view: undefined,
+		meta: "cardiovascular/arteries/arterial_velocity_1.json",
+		picker: undefined,
+		associateData: undefined};
 organsFileMap["Cardiovascular"]["Aorta"] = {
 		view: undefined,
 		meta: "cardiovascular/arteries/arteries_1.json",
 		picker: undefined,
 		sceneName: "Cardiovascular/Arterial System",
-		data: [{SystemName: "Cardiovascular", PartName: "Aorta"},
+		associateData: [{SystemName: "Cardiovascular", PartName: "Aorta"},
 		       {SystemName: "Cardiovascular", PartName: "Left Upper Limb"},
 		       {SystemName: "Cardiovascular", PartName: "Left Lower Limb"},
 		       {SystemName: "Cardiovascular", PartName: "Right Upper Limb"},
-		       {SystemName: "Cardiovascular", PartName: "Right Lower Limb"}]};
+		       {SystemName: "Cardiovascular", PartName: "Right Lower Limb"}],
+		 fields: [{SystemName: "Cardiovascular", PartName: "Arterial Flow"},
+		          {SystemName: "Cardiovascular", PartName: "Arterial Pressure"},
+		          {SystemName: "Cardiovascular", PartName: "Arterial Velocity"}]};
+organsFileMap["Cardiovascular"]
+
 organsFileMap["Cardiovascular"]["Left Upper Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
 organsFileMap["Cardiovascular"]["Left Lower Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
 organsFileMap["Cardiovascular"]["Right Upper Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
@@ -41,7 +65,8 @@ organsFileMap["Cardiovascular"]["Right Lower Limb"] = organsFileMap["Cardiovascu
 organsFileMap["Respiratory"]["Lungs"] = {
 		view: "respiratory/lungs_view.json",
 		meta: "respiratory/lungs_1.json",
-		picker: undefined};
+		picker: undefined,
+		associateData: undefined};
 
 function getPos(el) {
     for (var lx=0, ly=0;
@@ -50,13 +75,40 @@ function getPos(el) {
 	return {x: lx,y: ly};
 }
 
-var sliderChanged = function() {
+var timeSliderChanged = function() {
 	return function(value) {
 		if (pickerScene)
 			pickerScene.setMorphsTime(value * 30);
 		if (displayScene)
 			displayScene.setMorphsTime(value * 30);
 	}
+}
+
+var updateTimeSlider = function() {
+	var currentTime = zincRenderer.getCurrentTime();
+	var sliderValue = currentTime / 30.0;
+	organGuiControls.Time = sliderValue;
+	if (pickerScene)
+		pickerScene.setMorphsTime(currentTime);
+	timeSlider.updateDisplay();	
+}
+
+var updateTimeSliderCallback = function() {
+	return function() {
+		updateTimeSlider();
+	}	
+}
+
+var speedSliderChanged = function() {
+	return function(value) {
+		zincRenderer.setPlayRate(value);
+	}
+}
+
+var updateSpeedSlider = function() {
+	var playRate = zincRenderer.getPlayRate();
+	organGuiControls.Speed = playRate;
+	speedSlider.updateDisplay();	
 }
 
 var setOrgansString = function(name) {
@@ -118,7 +170,7 @@ var _hoverCallback = function() {
 				currentHoverId = id;
 				document.getElementById("organsDisplayArea").style.cursor = "pointer";
 				showTooltip(window_x, window_y);
-			} else if (displayScene.sceneName.includes("Cardiovascular/")) {
+			} else if (displayScene.sceneName.includes("Cardiovascular/Arterial")) {
 				document.getElementById("organsDisplayArea").style.cursor = "pointer";
 				setToolTipText("Click to show vascular model");
 				showTooltip(window_x, window_y);
@@ -134,18 +186,51 @@ var _hoverCallback = function() {
 function updateOrganPartsVisibilty(name, flag) {
 	return function(zincGeometry) {
 		if (zincGeometry.groupName && zincGeometry.groupName == name) {
+			
 			zincGeometry.setVisibility(flag);
 		}
 	}
 }
 
-var changeOrganPartsVisibility = function(name) {
+var changeOrganPartsVisibility = function(name, value) {
+	displayScene.forEachGeometry(updateOrganPartsVisibilty(name, value));
+	displayScene.forEachGlyphset(updateOrganPartsVisibilty(name, value));
+	if (pickerScene) {
+		pickerScene.forEachGeometry(updateOrganPartsVisibilty(name, value))
+		pickerScene.forEachGlyphset(updateOrganPartsVisibilty(name, value));
+	}
+}
+
+var changeOrganPartsVisibilityCallback = function(name) {
 	return function(value) {
-		displayScene.forEachGeometry(updateOrganPartsVisibilty(name, value));
-		displayScene.forEachGlyphset(updateOrganPartsVisibilty(name, value));Left
-		if (pickerScene) {
-			pickerScene.forEachGeometry(updateOrganPartsVisibilty(name, value))
-			pickerScene.forEachGlyphset(updateOrganPartsVisibilty(name, value));
+		changeOrganPartsVisibility(name, value);
+	}
+}
+
+var _addDataGeometryCallback = function() {
+	return function(geometry) {
+		geometry.groupName = "Data Geometry";
+		geometry.morph.material.color = new THREE.Color("#0099ff");
+	}
+}
+
+var changeDataGeometryVisibility = function() {
+	return function(value) {
+		if ((displayScene.findGeometriesWithGroupName("Data Geometry").length > 0) ||
+				(displayScene.findGlyphsetsWithGroupName("Data Geometry").length > 0)) {
+			changeOrganPartsVisibility("Data Geometry", value);
+		} else {
+			for ( var i = 0; i < associateData.length; i ++ ) {
+				var metaItem = systemMeta[associateData[i].SystemName][associateData[i].PartName];
+				var downloadPath = metaItem["BodyURL"];
+				console.log(downloadPath);
+				if (metaItem["FileFormat"] == "JSON")
+					displayScene.loadMetadataURL(downloadPath, _addDataGeometryallback());
+				else if (metaItem["FileFormat"] == "STL")
+					displayScene.loadSTL(downloadPath, "Data Geometry", _addDataGeometryCallback());
+				else if (metaItem["FileFormat"] == "OBJ") 
+					displayScene.loadOBJ(downloadPath, "Data Geometry", _addDataGeometryCallback());
+			}
 		}
 	}
 }
@@ -176,10 +261,12 @@ function initialiseOrgansVisualisation() {
 	var customContainer = document.getElementById("organGui").append(organGui.domElement);
 	var resetViewButton = { 'Reset View':function(){ zincRenderer.resetView() }};
 	var playButton = { 'Play/Pause':function(){ triggerAnimation() }};
-	timeSlider = organGui.add(organGuiControls, 'Time', 0.0, 100.0).step(0.1).onChange(sliderChanged());
 	organGuiControls.Time = 0.0;
-	organGui.add(resetViewButton, 'Reset View');
+	organGuiControls.Speed = 500.0;
+	timeSlider = organGui.add(organGuiControls, 'Time', 0.0, 100.0).step(0.1).onChange(timeSliderChanged());
 	organGui.add(playButton, 'Play/Pause');
+	speedSlider = organGui.add(organGuiControls, 'Speed', 0, 5000).step(50).onChange(speedSliderChanged());
+	organGui.add(resetViewButton, 'Reset View');
 	organPartsGui = organGui.addFolder('Visibility Control');
 	organPartsGui.open();
 }
@@ -197,7 +284,7 @@ var _addOrganPartCallback = function(systemName, partName, useDefautColour) {
 		if (geometry.groupName) {
 			if (!organPartGuiControls.hasOwnProperty(geometry.groupName)) {
 				organPartGuiControls[geometry.groupName] = true;
-				organPartsGui.add(organPartGuiControls, geometry.groupName).onChange(changeOrganPartsVisibility(geometry.groupName));
+				organPartsGui.add(organPartGuiControls, geometry.groupName).onChange(changeOrganPartsVisibilityCallback(geometry.groupName));
 			}
 			if (useDefautColour)
 				setGeometryColour(geometry, systemName, partName);
@@ -214,12 +301,48 @@ var _addOrganPartCallback = function(systemName, partName, useDefautColour) {
 	}
 }
 
+var toggleFieldVisibility = function(dataFields) {
+	return function(value) {
+		for ( var i = 0; i < dataFields.length; i ++ ) {
+			if (value != i) {
+				var geometryName = dataFields[i].PartName;
+				changeOrganPartsVisibility(geometryName, false);
+			}
+		}
+		if (value > -1) {
+			var partName = dataFields[value].PartName;
+			if ((displayScene.findGeometriesWithGroupName(partName).length > 0) ||
+				(displayScene.findGlyphsetsWithGroupName(partName).length > 0)) {
+				changeOrganPartsVisibility(partName, true);
+			} else {
+				var partDetails = getOrganDetails(dataFields[value].SystemName, partName);
+				if (partDetails != undefined) {
+					displayScene.loadMetadataURL(organsDirectoryPrefix + "/" + partDetails.meta);
+				}
+			}
+		}
+	}
+}
+
 var resetOrganSpecificGui = function() {
 	organPartGuiControls = function() {
 	};
 	organGui.removeFolder('Visibility Control');
 	organPartsGui = organGui.addFolder('Visibility Control');
 	organPartsGui.open();
+	if (associateData) {
+		organPartGuiControls["Data Geometry"] = false;
+		organPartsGui.add(organPartGuiControls, "Data Geometry").onChange(changeDataGeometryVisibility("Data Geometry"));
+	}
+	if (dataFields) {
+		organPartGuiControls.Field = -1;
+		var fieldPairs = {};
+		fieldPairs["None"] = -1
+		for ( var i = 0; i < dataFields.length; i ++ ) {
+			fieldPairs[dataFields[i].PartName] = i; 
+		}
+		organGui.add(organPartGuiControls, 'Field', fieldPairs ).onChange(toggleFieldVisibility(dataFields));
+	}
 }
 
 function loadOrgans(systemName, partName) {
@@ -227,8 +350,15 @@ function loadOrgans(systemName, partName) {
 		var metaItem = systemMeta[systemName][partName];
 		var name = systemName + "/" + partName;
 		var organsDetails = getOrganDetails(systemName, partName);
-		if (organsDetails !== undefined && organsDetails.sceneName !== undefined)
-			name = organsDetails.sceneName;
+		associateData = undefined;
+		dataFields = undefined;
+		if (organsDetails !== undefined){
+			if (organsDetails.sceneName !== undefined)
+				name = organsDetails.sceneName;
+			associateData = organsDetails.associateData;
+			if (organsDetails.fields)
+				dataFields = organsDetails.fields;
+		}
 		var organScene = zincRenderer.getSceneByName(name);
 		if (organScene == undefined) {
 			resetOrganSpecificGui();
@@ -244,18 +374,19 @@ function loadOrgans(systemName, partName) {
 				}
 				organScene.loadMetadataURL(organsDirectoryPrefix + "/" + organsDetails.meta, 
 					_addOrganPartCallback(systemName, partName, false));
+				var zincCameraControl = organScene.getZincCameraControls();
 				if (organsDetails.picker != undefined) {
 					var pickerSceneName = name + "_picker_scene";
 					pickerScene = zincRenderer.createScene(pickerSceneName);
 					pickerScene.loadMetadataURL(organsDirectoryPrefix + "/" + organsDetails.picker);
-					var zincCameraControl = organScene.getZincCameraControls();
 					zincCameraControl.enableRaycaster(pickerScene, _pickingCallback(), _hoverCallback());
+				} else {
+					zincCameraControl.enableRaycaster(organScene, _pickingCallback(), _hoverCallback());
 				}
 			} else {
 				organScene.loadViewURL(bodyDirectoryPrefix + "/body_view.json");
 				var downloadPath = metaItem["BodyURL"];
 				if (metaItem["FileFormat"] == "JSON") {
-
 					organScene.loadMetadataURL(downloadPath, _addOrganPartCallback(systemName, partName, false));
 				}
 				else if (metaItem["FileFormat"] == "STL")
@@ -279,6 +410,8 @@ function loadOrgans(systemName, partName) {
 			displayScene.forEachGlyphset(_addOrganPartCallback());
 		}
 		setOrgansString(name);
+		updateTimeSlider();
+		updateSpeedSlider();
 	}
 }
 
@@ -319,16 +452,3 @@ function viewAll()
 	zincRenderer.viewAll();
 }
 
-
-var updateTimeSlider = function() {
-	return function() {
-		if (zincRenderer.playAnimation == true)	{
-			var currentTime = zincRenderer.getCurrentTime();
-			var sliderValue = currentTime / 30.0;
-			organGuiControls.Time = sliderValue;
-			if (pickerScene)
-				pickerScene.setMorphsTime(currentTime);
-			timeSlider.updateDisplay();
-		}
-	}	
-}

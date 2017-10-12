@@ -803,6 +803,26 @@ Zinc.Scene = function ( containerIn, rendererIn) {
 		}
 	}
 	
+	this.findGeometriesWithGroupName = function(GroupName) {
+		var geometriesArray = [];
+		for ( var i = 0; i < zincGeometries.length; i ++ ) {
+			if (zincGeometries[i].groupName == GroupName) {
+				geometriesArray.push(zincGeometries[i]);
+			}
+		}
+		return geometriesArray;
+	}
+	
+	this.findGlyphsetsWithGroupName = function(GroupName) {
+		var glyphsetsArray = [];
+		for ( var i = 0; i < zincGlyphsets.length; i ++ ) {
+			if (zincGlyphsets[i].groupName == GroupName) {
+				glyphsetsArray.push(zincGlyphsets[i]);
+			}
+		}
+		return glyphsetsArray;
+	}
+	
 	var loadGlyphset = function(glyphsetData, glyphurl, groupName, finishCallback)
 	{
 		var newGlyphset = new Zinc.Glyphset();
@@ -1371,6 +1391,10 @@ Zinc.Renderer = function (containerIn, window) {
 		if (id in preRenderCallbackFunctions) {
    			delete preRenderCallbackFunctions[id];
 		}
+	}
+	
+	this.getPlayRate = function() {
+		return playRate;
 	}
 	
 	this.setPlayRate = function(playRateIn) {
