@@ -297,7 +297,7 @@ function volumeRenderStart(shaderText) {
 	sphere2.visible = false;
 	volumeScene.addObject( sphere2 );
 
-	cellPickerScene = zincRenderer.createScene("cell_picker_scene");
+	cellPickerScene = tissueRenderer.createScene("cell_picker_scene");
 	var zincCameraControl = volumeScene.getZincCameraControls();
 	
 	pickerSphere = new THREE.Mesh( geometry, material );

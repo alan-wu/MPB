@@ -226,7 +226,7 @@
 		<script src="js/svgController.js"></script>
 		<script>
 			var bodyRenderer = undefined;
-			var zincRenderer = undefined;
+			var organsRenderer = undefined;
 			var referenceRenderer = undefined;
 			var currentHoverId = -1;
 			var tooltipcontainerElement = document.getElementById('tooltipcontainer');
@@ -272,13 +272,13 @@
 			initialiseBodyPanel();
 			//loadBody();
 			
-			zincRenderer = setupRenderer("organsDisplayArea");
+			organsRenderer = setupRenderer("organsDisplayArea");
 			initialiseOrgansVisualisation();
 			
 			bodyRenderer.animate();
 			
-			zincRenderer.addPreRenderCallbackFunction(updateTimeSliderCallback());
-			zincRenderer.animate();
+			organsRenderer.addPreRenderCallbackFunction(updateTimeSliderCallback());
+			organsRenderer.animate();
 			
 			volumeRenderInit();
 			

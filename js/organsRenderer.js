@@ -91,7 +91,7 @@ var timeSliderChanged = function() {
 }
 
 var updateTimeSlider = function() {
-	var currentTime = zincRenderer.getCurrentTime();
+	var currentTime = organsRenderer.getCurrentTime();
 	var sliderValue = currentTime / 30.0;
 	organGuiControls.Time = sliderValue;
 	if (pickerScene)
@@ -107,12 +107,12 @@ var updateTimeSliderCallback = function() {
 
 var speedSliderChanged = function() {
 	return function(value) {
-		zincRenderer.setPlayRate(value);
+		organsRenderer.setPlayRate(value);
 	}
 }
 
 var updateSpeedSlider = function() {
-	var playRate = zincRenderer.getPlayRate();
+	var playRate = organsRenderer.getPlayRate();
 	organGuiControls.Speed = playRate;
 	speedSlider.updateDisplay();	
 }
@@ -250,14 +250,14 @@ var organsBackGroundChanged = function() {
 		var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
 		//document.getElementById("mainBody").style.backgroundColor = backgroundColourString;
 		var colour = new THREE.Color(backgroundColourString);
-		var internalRenderer = zincRenderer.getThreeJSRenderer();
+		var internalRenderer = organsRenderer.getThreeJSRenderer();
 		internalRenderer.setClearColor( colour, 1 );
 	}
 }
 
 
 function initialiseOrgansVisualisation() {
-	defaultScene = zincRenderer.getCurrentScene();
+	defaultScene = organsRenderer.getCurrentScene();
 	organGui = new dat.GUI({autoPlace: false});
 	organGui.domElement.id = 'gui';
 	organGui.close();
@@ -265,8 +265,8 @@ function initialiseOrgansVisualisation() {
 	var controller = organGui.addColor(control, 'Background');
 	controller.onChange(organsBackGroundChanged());
 	var customContainer = document.getElementById("organGui").append(organGui.domElement);
-	var resetViewButton = { 'Reset View':function(){ zincRenderer.resetView() }};
-	var viewAllButton = { 'View All':function(){ zincRenderer.viewAll() }};
+	var resetViewButton = { 'Reset View':function(){ organsRenderer.resetView() }};
+	var viewAllButton = { 'View All':function(){ organsRenderer.viewAll() }};
 	var playButton = { 'Play/Pause':function(){ triggerAnimation() }};
 	organGuiControls.Time = 0.0;
 	organGuiControls.Speed = 500.0;
@@ -367,10 +367,10 @@ function loadOrgans(systemName, partName) {
 			if (organsDetails.fields)
 				dataFields = organsDetails.fields;
 		}
-		var organScene = zincRenderer.getSceneByName(name);
+		var organScene = organsRenderer.getSceneByName(name);
 		if (organScene == undefined) {
 			resetOrganSpecificGui();
-			organScene = zincRenderer.createScene(name);
+			organScene = organsRenderer.createScene(name);
 			displayScene = organScene;
 			var directionalLight = organScene.directionalLight;
 			directionalLight.intensity = 1.4;
@@ -385,7 +385,7 @@ function loadOrgans(systemName, partName) {
 				var zincCameraControl = organScene.getZincCameraControls();
 				if (organsDetails.picker != undefined) {
 					var pickerSceneName = name + "_picker_scene";
-					pickerScene = zincRenderer.createScene(pickerSceneName);
+					pickerScene = organsRenderer.createScene(pickerSceneName);
 					pickerScene.loadMetadataURL(organsDirectoryPrefix + "/" + organsDetails.picker);
 					zincCameraControl.enableRaycaster(pickerScene, _pickingCallback(), _hoverCallback());
 				} else {
@@ -401,19 +401,19 @@ function loadOrgans(systemName, partName) {
 					organScene.loadSTL(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
 				else if (metaItem["FileFormat"] == "OBJ") 
 					organScene.loadOBJ(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
-				zincRenderer.setCurrentScene(organScene);
+				organsRenderer.setCurrentScene(organScene);
 				var zincCameraControl = organScene.getZincCameraControls();
 				zincCameraControl.enableRaycaster(organScene, _pickingCallback(), _hoverCallback());
 			}
 			var directionalLight = organScene.directionalLight;
 			directionalLight.intensity = 1.4;
-			zincRenderer.setCurrentScene(organScene);
+			organsRenderer.setCurrentScene(organScene);
 		} else if (displayScene != organScene){
 			resetOrganSpecificGui();
-			zincRenderer.setCurrentScene(organScene);
+			organsRenderer.setCurrentScene(organScene);
 			displayScene = organScene;
 			var pickerSceneName = name + "_picker_scene";
-			pickerScene = zincRenderer.getSceneByName(pickerSceneName);
+			pickerScene = organsRenderer.getSceneByName(pickerSceneName);
 			displayScene.forEachGeometry(_addOrganPartCallback());
 			displayScene.forEachGlyphset(_addOrganPartCallback());
 		}
@@ -430,33 +430,32 @@ function showHideOrgans(flag) {
 }
 
 function showOrgans() {
-	zincRenderer.setCurrentScene(displayScene);
+	organsRenderer.setCurrentScene(displayScene);
 	if (pickerScene)
 		pickerScene.forEachGlyphset(showHideOrgans(true));
 }
 
 function hideOrgans() {
-	zincRenderer.setCurrentScene(defaultScene);
+	organsRenderer.setCurrentScene(defaultScene);
 	if (pickerScene)
 		pickerScene.forEachGlyphset(showHideOrgans(false));
 
 }
 
 var triggerAnimation = function() {
-	if (zincRenderer.playAnimation == true) {
-		zincRenderer.playAnimation = false;
+	if (organsRenderer.playAnimation == true) {
+		organsRenderer.playAnimation = false;
 	} else {
-		zincRenderer.playAnimation = true;	
+		organsRenderer.playAnimation = true;	
 	}
 }
 
 function resetView()
 {
-	zincRenderer.resetView();
+	organsRenderer.resetView();
 }
 
 function viewAll()
 {
-	zincRenderer.viewAll();
+	organsRenderer.viewAll();
 }
-
