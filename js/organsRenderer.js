@@ -22,6 +22,7 @@ var organsControl = function() {
 var organsFileMap = new Array();
 
 organsFileMap["Cardiovascular"] = new Array();
+organsFileMap["Digestive"] = new Array();
 organsFileMap["Respiratory"] = new Array();
 organsFileMap["Cardiovascular"]["Heart"] = {
 		view: "cardiovascular/heart/heart_view.json",
@@ -62,6 +63,11 @@ organsFileMap["Cardiovascular"]["Left Upper Limb"] = organsFileMap["Cardiovascul
 organsFileMap["Cardiovascular"]["Left Lower Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
 organsFileMap["Cardiovascular"]["Right Upper Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
 organsFileMap["Cardiovascular"]["Right Lower Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
+organsFileMap["Digestive"]["Stomach"] = {
+		view: undefined,
+		meta: "digestive/stomach_1.json",
+		picker: undefined,
+		associateData: undefined};
 organsFileMap["Respiratory"]["Lungs"] = {
 		view: "respiratory/lungs_view.json",
 		meta: "respiratory/lungs_1.json",
@@ -260,6 +266,7 @@ function initialiseOrgansVisualisation() {
 	controller.onChange(organsBackGroundChanged());
 	var customContainer = document.getElementById("organGui").append(organGui.domElement);
 	var resetViewButton = { 'Reset View':function(){ zincRenderer.resetView() }};
+	var viewAllButton = { 'View All':function(){ zincRenderer.viewAll() }};
 	var playButton = { 'Play/Pause':function(){ triggerAnimation() }};
 	organGuiControls.Time = 0.0;
 	organGuiControls.Speed = 500.0;
@@ -267,6 +274,7 @@ function initialiseOrgansVisualisation() {
 	organGui.add(playButton, 'Play/Pause');
 	speedSlider = organGui.add(organGuiControls, 'Speed', 0, 5000).step(50).onChange(speedSliderChanged());
 	organGui.add(resetViewButton, 'Reset View');
+	organGui.add(viewAllButton, 'View All');
 	organPartsGui = organGui.addFolder('Visibility Control');
 	organPartsGui.open();
 }
