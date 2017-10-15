@@ -94,9 +94,12 @@
 					</div>
 					<input class="screenButton" id="organsScreenButton" type="button" onclick="expandCollapse(this, 'organsDisplayPort')" value="Expand"</input>
 					<div  id="organGui">
-					</div>			
+					</div>
 				</div>
 				<div id="organsDisplayArea" style="height:100%;">
+				</div>
+				<div style="text-align:center;width:100%;position: absolute;bottom: 3%;">
+					<input id="organLinkButton" type="button" onclick="openOrganModelLink()" value="Models & data">
 				</div>
 			</div>
 			
@@ -114,15 +117,15 @@
 				<div id="cellButtonContainer" style="visibility:hidden;">
 					<div id="cellButtonDivider" style="positon:relative;bottom:10%;">
 						<div style="padding-left:10%;float:left;text-align: center;">
-							<input class="w3-circle w3-gray w3-hover-gray" style="z-index:2;" id="cellButton1" type="button" onclick="openCellModelUI('Cardiac myocyte')" value="Cardiac myocyte"</input>
+							<input class="w3-button w3-round-xlarge w3-gray w3-hover-gray" style="padding-top:1%;padding-bottom:1%;z-index:2;border-color: #ffffff;" id="cellButton1" type="button" onclick="openCellModelUI('Cardiac myocyte')" value="Cardiac myocyte"</input>
 						</div>
 						<div style="padding-right:10%;float:right"text-align: center;">
-							<a target="_blank" href="https://models.physiomeproject.org/mechanical_constitutive_laws">Constitutive laws</a>
+							<input type="button" style="background-color:rgb(100%, 30%, 30%);" onclick="openConstitutiveLawsLink()" value="Constitutive laws">
 						</div>
 					</div>
 					<div id="cellButtonDivider" style="bottom:4%;">
 						<div style="padding-left:10%;float:left;text-align: center;">
-							<input class="w3-circle w3-gray w3-hover-gray" style="z-index:2;" id="cellButton2" type="button" onclick="openCellModelUI('Cardiac fibroblast')" value="Cardiac fibroblast"</input>
+							<input class="w3-button w3-round-xlarge w3-gray w3-hover-gray" style="padding-top:1%;padding-bottom:1%;z-index:2;border-color: #ffffff;" id="cellButton2" type="button" onclick="openCellModelUI('Cardiac fibroblast')" value="Cardiac fibroblast"</input>
 						</div>
 					</div>
 				</div>
@@ -157,20 +160,16 @@
 					<input class="screenButton" id="modelScreenButton" type="button" onclick="expandSVGCollapse(this, 'modelDisplayPort')" value="Expand"</input>
 					<div id="modelGui">
 					</div>
-					<div class="textContainer">
-						<p style="text-align: center;">&nbsp;</p>
-						<p style="text-align: center;">&nbsp;</p>
-					</div>
-				</div>
-				<div id="modelsController" style="position:relative;text-align:center;visibility:hidden;">
+					<div id="modelsController">
 						<input class="modelButton" type="button" onclick="runModel(this)" value="Run Simulation"></input>
-						<p style="text-align: center;">&nbsp;</p>
-						<div id="ZoomControl">
+						<div id="ZoomControl" style="position:absolute;margin-left:55%;">
 						<input id="svgZoomOut" title="Zoom Out" class="w3-circle w3-white w3-hover-white" style="width:30px;height:30px;" type="button" value="-" onclick="svgZoomOut();">
 						<input  title="Reset" class="w3-circle w3-white w3-hover-white" style="height:30px;" type="button" value="Reset" onclick="resetZoom();">
 						<input id="svgZoomIn" title="Zoom In" class="w3-circle w3-white w3-hover-white" style="width:30px;height:30px;" type="button" value="+"  onclick="svgZoomIn();">
 						</div>
+					</div>
 				</div>
+
 				<p style="text-align: center;">&nbsp;</p>
 				<div id="modelsContainer">
 					<object class="svgContainer" id="testsvg" align="middle" type="image/svg+xml">SVGs not loaded yet.</object>

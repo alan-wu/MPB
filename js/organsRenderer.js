@@ -9,6 +9,7 @@ var organGuiControls = new function() {
 };
 var associateData = undefined;
 var dataFields = undefined;
+var externalOrganLink = undefined
 
 var organPartsGui;
 var organPartGuiControls = function() {
@@ -28,7 +29,8 @@ organsFileMap["Cardiovascular"]["Heart"] = {
 		view: "cardiovascular/heart/heart_view.json",
 		meta: "cardiovascular/heart/animated_nerve_1.json",
 		picker: "cardiovascular/heart/picking_node_1.json",
-		associateData: undefined};
+		associateData: undefined,
+		externalLink: "https://models.cellml.org/e/bd/deforming_heart.rdf/view"};
 organsFileMap["Cardiovascular"]["Arterial Flow"] = {
 		view: undefined,
 		meta: "cardiovascular/arteries/arterial_flow_1.json",
@@ -360,13 +362,22 @@ function loadOrgans(systemName, partName) {
 		var organsDetails = getOrganDetails(systemName, partName);
 		associateData = undefined;
 		dataFields = undefined;
+		externalOrganLink = undefined;
 		if (organsDetails !== undefined){
 			if (organsDetails.sceneName !== undefined)
 				name = organsDetails.sceneName;
 			associateData = organsDetails.associateData;
 			if (organsDetails.fields)
 				dataFields = organsDetails.fields;
+			externalOrganLink = organsDetails.externalLink;
 		}
+		var button = document.getElementById("organLinkButton");
+		if (externalOrganLink) {
+			button.style.visibility = "visible";
+		} else {
+			button.style.visibility = "hidden";
+		}
+			
 		var organScene = organsRenderer.getSceneByName(name);
 		if (organScene == undefined) {
 			resetOrganSpecificGui();
@@ -459,3 +470,8 @@ function viewAll()
 {
 	organsRenderer.viewAll();
 }
+
+function openOrganModelLink() {
+	window.open(externalOrganLink, '');
+}
+

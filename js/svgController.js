@@ -5,6 +5,7 @@ svgLayoutCallbacksElement["Chloride_button"] = "Chloride";
 svgLayoutCallbacksElement["Hydrogen_button"] = "Hydrogen";
 svgLayoutCallbacksElement["Calcium_button"] = "Calcium";
 svgLayoutCallbacksElement["Anion_button"] = "Anion";
+svgLayoutCallbacksElement["Metabolism_button"] = "Metabolism";
 
 var svgIonChannelCallbackElement = new Array();
 svgIonChannelCallbackElement["v1_button"] = "v1_expression";

@@ -12,6 +12,7 @@ var meshFirstPass, meshSecondPass;
 var cellPickerScene;
 var gui;
 var guiControls;
+var constitutiveLawsLink = "https://models.physiomeproject.org/mechanical_constitutive_laws";
 
 var showCellTooltip = function(id, x, y) {
 	tiptextElement.innerHTML = "Cell model " + id;
@@ -35,7 +36,7 @@ var openCellModelUI = function(id) {
 	var cellTitle = "<strong>Cell: <span style='color:#FF4444'>" + id + "</span></strong>";
 	setCellPanelTitle(cellTitle);
 	openCell();
-	openModel("Myocyte_v4_Grouped_v4.svg");
+	openModel("Myocyte_v6_Grouped.svg");
 }
 
 var _pickingCellCallback = function() {
@@ -375,4 +376,6 @@ var resetTissuePanel = function() {
 	document.getElementById("cellButtonContainer").style.visibility = "hidden";
 }
 
-
+var openConstitutiveLawsLink = function() {
+	window.open(constitutiveLawsLink, '');
+}

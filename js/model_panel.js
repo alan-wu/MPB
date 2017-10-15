@@ -10,7 +10,7 @@ var openModel = function(svgName) {
 	var svgObject = document.getElementById("testsvg");
 	var svgFullName = "svg/" + svgName;
 
-	if (svgName == "Myocyte_v4_Grouped_v4.svg") {
+	if (svgName == "Myocyte_v6_Grouped.svg") {
 		svgObject.onload = function() {
 			svgLoaded();
 			runModelURL = 'https://models.cellml.org/workspace/noble_1962/rawfile/c70f8962407db00673f1fdcac9f35a2593781c17/noble_1962.sedml';
