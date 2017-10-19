@@ -82,7 +82,7 @@ function enableSVGScrollEvent(targetelement) {
     }
 }
 
-function disableSVGScrollEvent(element) {
+function disableSVGScrollEvent(targetelement) {
 	if (targetelement.removeEventListener) {
 		targetelement.removeEventListener( 'wheel', function ( event ) { onSVGScrollEvent(event); }, true);
 	}
@@ -96,7 +96,7 @@ var expandSVGCollapse = function(source, portName) {
 		enableSVGScrollEvent(targetelement);
 		
 	} else {
-		var targetelement = document.getElementById("modelsContainer").contentDocument;
+		var targetelement = document.getElementById("testsvg").contentDocument;
 		disableSVGScrollEvent(targetelement);
 		targetelement = document.getElementById("modelsContainer");
 		enableSVGScrollEvent(targetelement);
