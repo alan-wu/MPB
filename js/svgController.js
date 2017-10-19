@@ -48,13 +48,13 @@ var svgZoom = function() {
 	 object.style.width = widthString;
 }
 
-var svgZoomIn = function() {
-	currentZoom = currentZoom + 0.25;
+var svgZoomIn = function(ratio) {
+	currentZoom = currentZoom + ratio;
 	svgZoom();
 }
 
-var svgZoomOut = function() {
-	currentZoom = currentZoom - 0.25;
+var svgZoomOut = function(ratio) {
+	currentZoom = currentZoom - ratio;
 	svgZoom();
 }
 
@@ -65,7 +65,42 @@ var resetZoom = function() {
 	object.style.width = "100%";
 }
 
+var onSVGScrollEvent = function(event) {
+		console.log(event)
+		if (event.deltaY > 0) {
+			svgZoomIn(0.1);
+		} else if (event.deltaY < 0) {
+			svgZoomOut(0.1);
+		}
+		event.preventDefault(); 
+		event.stopImmediatePropagation(); 
+}
+
+function enableSVGScrollEvent(targetelement) {
+	if (targetelement.addEventListener) {
+		targetelement.addEventListener( 'wheel', function ( event ) { onSVGScrollEvent(event); }, true);
+    }
+}
+
+function disableSVGScrollEvent(element) {
+	if (targetelement.removeEventListener) {
+		targetelement.removeEventListener( 'wheel', function ( event ) { onSVGScrollEvent(event); }, true);
+	}
+}
+
 var expandSVGCollapse = function(source, portName) {
+	if (source.value=="Expand") {
+		var targetelement = document.getElementById("testsvg").contentDocument;
+		enableSVGScrollEvent(targetelement);
+		targetelement = document.getElementById("modelsContainer");
+		enableSVGScrollEvent(targetelement);
+		
+	} else {
+		var targetelement = document.getElementById("modelsContainer").contentDocument;
+		disableSVGScrollEvent(targetelement);
+		targetelement = document.getElementById("modelsContainer");
+		enableSVGScrollEvent(targetelement);
+	}
 	expandCollapse(source, portName);
 	resetZoom();
 	for (var key in svgLayoutCallbacksElement) {

@@ -116,15 +116,15 @@
 				</div>
 				<div id="cellButtonContainer" style="visibility:hidden;">
 					<div id="cellButtonDivider" style="positon:relative;bottom:10%;">
-						<div style="padding-left:10%;float:left;text-align: center;">
+						<div style="padding-left:5%;float:left;text-align: center;">
 							<input class="w3-button w3-round-xlarge w3-gray w3-hover-gray" style="padding-top:1%;padding-bottom:1%;z-index:2;border-color: #ffffff;" id="cellButton1" type="button" onclick="openCellModelUI('Cardiac myocyte')" value="Cardiac myocyte"</input>
 						</div>
-						<div style="padding-right:10%;float:right"text-align: center;">
+						<div style="padding-right:5%;width:100%;text-align:right;">
 							<input type="button" style="background-color:rgb(100%, 30%, 30%);" onclick="openConstitutiveLawsLink()" value="Constitutive laws">
 						</div>
 					</div>
 					<div id="cellButtonDivider" style="bottom:4%;">
-						<div style="padding-left:10%;float:left;text-align: center;">
+						<div style="padding-left:5%;float:left;text-align: center;">
 							<input class="w3-button w3-round-xlarge w3-gray w3-hover-gray" style="padding-top:1%;padding-bottom:1%;z-index:2;border-color: #ffffff;" id="cellButton2" type="button" onclick="openCellModelUI('Cardiac fibroblast')" value="Cardiac fibroblast"</input>
 						</div>
 					</div>
@@ -163,9 +163,9 @@
 					<div id="modelsController">
 						<input class="modelButton" type="button" onclick="runModel(this)" value="Run Simulation"></input>
 						<div id="ZoomControl" style="position:absolute;margin-left:55%;">
-						<input id="svgZoomOut" title="Zoom Out" class="w3-circle w3-white w3-hover-white" style="width:30px;height:30px;" type="button" value="-" onclick="svgZoomOut();">
+						<input id="svgZoomOut" title="Zoom Out" class="w3-circle w3-white w3-hover-white" style="width:30px;height:30px;" type="button" value="-" onclick="svgZoomOut(0.20);">
 						<input  title="Reset" class="w3-circle w3-white w3-hover-white" style="height:30px;" type="button" value="Reset" onclick="resetZoom();">
-						<input id="svgZoomIn" title="Zoom In" class="w3-circle w3-white w3-hover-white" style="width:30px;height:30px;" type="button" value="+"  onclick="svgZoomIn();">
+						<input id="svgZoomIn" title="Zoom In" class="w3-circle w3-white w3-hover-white" style="width:30px;height:30px;" type="button" value="+"  onclick="svgZoomIn(0.20);">
 						</div>
 					</div>
 				</div>
