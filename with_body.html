@@ -92,7 +92,7 @@
 					<div class="titleContainer">
 						<p class="titleText" id="OrganTitle"><strong>Organ</strong></p>
 					</div>
-					<input class="screenButton" id="organsScreenButton" type="button" onclick="expandCollapse(this, 'organsDisplayPort')" value="Expand"</input>
+					<input class="screenButton" id="organsScreenButton" type="button" onclick="expandCollapse(this, 'organsDisplayPort')" value="Expand">
 					<div  id="organGui">
 					</div>
 				</div>
@@ -108,7 +108,7 @@
 					<div class="titleContainer" style="bottom:2%;">
 						<p class="titleText" id="TissueTitle"><strong>Tissue</strong></p>
 					</div>
-					<input class="screenButton" id="tissueScreenButton" type="button" onclick="expandCollapse(this, 'tissueDisplayPort')" value="Expand"</input>
+					<input class="screenButton" id="tissueScreenButton" type="button" onclick="expandCollapse(this, 'tissueDisplayPort')" value="Expand">
 					<div id="tissueGui">
 					</div>
 				</div>
@@ -117,7 +117,7 @@
 				<div id="cellButtonContainer" style="visibility:hidden;">
 					<div id="cellButtonDivider" style="positon:relative;bottom:10%;">
 						<div style="padding-left:5%;float:left;text-align: center;">
-							<input class="w3-button w3-round-xlarge w3-gray w3-hover-gray" style="padding-top:1%;padding-bottom:1%;z-index:2;border-color: #ffffff;" id="cellButton1" type="button" onclick="openCellModelUI('Cardiac myocyte')" value="Cardiac myocyte"</input>
+							<input class="w3-button w3-round-xlarge w3-gray w3-hover-gray" style="padding-top:1%;padding-bottom:1%;z-index:2;border-color: #ffffff;" id="cellButton1" type="button" onclick="openCellModelUI('Cardiac myocyte')" value="Cardiac myocyte">
 						</div>
 						<div style="padding-right:5%;width:100%;text-align:right;">
 							<input type="button" style="background-color:rgb(100%, 30%, 30%);" onclick="openConstitutiveLawsLink()" value="Constitutive laws">
@@ -125,7 +125,7 @@
 					</div>
 					<div id="cellButtonDivider" style="bottom:4%;">
 						<div style="padding-left:5%;float:left;text-align: center;">
-							<input class="w3-button w3-round-xlarge w3-gray w3-hover-gray" style="padding-top:1%;padding-bottom:1%;z-index:2;border-color: #ffffff;" id="cellButton2" type="button" onclick="openCellModelUI('Cardiac fibroblast')" value="Cardiac fibroblast"</input>
+							<input class="w3-button w3-round-xlarge w3-gray w3-hover-gray" style="padding-top:1%;padding-bottom:1%;z-index:2;border-color: #ffffff;" id="cellButton2" type="button" onclick="openCellModelUI('Cardiac fibroblast')" value="Cardiac fibroblast">
 						</div>
 					</div>
 				</div>
@@ -136,7 +136,7 @@
 					<div class="titleContainer" style="bottom:5%;">
 						<p class="titleText" id="CellTitle"><strong>Cell</strong></p>
 					</div>
-					<input class="screenButton" id="cellScreenButton" type="button" onclick="expandCollapse(this, 'cellDisplayPort')" value="Expand"</input>
+					<input class="screenButton" id="cellScreenButton" type="button" onclick="expandCollapse(this, 'cellDisplayPort')" value="Expand">
 					<div id="cellGui">
 					</div>
 					<div class="textContainer">
@@ -157,11 +157,11 @@
 					<div class="titleContainer">
 						<p class="titleText" id="ModelTitle"><strong>Models</strong></p>
 					</div>
-					<input class="screenButton" id="modelScreenButton" type="button" onclick="expandSVGCollapse(this, 'modelDisplayPort')" value="Expand"</input>
+					<input class="screenButton" id="modelScreenButton" type="button" onclick="expandSVGCollapse(this, 'modelDisplayPort')" value="Expand">
 					<div id="modelGui">
 					</div>
 					<div id="modelsController">
-						<input class="modelButton" type="button" onclick="runModel(this)" value="Run Simulation"></input>
+						<input class="modelButton" type="button" onclick="runModel(this)" value="Run Simulation">
 						<div id="ZoomControl" style="position:absolute;margin-left:55%;">
 						<input id="svgZoomOut" title="Zoom Out" class="w3-circle w3-white w3-hover-white" style="width:30px;height:30px;" type="button" value="-" onclick="svgZoomOut(0.20);">
 						<input  title="Reset" class="w3-circle w3-white w3-hover-white" style="height:30px;" type="button" value="Reset" onclick="resetZoom();">
@@ -175,9 +175,9 @@
 					<object class="svgContainer" id="testsvg" align="middle" type="image/svg+xml">SVGs not loaded yet.</object>
 				<!--
 					<p style="text-align: center;">&nbsp;</p>
-					<input class="modelButton" type="button" onclick="svgElemenToggle('testsvg', 'cls-5')" value="Green"></input>
-					<input class="modelButton" type="button" onclick="svgElemenToggle('testsvg', 'cls-6')" value="Orange"></input>
-					<input class="modelButton" type="button" onclick="svgElemenToggle('testsvg', 'cls-7')" value="Pink"></input>					
+					<input class="modelButton" type="button" onclick="svgElemenToggle('testsvg', 'cls-5')" value="Green">
+					<input class="modelButton" type="button" onclick="svgElemenToggle('testsvg', 'cls-6')" value="Orange">
+					<input class="modelButton" type="button" onclick="svgElemenToggle('testsvg', 'cls-7')" value="Pink">					
 
 					<div style="height:20%;border-top: 2px solid #000000;">
 						<div style="height:100%;left:0%;width:50%;float:left;border-right: 2px solid #000000;border-bottom: 2px solid #000000;">
@@ -185,7 +185,7 @@
 							<a style="padding-bottom:1%;max-width:100%;max-height:100%;" target="_blank" href = "https://models.cellml.org/exposure/5230da0/jafri_rice_winslow_1998_b.cellml/view">
 								<img align="middle" src="images/jafri_rice_winslow_1998.png" class="model">
 							</a>
-							<input class="modelButton" type="button" onclick="runModel(this)" value="Run Simulation"></input>
+							<input class="modelButton" type="button" onclick="runModel(this)" value="Run Simulation">
 						</div>
 						<div style="height:100%;left:50%;width:50%;float:left;">
 							<p style="text-align: center;">&nbsp;</p>
