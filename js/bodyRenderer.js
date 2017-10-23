@@ -5,6 +5,7 @@ var bodyPartsGui;
 var currentHoveredMaterial = undefined;
 var currentSelectedMaterial = undefined;
 var systemGuiFolder = new Array();
+var remvoeWhenNotVisibile = false;
 
 systemGuiFolder["Musculo-skeletal"] = undefined;
 systemGuiFolder["Cardiovascular"] = undefined;
@@ -142,14 +143,17 @@ var _hoverBodyCallback = function() {
 	}
 };
 
-function updateBodyPartsVisibilty(name, flag) {
-	return function(zincGeometry) {
-		if (zincGeometry.groupName && zincGeometry.groupName == name) {
-			zincGeometry.setVisibility(flag);
+var removeGeometry = function(systemName, name) {
+	if (remvoeWhenNotVisibile) {
+		console.log(systemMeta)
+		if (systemMeta[systemName].hasOwnProperty(name) && systemMeta[systemName][name].geometry) {
+			bodyScene.removeZincGeometry(systemMeta[systemName][name].geometry);
+			systemMeta[systemName][name]["loaded"] = ITEM_LOADED.FALSE;
+			systemMeta[systemName][name].geometry = undefined;
 		}
+		
 	}
 }
-	
 
 var changeBodyPartsVisibility = function(name, systemName) {
 	return function(value) { 
@@ -158,6 +162,7 @@ var changeBodyPartsVisibility = function(name, systemName) {
 		}
 		var isPartial = false;
 		if (value == false) {
+			removeGeometry(systemName, name);
 			systemPartsGuiControls[systemName].All = false;
 			for (var partName in systemPartsGuiControls[systemName]) {
 				if (partName != "All" && systemPartsGuiControls[systemName].hasOwnProperty(partName)) {
@@ -211,8 +216,10 @@ var toggleSystem = function(systemName, value) {
 			if (systemPartsGuiControls[systemName][partName] != value) {
 				if (systemMeta[systemName].hasOwnProperty(partName)) {
 					systemPartsGuiControls[systemName][partName] = value;
-					if (systemMeta[systemName][partName].geometry)
+					if (systemMeta[systemName][partName].geometry) {
 						systemMeta[systemName][partName].geometry.setVisibility(value);
+						removeGeometry(systemName, partName);
+					}
 					if (value == true) {
 						readModel(systemName, partName, false);
 					}
