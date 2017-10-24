@@ -349,7 +349,9 @@ function initialiseBodyPanel() {
 	var directionalLight = scene.directionalLight;
 	directionalLight.intensity = 1.4;
 	var zincCameraControl = scene.getZincCameraControls();
-	zincCameraControl.enableRaycaster(scene, _pickingBodyCallback(), _hoverBodyCallback());	
+	zincCameraControl.enableRaycaster(scene, _pickingBodyCallback(), _hoverBodyCallback());
+	zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
+	zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
 
 	bodyGui.add(resetViewButton, 'Reset View');
 }

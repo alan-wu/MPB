@@ -300,7 +300,8 @@ function volumeRenderStart(shaderText) {
 
 	cellPickerScene = tissueRenderer.createScene("cell_picker_scene");
 	var zincCameraControl = volumeScene.getZincCameraControls();
-	
+	zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
+	zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
 	pickerSphere = new THREE.Mesh( geometry, material );
 	pickerSphere.position.x = 0.279;
 	pickerSphere.position.y = 0.14;

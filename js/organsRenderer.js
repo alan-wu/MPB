@@ -394,6 +394,8 @@ function loadOrgans(systemName, partName) {
 				organScene.loadMetadataURL(organsDirectoryPrefix + "/" + organsDetails.meta, 
 					_addOrganPartCallback(systemName, partName, false));
 				var zincCameraControl = organScene.getZincCameraControls();
+				zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
+				zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
 				if (organsDetails.picker != undefined) {
 					var pickerSceneName = name + "_picker_scene";
 					pickerScene = organsRenderer.createScene(pickerSceneName);
@@ -415,6 +417,8 @@ function loadOrgans(systemName, partName) {
 				organsRenderer.setCurrentScene(organScene);
 				var zincCameraControl = organScene.getZincCameraControls();
 				zincCameraControl.enableRaycaster(organScene, _pickingCallback(), _hoverCallback());
+				zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
+				zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
 			}
 			var directionalLight = organScene.directionalLight;
 			directionalLight.intensity = 1.4;
