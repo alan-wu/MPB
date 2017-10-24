@@ -1,3 +1,5 @@
+var svgRightClickDown = false;
+
 var svgLayoutCallbacksElement = new Array();
 svgLayoutCallbacksElement["Sodium_button"] = "Sodium";
 svgLayoutCallbacksElement["Potassium_button"] = "Potassium";
@@ -73,33 +75,75 @@ var onSVGScrollEvent = function(event) {
 			svgZoomOut(0.1);
 		}
 		event.preventDefault(); 
+		event.stopPropagation();
 		event.stopImmediatePropagation(); 
 }
 
-function enableSVGScrollEvent(targetelement) {
-	if (targetelement.addEventListener) {
-		targetelement.addEventListener( 'wheel', function ( event ) { onSVGScrollEvent(event); }, true);
+function onSVGMouseDown( event ) {
+   	if (event.button == 2) {
+   		svgRightClickDown = true;
+   		event.preventDefault();
+   		event.stopImmediatePropagation(); 
+    } else {
+    	svgRightClickDown = false;
     }
 }
 
-function disableSVGScrollEvent(targetelement) {
-	if (targetelement.removeEventListener) {
-		targetelement.removeEventListener( 'wheel', function ( event ) { onSVGScrollEvent(event); }, true);
+function onSVGMouseMove( event ) {
+	if (svgRightClickDown == true) {
+		targetElement = document.getElementById("modelsContainer");
+		targetElement.scrollTop += event.movementY;
+		targetElement.scrollLeft -= event.movementX;
 	}
+}
+
+function onSVGMouseUp( event ) {
+   	if (event.button == 2) {
+   		event.preventDefault();
+   		event.stopPropagation();
+   		event.stopImmediatePropagation(); 
+    }
+	svgRightClickDown = false;
+}
+
+function onSVGMouseLeave( event ) {
+	svgRightClickDown = false;
+}
+
+function enableSVGMouseInteraction(targetElement) {
+	if (targetElement.addEventListener) {
+		targetElement.addEventListener( 'mousedown', onSVGMouseDown, false );
+		targetElement.addEventListener( 'mousemove', onSVGMouseMove, false );
+		targetElement.addEventListener( 'mouseup', onSVGMouseUp, false );
+		targetElement.addEventListener( 'mouseleave', onSVGMouseLeave, false );
+		targetElement.oncontextmenu = function() { return false;};
+		targetElement.addEventListener( 'wheel', function ( event ) { onSVGScrollEvent(event); }, true);
+    }
+}
+
+function disableSVGMouseInteraction(targetElement) {
+	if (targetElement.removeEventListener) {
+		targetElement.removeEventListener( 'mousedown', onSVGMouseDown, false );
+		targetElement.removeEventListener( 'mousemove', onSVGMouseMove, false );
+		targetElement.removeEventListener( 'mouseup', onSVGMouseUp, false );
+		targetElement.removeEventListener( 'mouseleave', onSVGMouseLeave, false );
+		targetElement.removeEventListener( 'oncontextmenu', function() { return false;}, false);
+		targetElement.oncontextmenu = function() { return true;};
+		targetElement.removeEventListener( 'wheel', function ( event ) { onSVGScrollEvent(event); }, true);
+    }
 }
 
 var expandSVGCollapse = function(source, portName) {
 	if (source.value=="Expand") {
 		var targetelement = document.getElementById("testsvg").contentDocument;
-		enableSVGScrollEvent(targetelement);
+		enableSVGMouseInteraction(targetelement);
 		targetelement = document.getElementById("modelsContainer");
-		enableSVGScrollEvent(targetelement);
-		
+		enableSVGMouseInteraction(targetelement);
 	} else {
 		var targetelement = document.getElementById("testsvg").contentDocument;
-		disableSVGScrollEvent(targetelement);
+		disableSVGMouseInteraction(targetelement);
 		targetelement = document.getElementById("modelsContainer");
-		enableSVGScrollEvent(targetelement);
+		disableSVGMouseInteraction(targetelement);
 	}
 	expandCollapse(source, portName);
 	resetZoom();
