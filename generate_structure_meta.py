@@ -1,6 +1,6 @@
 import os
 import json
-# Create a button map of Qt mouse buttons to Zinc input buttons
+
 modelsFolder = "models/body"
 folder_system_map = {'cardiovascular': 'Cardiovascular', 'digestive': 'Digestive', 'male': 'Male Reproductive', \
                     'musculo': 'Musculo-skeletal', 'nervous': 'Brain & Central Nervous', 'respiratory':'Respiratory', \
