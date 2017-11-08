@@ -50,41 +50,6 @@
 			</div>
 	
 			<div id="bodyDisplayPort" class="bodyDisplayPortCollapse">
-				<div style="position:absolute;width:100%;">
-					<div class="titleContainer">
-						<p class="titleText"><strong>Body</strong></p>
-					</div>
-					<input class="screenButton" id="bodyScreenButton" type="button" onclick="expandCollapse(this, 'bodyDisplayPort')" value="Expand"></input>
-					<div  id="bodyGui">
-					</div>
-				</div>
-				<div id="systemToggle">
-					<input id="Cardiovascular" title="Cardiovascular system" class="w3-circle systemToggleButton systemToggleButtonOff" type="button" value="CV" style="background-color:#7f1e00;" onclick="systemButtonPress(this);">
-					<br>
-					<input id="Digestive" title="Digestive system" class="w3-circle systemToggleButton systemToggleButton systemToggleButtonOff" type="button" value="D" style="background-color:#FFE4E1;" onclick="systemButtonPress(this);">
-					<br>
-					<input id="Endocrine" title="Endocrine system" class="w3-circle systemToggleButton systemToggleButton systemToggleButtonOff" type="button" value="E" style="background-color:DARKORANGE;" onclick="systemButtonPress(this);">
-					<br>
-					<input id="Immunological" title="Immunological system" class="w3-circle systemToggleButton systemToggleButton systemToggleButtonOff" type="button" value="I" style="background-color:REBECCAPURPLE;" onclick="systemButtonPress(this);">
-					<br>
-					<input id="Musculo-skeletal" title="Musculoskeletal system" class="w3-circle systemToggleButton systemToggleButton systemToggleButtonOff" type="button" value="MSK" style="font-size:11px;background-color:rgb(90%, 90%, 70%);" onclick="systemButtonPress(this);">
-					<br>
-					<input id="Brain & Central Nervous" title="Nervous system" class="w3-circle systemToggleButton systemToggleButton systemToggleButtonOff" type="button" value="N" style="background-color:#FFDAB9;" onclick="systemButtonPress(this);">
-					<br>
-					<input id="Respiratory" title="Respiratory system" class="w3-circle systemToggleButton systemToggleButton systemToggleButtonOff" type="button" value="R" style="background-color:#DB7093;" onclick="systemButtonPress(this);">
-					<br>
-					<input id="Male Reproductive" title="Reproductive system" class="w3-circle systemToggleButton systemToggleButton systemToggleButtonOff" type="button" value="RM" style="background-color:#FA8072;" onclick="systemButtonPress(this);">
-					<br>
-					<input id="Female Reproductive" title="Female reproductive system" class="w3-circle systemToggleButton systemToggleButton systemToggleButtonOff" type="button" value="RF" style="background-color:#FFC0CB;" onclick="systemButtonPress(this);">
-					<br>
-					<input id="Skin (integument)" title="Skin" class="w3-circle systemToggleButton systemToggleButton systemToggleButtonOff" type="button" value="S" style="background-color:rgb(90%, 70%, 50%);" onclick="systemButtonPress(this);">
-					<br>
-					<input id="Special sense organs" title="Special senses" class="w3-circle systemToggleButton systemToggleButton systemToggleButtonOff" type="button" value="SS" style="background-color:GOLDENROD;" onclick="systemButtonPress(this);">
-					<br>
-					<input id="Urinary" title="Urinary system" class="w3-circle systemToggleButton systemToggleButton systemToggleButtonOff" type="button" value="U" style="background-color:DARKOLIVEGREEN;" onclick="systemButtonPress(this);">
-				</div>
-				<div id="bodyDisplayArea" style="height:100%;">	
-				</div>
 			</div>		
 		
 			<div id="organsDisplayPort" class="organsDisplayPortCollapse">
@@ -211,6 +176,7 @@
 		<script src="js/three.min.js"></script>
 		<script src="js/OBJLoader.js"></script>
 		<script src="js/STLLoader.js"></script>
+		<script src="js/pjp.js"></script>
 		<script src="js/zinc_threejs_control.js"></script>
 		<script src="js/zinc_3js_renderer.js"></script>
 		<script src="js/dat.gui.js"></script>
@@ -224,38 +190,13 @@
 		<script src="js/model_panel.js"></script>
 		<script src="js/svgController.js"></script>
 		<script>
-			var bodyRenderer = undefined;
-			var organsRenderer = undefined;
+			var bodyViewer = undefined;
+			var organsViewer = undefined;
 			var referenceRenderer = undefined;
-			var currentHoverId = -1;
 			var tooltipcontainerElement = document.getElementById('tooltipcontainer');
 			var tipElement = document.getElementById('tip');
 			var tiptextElement = document.getElementById('tiptext');
-			
-			var toggleSplitDisplay = function(displayStyle) {
-				var portArrays = ["bodyDisplayPort", "organsDisplayPort", "tissueDisplayPort", "cellDisplayPort", "modelDisplayPort"];
-				for (var i = 0; i < portArrays.length; i++) {
-					var portElement = document.getElementById(portArrays[i]);
-					portElement.className = portArrays[i] + "Collapse";
-					portElement.style.display = displayStyle;
-				}cellDisplayPort
-			}
-			
-			var expandCollapse = function(source, portName) {
-				if (source.value=="Expand") {
-					source.value = "Collapse";
-					toggleSplitDisplay("none");
-					var portElement = document.getElementById(portName);
-					portElement.className = "fullPortDisplay";
-					portElement.style.display = "block";
-				}
-    			else { 
-    				source.value = "Expand";
-    				toggleSplitDisplay("block");
-    			}
-			
-			}
-			
+
 			function setupRenderer(elementID) {
 				var localContainer = document.createElement( 'div' );
 				document.getElementById(elementID).appendChild( localContainer );
@@ -267,24 +208,23 @@
 				return localRenderer;
 			}
 			
-			bodyRenderer = setupRenderer("bodyDisplayArea");
-			initialiseBodyPanel();
-			//loadBody();
 			
-			organsRenderer = setupRenderer("organsDisplayArea");
-			initialiseOrgansVisualisation();
+			var systemMetaReadyCallback = function() {
+				return function() {
+					bodyViewer.readSystemMeta();
+				}	
+			}
 			
-			bodyRenderer.animate();
-			
-			organsRenderer.addPreRenderCallbackFunction(updateTimeSliderCallback());
-			organsRenderer.animate();
+			var modelsLoader = new PJP.ModelsLoader();
+			modelsLoader.addSystemMetaIsReadyCallback(systemMetaReadyCallback());
+			bodyViewer = new PJP.BodyViewer("bodyDisplayPort");			
+			organsViewer = new PJP.OrgansViewer("organsDisplayArea");
+			modelsLoader.initialiseLoading();
 			
 			volumeRenderInit();
 			
 			initialiseCellPanel();
 			initialiseModelPanel();
-			
-			initialiseLoading();
 
 		</script>
 
