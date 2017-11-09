@@ -11,7 +11,8 @@ PJP.OrgansViewer = function(PanelName)  {
 	};
 	var associateData = undefined;
 	var dataFields = undefined;
-	var externalOrganLink = undefined
+	var externalOrganLink = undefined;
+	var timeoutID = 0;
 	
 	var organPartsGui;
 	var organPartGuiControls = function() {
@@ -21,10 +22,11 @@ PJP.OrgansViewer = function(PanelName)  {
 	var organsControl = function() {
 		  this.Background = [ 255, 255, 255 ]; // RGB array
 	};
+	var UIIsReady = false;
 	
 	var _this = this;
 	
-	var organsRenderer = PJP.setupRenderer(PanelName);
+	var organsRenderer = null;
 	
 	var organsFileMap = new Array();
 	
@@ -176,10 +178,10 @@ PJP.OrgansViewer = function(PanelName)  {
 				hideTooltip();
 				document.getElementById("organsDisplayArea").style.cursor = "auto";
 			}
-		}	
+		}
 	};
 	
-	function updateOrganPartsVisibilty(name, flag) {
+	var updateOrganPartsVisibilty = function(name, flag) {
 		return function(zincGeometry) {
 			if (zincGeometry.groupName && zincGeometry.groupName == name) {
 				
@@ -246,6 +248,8 @@ PJP.OrgansViewer = function(PanelName)  {
 	}
 	
 	var initialiseOrgansVisualisation = function() {
+		organsRenderer = PJP.setupRenderer("organsDisplayArea");
+		organsRenderer.addPreRenderCallbackFunction(updateTimeSliderCallback());
 		defaultScene = organsRenderer.getCurrentScene();
 		organGui = new dat.GUI({autoPlace: false});
 		organGui.domElement.id = 'gui';
@@ -266,6 +270,35 @@ PJP.OrgansViewer = function(PanelName)  {
 		organGui.add(viewAllButton, 'View All');
 		organPartsGui = organGui.addFolder('Visibility Control');
 		organPartsGui.open();
+		organsRenderer.animate();
+	}
+	
+	var addUICallback = function() {
+		var callbackElement = document.getElementById("organLinkButton");
+		callbackElement.onclick = function() { openOrganModelLink() };
+	}
+	
+	var loadHTMLComplete = function(link) {
+		return function(event) {
+			var localDOM = document.getElementById(PanelName);
+			var childNodes = link.import.body.childNodes;
+			for (i = 0; i < childNodes.length; i++) {
+				localDOM.appendChild(childNodes[i]);
+			}
+			addUICallback();
+			initialiseOrgansVisualisation();
+			document.head.removeChild(link);
+			UIIsReady = true;
+		}
+	}
+	
+	var initialise = function() {
+		var link = document.createElement('link');
+		link.rel = 'import';
+		link.href = 'snippets/organsViewer.html';
+		link.onload = loadHTMLComplete(link);
+		link.onerror = loadHTMLComplete(link);
+		document.head.appendChild(link);	
 	}
 	
 	var getOrganDetails = function(systemName, partName) {
@@ -343,86 +376,98 @@ PJP.OrgansViewer = function(PanelName)  {
 	}
 	
 	this.loadOrgans = function(systemName, partName) {
-		if (systemName && partName) {
-			var systemMeta = modelsLoader.getSystemMeta();
-			var metaItem = systemMeta[systemName][partName];
-			var name = systemName + "/" + partName;
-			var organsDetails = getOrganDetails(systemName, partName);
-			associateData = undefined;
-			dataFields = undefined;
-			externalOrganLink = undefined;
-			if (organsDetails !== undefined){
-				if (organsDetails.sceneName !== undefined)
-					name = organsDetails.sceneName;
-				associateData = organsDetails.associateData;
-				if (organsDetails.fields)
-					dataFields = organsDetails.fields;
-				externalOrganLink = organsDetails.externalLink;
-			}
-			var button = document.getElementById("organLinkButton");
-			if (externalOrganLink) {
-				button.style.visibility = "visible";
-			} else {
-				button.style.visibility = "hidden";
-			}
-				
-			var organScene = organsRenderer.getSceneByName(name);
-			if (organScene == undefined) {
-				resetOrganSpecificGui();
-				organScene = organsRenderer.createScene(name);
-				displayScene = organScene;
-				var directionalLight = organScene.directionalLight;
-				directionalLight.intensity = 1.4;
-				if (organsDetails != undefined) {
-					if (organsDetails.view !== undefined)
-						organScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.view);
-					else {
-						organScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
-					}
-					organScene.loadMetadataURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.meta, 
-						_addOrganPartCallback(systemName, partName, false));
-					var zincCameraControl = organScene.getZincCameraControls();
-					zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
-					zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
-					if (organsDetails.picker != undefined) {
-						var pickerSceneName = name + "_picker_scene";
-						pickerScene = organsRenderer.createScene(pickerSceneName);
-						pickerScene.loadMetadataURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.picker);
-						zincCameraControl.enableRaycaster(pickerScene, _pickingCallback(), _hoverCallback());
-					} else {
-						zincCameraControl.enableRaycaster(organScene, _pickingCallback(), _hoverCallback());
-					}
-				} else {
-					organScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
-					var downloadPath = metaItem["BodyURL"];
-					if (metaItem["FileFormat"] == "JSON") {
-						organScene.loadMetadataURL(downloadPath, _addOrganPartCallback(systemName, partName, false));
-					}
-					else if (metaItem["FileFormat"] == "STL")
-						organScene.loadSTL(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
-					else if (metaItem["FileFormat"] == "OBJ") 
-						organScene.loadOBJ(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
-					organsRenderer.setCurrentScene(organScene);
-					var zincCameraControl = organScene.getZincCameraControls();
-					zincCameraControl.enableRaycaster(organScene, _pickingCallback(), _hoverCallback());
-					zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
-					zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
+		if (UIIsReady) {
+			if (systemName && partName) {
+				var systemMeta = modelsLoader.getSystemMeta();
+				var metaItem = systemMeta[systemName][partName];
+				var name = systemName + "/" + partName;
+				var organsDetails = getOrganDetails(systemName, partName);
+				associateData = undefined;
+				dataFields = undefined;
+				externalOrganLink = undefined;
+				if (organsDetails !== undefined){
+					if (organsDetails.sceneName !== undefined)
+						name = organsDetails.sceneName;
+					associateData = organsDetails.associateData;
+					if (organsDetails.fields)
+						dataFields = organsDetails.fields;
+					externalOrganLink = organsDetails.externalLink;
 				}
-				var directionalLight = organScene.directionalLight;
-				directionalLight.intensity = 1.4;
-				organsRenderer.setCurrentScene(organScene);
-			} else if (displayScene != organScene){
-				resetOrganSpecificGui();
-				organsRenderer.setCurrentScene(organScene);
-				displayScene = organScene;
-				var pickerSceneName = name + "_picker_scene";
-				pickerScene = organsRenderer.getSceneByName(pickerSceneName);
-				displayScene.forEachGeometry(_addOrganPartCallback());
-				displayScene.forEachGlyphset(_addOrganPartCallback());
+				var button = document.getElementById("organLinkButton");
+				if (externalOrganLink) {
+					button.style.visibility = "visible";
+				} else {
+					button.style.visibility = "hidden";
+				}
+					
+				var organScene = organsRenderer.getSceneByName(name);
+				if (organScene == undefined) {
+					resetOrganSpecificGui();
+					organScene = organsRenderer.createScene(name);
+					displayScene = organScene;
+					var directionalLight = organScene.directionalLight;
+					directionalLight.intensity = 1.4;
+					if (organsDetails != undefined) {
+						if (organsDetails.view !== undefined)
+							organScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.view);
+						else {
+							organScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
+						}
+						organScene.loadMetadataURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.meta, 
+							_addOrganPartCallback(systemName, partName, false));
+						var zincCameraControl = organScene.getZincCameraControls();
+						zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
+						zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
+						if (organsDetails.picker != undefined) {
+							var pickerSceneName = name + "_picker_scene";
+							pickerScene = organsRenderer.createScene(pickerSceneName);
+							pickerScene.loadMetadataURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.picker);
+							zincCameraControl.enableRaycaster(pickerScene, _pickingCallback(), _hoverCallback());
+						} else {
+							zincCameraControl.enableRaycaster(organScene, _pickingCallback(), _hoverCallback());
+						}
+					} else {
+						organScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
+						var downloadPath = metaItem["BodyURL"];
+						if (metaItem["FileFormat"] == "JSON") {
+							organScewith_body.htmlne.loadMetadataURL(downloadPath, _addOrganPartCallback(systemName, partName, false));
+						}
+						else if (metaItem["FileFormat"] == "STL")
+							organScene.loadSTL(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
+						else if (metaItem["FileFormat"] == "OBJ") 
+							organScene.loadOBJ(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
+						organsRenderer.setCurrentScene(organScene);
+						var zincCameraControl = organScene.getZincCameraControls();
+						zincCameraControl.enableRaycaster(organScene, _pickingCallback(), _hoverCallback());
+						zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
+						zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
+					}
+					var directionalLight = organScene.directionalLight;
+					directionalLight.intensity = 1.4;
+					organsRenderer.setCurrentScene(organScene);
+				} else if (displayScene != organScene){
+					resetOrganSpecificGui();
+					organsRenderer.setCurrentScene(organScene);
+					displayScene = organScene;
+					var pickerSceneName = name + "_picker_scene";
+					pickerScene = organsRenderer.getSceneByName(pickerSceneName);
+					displayScene.forEachGeometry(_addOrganPartCallback());
+					displayScene.forEachGlyphset(_addOrganPartCallback());
+				}
+				setOrgansString(name);
+				updateTimeSlider();
+				updateSpeedSlider();
 			}
-			setOrgansString(name);
-			updateTimeSlider();
-			updateSpeedSlider();
+		} else {
+			if (timeoutID == 0)
+				timeoutID = setTimeout(loadOrgansTimeputCallback(systemName, partName), 500);
+		}
+	}
+	
+	var loadOrgansTimeputCallback = function(systemName, partName) {
+		return function () {
+			timeoutID = 0;
+			_this.loadOrgans(systemName, partName);
 		}
 	}
 	
@@ -467,9 +512,7 @@ PJP.OrgansViewer = function(PanelName)  {
 		window.open(externalOrganLink, '');
 	}
 	
-	initialiseOrgansVisualisation();
-	organsRenderer.addPreRenderCallbackFunction(updateTimeSliderCallback());
-	organsRenderer.animate();
+	initialise();
 
 }
 

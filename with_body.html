@@ -53,19 +53,6 @@
 			</div>		
 		
 			<div id="organsDisplayPort" class="organsDisplayPortCollapse">
-				<div style="position:absolute;width:100%;">
-					<div class="titleContainer">
-						<p class="titleText" id="OrganTitle"><strong>Organ</strong></p>
-					</div>
-					<input class="screenButton" id="organsScreenButton" type="button" onclick="expandCollapse(this, 'organsDisplayPort')" value="Expand">
-					<div  id="organGui">
-					</div>
-				</div>
-				<div id="organsDisplayArea" style="height:100%;">
-				</div>
-				<div style="text-align:center;width:100%;position: absolute;bottom: 3%;">
-					<input id="organLinkButton" type="button" onclick="openOrganModelLink()" value="Models & data">
-				</div>
 			</div>
 			
 			<div id="tissueDisplayPort" class="tissueDisplayPortCollapse">
@@ -218,7 +205,7 @@
 			var modelsLoader = new PJP.ModelsLoader();
 			modelsLoader.addSystemMetaIsReadyCallback(systemMetaReadyCallback());
 			bodyViewer = new PJP.BodyViewer("bodyDisplayPort");			
-			organsViewer = new PJP.OrgansViewer("organsDisplayArea");
+			organsViewer = new PJP.OrgansViewer("organsDisplayPort");
 			modelsLoader.initialiseLoading();
 			
 			volumeRenderInit();

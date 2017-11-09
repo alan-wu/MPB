@@ -281,7 +281,7 @@ PJP.BodyViewer = function(PanelName)  {
 		}
 	}
 	
-	this.systemButtonPress = function(receivedElement) {
+	var systemButtonPress = function(receivedElement) {
 		var systemName = receivedElement.id;
 		toggleSystem(systemName, !(systemPartsGuiControls[systemName]["All"]));
 	}
@@ -367,6 +367,22 @@ PJP.BodyViewer = function(PanelName)  {
 		bodyRenderer.animate();
 	}
 	
+	var systemButtonPressCallback = function(element) {
+		return function() {
+			systemButtonPress(element);
+		}
+	}
+	
+	var addUICallback = function() {
+		var callbackContainer = document.getElementById("systemToggle");
+		var inputs, index;
+		inputs = callbackContainer.getElementsByTagName('input');
+		for (var i = 0; i < inputs.length; ++i) {
+			
+			inputs[i].onclick = systemButtonPressCallback(inputs[i]); 
+		}
+	}
+	
 	var loadHTMLComplete = function(link) {
 		return function(event) {
 			var localDOM = document.getElementById(PanelName);
@@ -374,6 +390,7 @@ PJP.BodyViewer = function(PanelName)  {
 			for (i = 0; i < childNodes.length; i++) {
 				localDOM.appendChild(childNodes[i]);
 			}
+			addUICallback();
 			initialiseBodyPanel();
 			document.head.removeChild(link);
 			UIIsReady = true;
