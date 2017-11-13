@@ -281,7 +281,11 @@ PJP.OrgansViewer = function(PanelName)  {
 	var loadHTMLComplete = function(link) {
 		return function(event) {
 			var localDOM = document.getElementById(PanelName);
-			var childNodes = link.import.body.childNodes;
+			var childNodes = null;
+			if (link.import.body !== undefined)
+				childNodes = link.import.body.childNodes;
+			else if (link.childNodes !== undefined)
+				childNodes = link.childNodes;
 			for (i = 0; i < childNodes.length; i++) {
 				localDOM.appendChild(childNodes[i]);
 			}

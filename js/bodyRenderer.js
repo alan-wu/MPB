@@ -236,7 +236,8 @@ PJP.BodyViewer = function(PanelName)  {
 			}
 		}
 		for (var i = 0; i < systemGuiFolder[systemName].__controllers.length; i++) {
-			systemGuiFolder[systemName].__controllers[i].updateDisplay();
+			systemGuiFolder[systemName].__controllers[i].updateD
+			readModel(systemName, partName, true);isplay();
 			systemGuiFolder[systemName].__controllers[i].__prev = 
 				systemGuiFolder[systemName].__controllers[i].__checkbox.checked;
 		}
@@ -386,10 +387,14 @@ PJP.BodyViewer = function(PanelName)  {
 	var loadHTMLComplete = function(link) {
 		return function(event) {
 			var localDOM = document.getElementById(PanelName);
-			var childNodes = link.import.body.childNodes;
+			var childNodes = null;
+			if (link.import.body !== undefined)
+				childNodes = link.import.body.childNodes;
+			else if (link.childNodes !== undefined)
+				childNodes = link.childNodes;
 			for (i = 0; i < childNodes.length; i++) {
 				localDOM.appendChild(childNodes[i]);
-			}
+			}	
 			addUICallback();
 			initialiseBodyPanel();
 			document.head.removeChild(link);
@@ -398,6 +403,7 @@ PJP.BodyViewer = function(PanelName)  {
 	}
 	
 	var initialise = function() {
+
 		var link = document.createElement('link');
 		link.rel = 'import';
 		link.href = 'snippets/bodyViewer.html';
@@ -451,6 +457,7 @@ PJP.BodyViewer = function(PanelName)  {
 			setTimeout(function(){ _this.readSystemMeta(); }, 500);
 		}
 	}
+	
 	
 	initialise();
 
