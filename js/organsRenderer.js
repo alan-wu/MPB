@@ -145,13 +145,13 @@ PJP.OrgansViewer = function(PanelName)  {
 					currentHoverId = id;
 					showTooltip(window_x, window_y);
 					var tissueTitle = "<strong>Tissue: <span style='color:#FF4444'>" + id + "</span></strong>";
-					setTissueTitleString(tissueTitle);
-					document.getElementById("cellButtonContainer").style.visibility = "visible";
-					showCollagenVisible(true);
+					tissueViewer.setTissueTitleString(tissueTitle);
+					tissueViewer.showButtons(true);
+					tissueViewer.showCollagenVisible(true);
 				} else if (displayScene.sceneName.includes("Cardiovascular/Arterial")) {
 					setToolTipText("Click to show vascular model");
 					showTooltip(window_x, window_y);
-					resetTissuePanel();
+					tissueViewer.resetTissuePanel();
 					resetCellPanel();
 					openModel("BG_Circulation_Model.svg");
 				}

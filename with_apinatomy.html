@@ -57,31 +57,6 @@
 			</div>
 			
 			<div id="tissueDisplayPort" class="tissueDisplayPortCollapse">
-				<div style="position:absolute;width:100%;">
-					<div class="titleContainer" style="bottom:2%;">
-						<p class="titleText" id="TissueTitle"><strong>Tissue</strong></p>
-					</div>
-					<input class="screenButton" id="tissueScreenButton" type="button" onclick="expandCollapse(this, 'tissueDisplayPort')" value="Expand">
-					<div id="tissueGui">
-					</div>
-				</div>
-				<div id="tissueDisplayArea" style="height:100%;">
-				</div>
-				<div id="cellButtonContainer" style="visibility:hidden;">
-					<div id="cellButtonDivider" style="positon:relative;bottom:10%;">
-						<div style="padding-left:5%;float:left;text-align: center;">
-							<input class="w3-button w3-round-xlarge w3-gray w3-hover-gray" style="padding-top:1%;padding-bottom:1%;z-index:2;border-color: #ffffff;" id="cellButton1" type="button" onclick="openCellModelUI('Cardiac myocyte')" value="Cardiac myocyte">
-						</div>
-						<div style="padding-right:5%;width:100%;text-align:right;">
-							<input type="button" style="background-color:rgb(100%, 30%, 30%);" onclick="openConstitutiveLawsLink()" value="Constitutive laws">
-						</div>
-					</div>
-					<div id="cellButtonDivider" style="bottom:4%;">
-						<div style="padding-left:5%;float:left;text-align: center;">
-							<input class="w3-button w3-round-xlarge w3-gray w3-hover-gray" style="padding-top:1%;padding-bottom:1%;z-index:2;border-color: #ffffff;" id="cellButton2" type="button" onclick="openCellModelUI('Cardiac fibroblast')" value="Cardiac fibroblast">
-						</div>
-					</div>
-				</div>
 			</div>
 			
 			<div id="cellDisplayPort" class="cellDisplayPortCollapse">
@@ -185,27 +160,15 @@
 		<script>
 			var bodyViewer = undefined;
 			var organsViewer = undefined;
-			var referenceRenderer = undefined;
+			var tissueViewer = undefined;
 			var tooltipcontainerElement = document.getElementById('tooltipcontainer');
 			var tipElement = document.getElementById('tip');
 			var tiptextElement = document.getElementById('tiptext');
-
-			function setupRenderer(elementID) {
-				var localContainer = document.createElement( 'div' );
-				document.getElementById(elementID).appendChild( localContainer );
-				localContainer.style.height = "100%"
-				var localRenderer = new Zinc.Renderer(localContainer, window);
-				Zinc.defaultMaterialColor = 0xFFFF9C
-				localRenderer.initialiseVisualisation();
-				localRenderer.playAnimation = false;	
-				return localRenderer;
-			}
-			
 			
 			var systemMetaReadyCallback = function() {
 				return function() {
 					bodyViewer.readSystemMeta();
-				}	
+				}
 			}
 			
 			var modelsLoader = new PJP.ModelsLoader();
@@ -213,8 +176,7 @@
 			bodyViewer = new PJP.BodyViewer("bodyDisplayPort");			
 			organsViewer = new PJP.OrgansViewer("organsDisplayPort");
 			modelsLoader.initialiseLoading();
-			
-			volumeRenderInit();
+			tissueViewer = new PJP.TissueViewer("tissueDisplayPort");
 			
 			initialiseCellPanel();
 			initialiseModelPanel();

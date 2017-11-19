@@ -403,7 +403,6 @@ PJP.BodyViewer = function(PanelName)  {
 	}
 	
 	var initialise = function() {
-
 		var link = document.createElement('link');
 		link.rel = 'import';
 		link.href = 'snippets/bodyViewer.html';
@@ -431,7 +430,6 @@ PJP.BodyViewer = function(PanelName)  {
 		}
 	}
 	
-	
 	var readBodyRenderModel = function(systemName, partMap) {
 		for (var partName in partMap) {
 			if (partMap.hasOwnProperty(partName)) {
@@ -457,7 +455,6 @@ PJP.BodyViewer = function(PanelName)  {
 			setTimeout(function(){ _this.readSystemMeta(); }, 500);
 		}
 	}
-	
 	
 	initialise();
 
