@@ -237,7 +237,7 @@ PJP.BodyViewer = function(PanelName)  {
 		}
 		for (var i = 0; i < systemGuiFolder[systemName].__controllers.length; i++) {
 			systemGuiFolder[systemName].__controllers[i].updateD
-			readModel(systemName, partName, true);isplay();
+			readModel(systemName, partName, true);
 			systemGuiFolder[systemName].__controllers[i].__prev = 
 				systemGuiFolder[systemName].__controllers[i].__checkbox.checked;
 		}
