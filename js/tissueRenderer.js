@@ -15,6 +15,7 @@ PJP.TissueViewer = function(PanelName)  {
 	var gui;
 	var guiControls;
 	var constitutiveLawsLink = "https://models.physiomeproject.org/mechanical_constitutive_laws";
+	var UIIsReady = false;
 	var _this = this;
 	
 	var showCellTooltip = function(id, x, y) {
@@ -41,8 +42,8 @@ PJP.TissueViewer = function(PanelName)  {
 	
 	var openCellModelUI = function(id) {
 		var cellTitle = "<strong>Cell: <span style='color:#FF4444'>" + id + "</span></strong>";
-		setCellPanelTitle(cellTitle);
-		openCell();
+		cellPanel.setCellPanelTitle(cellTitle);
+		cellPanel.openCell();
 		openModel("Myocyte_v6_Grouped.svg");
 	}
 	

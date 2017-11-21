@@ -152,7 +152,7 @@ PJP.OrgansViewer = function(PanelName)  {
 					setToolTipText("Click to show vascular model");
 					showTooltip(window_x, window_y);
 					tissueViewer.resetTissuePanel();
-					resetCellPanel();
+					cellPanel.resetCellPanel();
 					openModel("BG_Circulation_Model.svg");
 				}
 			}

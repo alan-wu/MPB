@@ -1,0 +1,25 @@
+<div style="position:absolute;width:100%;">
+	<div class="titleContainer" style="bottom:2%;">
+		<p class="titleText" id="TissueTitle"><strong>Tissue</strong></p>
+	</div>
+	<input class="screenButton" id="tissueScreenButton" type="button" onclick="expandCollapse(this, 'tissueDisplayPort')" value="Expand">
+	<div id="tissueGui">
+	</div>
+</div>
+<div id="tissueDisplayArea" style="height:100%;">
+</div>
+<div id="cellButtonContainer" style="visibility:hidden;">
+	<div id="cellButtonDivider" style="positon:relative;bottom:10%;">
+		<div style="padding-left:5%;float:left;text-align: center;">
+			<input class="w3-button w3-round-xlarge w3-gray w3-hover-gray" style="padding-top:1%;padding-bottom:1%;z-index:2;border-color: #ffffff;" id="cellButton1" type="button" value="Cardiac myocyte">
+		</div>
+		<div style="padding-right:5%;width:100%;text-align:right;">
+			<input type="button" style="background-color:rgb(100%, 30%, 30%);" value="Constitutive laws" id="cellButton3">
+		</div>
+	</div>
+	<div id="cellButtonDivider" style="bottom:4%;">
+		<div style="padding-left:5%;float:left;text-align: center;">
+			<input class="w3-button w3-round-xlarge w3-gray w3-hover-gray" style="padding-top:1%;padding-bottom:1%;z-index:2;border-color: #ffffff;" id="cellButton2" type="button" value="Cardiac fibroblast">
+		</div>
+	</div>
+</div>
