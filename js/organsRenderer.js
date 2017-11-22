@@ -153,7 +153,7 @@ PJP.OrgansViewer = function(PanelName)  {
 					showTooltip(window_x, window_y);
 					tissueViewer.resetTissuePanel();
 					cellPanel.resetCellPanel();
-					openModel("BG_Circulation_Model.svg");
+					modelPanel.openModel("BG_Circulation_Model.svg");
 				}
 			}
 		}	

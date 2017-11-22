@@ -15,7 +15,7 @@ svgIonChannelCallbackElement["v1_button"] = "v1_expression";
 var svgCannelExpressionCallbackElement = new Array();
 svgCannelExpressionCallbackElement["v1_expression"] = " https://models.physiomeproject.org/e/430/sodium_ion_channel.cellml/view";
 
-var svgElemenClassToggle = function(svgElementId, svgClassName) {
+var svgElementClassToggle = function(svgElementId, svgClassName) {
 	  var object = document.getElementById(svgElementId);
 	  var svgDocument = object.contentDocument;
 	  var svgElement = svgDocument.getElementsByClassName(svgClassName);

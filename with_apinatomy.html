@@ -63,58 +63,6 @@
 			</div>
 			
 			<div id="modelDisplayPort" class="modelDisplayPortCollapse">
-				<div style="width:100%;">
-					<div class="titleContainer">
-						<p class="titleText" id="ModelTitle"><strong>Models</strong></p>
-					</div>
-					<input class="screenButton" id="modelScreenButton" type="button" onclick="expandSVGCollapse(this, 'modelDisplayPort')" value="Expand">
-					<div id="modelGui">
-					</div>
-					<div id="modelsController">
-						<input class="modelButton" type="button" onclick="runModel(this)" value="Run Simulation">
-						<div id="ZoomControl" style="position:absolute;margin-left:55%;">
-						<input id="svgZoomOut" title="Zoom Out" class="w3-circle w3-white w3-hover-white" style="width:30px;height:30px;" type="button" value="-" onclick="svgZoomOut(0.20);">
-						<input  title="Reset" class="w3-circle w3-white w3-hover-white" style="height:30px;" type="button" value="Reset" onclick="resetZoom();">
-						<input id="svgZoomIn" title="Zoom In" class="w3-circle w3-white w3-hover-white" style="width:30px;height:30px;" type="button" value="+"  onclick="svgZoomIn(0.20);">
-						</div>
-					</div>
-				</div>
-
-				<p style="text-align: center;">&nbsp;</p>
-				<div id="modelsContainer">
-					<object class="svgContainer" id="testsvg" align="middle" type="image/svg+xml">SVGs not loaded yet.</object>
-				<!--
-					<p style="text-align: center;">&nbsp;</p>
-					<input class="modelButton" type="button" onclick="svgElemenToggle('testsvg', 'cls-5')" value="Green">
-					<input class="modelButton" type="button" onclick="svgElemenToggle('testsvg', 'cls-6')" value="Orange">
-					<input class="modelButton" type="button" onclick="svgElemenToggle('testsvg', 'cls-7')" value="Pink">					
-
-					<div style="height:20%;border-top: 2px solid #000000;">
-						<div style="height:100%;left:0%;width:50%;float:left;border-right: 2px solid #000000;border-bottom: 2px solid #000000;">
-							<p style="text-align: center;">Electrophysiology</p>
-							<a style="padding-bottom:1%;max-width:100%;max-height:100%;" target="_blank" href = "https://models.cellml.org/exposure/5230da0/jafri_rice_winslow_1998_b.cellml/view">
-								<img align="middle" src="images/jafri_rice_winslow_1998.png" class="model">
-							</a>
-							<input class="modelButton" type="button" onclick="runModel(this)" value="Run Simulation">
-						</div>
-						<div style="height:100%;left:50%;width:50%;float:left;">
-							<p style="text-align: center;">&nbsp;</p>
-							<p style="text-align: center;">Metabolism</p>
-							<a style="max-width:100%;max-height:100%;" target="_blank" href = "https://models.cellml.org/exposure/1a1ce68/salem_saidel_stanley_cabrera_2002.cellml/view">
-								<img align="middle" src="images/salem_2002.png" class="model">
-							</a>
-						</div>
-					</div>
-					<div style="height:20%;">
-						<div style="height:100%;left:0%;width:50%;float:left;border-right: 2px solid #000000;border-bottom: 2px solid #000000;">
-							<p style="text-align: center;">Signalling</p>
-							<a style="width:100%;" target="_blank" href = "https://models.cellml.org/exposure/39fee05/cooling_hunter_crampin_2007.cellml/view">
-								<img align="middle" src="images/cooling_2007.png" class="model">
-							</a>
-						</div>
-					</div>
-					-->	
-				</div>
 			</div>
 		</div>
 		<div style="position:absolute;height:30%;width:100%;top:70%;border-top: 1px solid black;">
@@ -144,6 +92,7 @@
 			var organsViewer = undefined;
 			var tissueViewer = undefined;
 			var cellPanel = undefined;
+			var modelPanel = undefined;
 			var tooltipcontainerElement = document.getElementById('tooltipcontainer');
 			var tipElement = document.getElementById('tip');
 			var tiptextElement = document.getElementById('tiptext');
@@ -154,14 +103,14 @@
 				}
 			}
 			
-			var modelsLoader = new PJP.ModelsLoader();
-			modelsLoader.addSystemMetaIsReadyCallback(systemMetaReadyCallback());
 			bodyViewer = new PJP.BodyViewer("bodyDisplayPort");			
 			organsViewer = new PJP.OrgansViewer("organsDisplayPort");
+			var modelsLoader = new PJP.ModelsLoader();
+			modelsLoader.addSystemMetaIsReadyCallback(systemMetaReadyCallback());
 			modelsLoader.initialiseLoading();
 			tissueViewer = new PJP.TissueViewer("tissueDisplayPort");
 			cellPanel = new PJP.CellPanel("cellDisplayPort");
-			initialiseModelPanel();
+			modelPanel = new PJP.ModelPanel("modelDisplayPort");
 
 		</script>
 

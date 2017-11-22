@@ -44,7 +44,7 @@ PJP.TissueViewer = function(PanelName)  {
 		var cellTitle = "<strong>Cell: <span style='color:#FF4444'>" + id + "</span></strong>";
 		cellPanel.setCellPanelTitle(cellTitle);
 		cellPanel.openCell();
-		openModel("Myocyte_v6_Grouped.svg");
+		modelPanel.openModel("Myocyte_v6_Grouped.svg");
 	}
 	
 	var _pickingCellCallback = function() {
