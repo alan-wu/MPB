@@ -314,7 +314,7 @@ PJP.BodyViewer = function(PanelName)  {
 				geometry.morph.material.side = THREE.FrontSide;
 			}
 			geometry.morph.userData = [systemName, partName];
-		}	
+		}
 	};
 	
 	var addSystemFolder = function() {
@@ -341,7 +341,6 @@ PJP.BodyViewer = function(PanelName)  {
 			internalRenderer.setClearColor( colour, 1 );
 		}
 	}
-	
 	
 	var initialiseBodyPanel = function() {
 		bodyRenderer = PJP.setupRenderer("bodyDisplayArea");
@@ -442,7 +441,6 @@ PJP.BodyViewer = function(PanelName)  {
 				}
 			}
 		}
-		
 	}
 	
 	this.readSystemMeta = function() {
@@ -457,6 +455,5 @@ PJP.BodyViewer = function(PanelName)  {
 	}
 	
 	initialise();
-
 }
 
