@@ -1,4 +1,6 @@
 var expandCollapseApinatomy = function(source, portName) {
+	if (source.value == "Expand")
+		resetExpandButton();
 	expandCollapse(source, portName);
 	if (source.value == "Expand") {
 		main.apinatomyPanel.className = "apinatomyDisplayPortCollapse";
@@ -11,6 +13,7 @@ var expandCollapseApinatomy = function(source, portName) {
 
 var showApinatomy = function() {
 	main.apinatomyPanel.style.visibility = "visible";
+	main.hideApinatomyButton.style.visibility = "visible";
 	main.apinatomyIsDisplayed = true;
 	main.topPanel.className = "topPanelCollapse";
 	main.showApinatomyButton.style.visibility = "hidden";
@@ -18,6 +21,7 @@ var showApinatomy = function() {
 
 var hideApinatomy = function() {
 	main.apinatomyPanel.style.visibility = "hidden";
+	main.hideApinatomyButton.style.visibility = "hidden";
 	main.apinatomyIsDisplayed = false;
 	main.topPanel.className = "topPanelExpand";
 	main.showApinatomyButton.style.visibility = "visible";

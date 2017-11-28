@@ -34,6 +34,14 @@ var hideTooltip = function() {
 	tiptextElement.style.opacity = 0;
 }
 
+var previousSource = undefined;
+
+var resetExpandButton = function() {
+	if (previousSource !== undefined)
+		previousSource.value = "Expand";
+	previousSource = undefined;
+}
+
 var toggleSplitDisplay = function(displayStyle) {
 	var portArrays = ["bodyDisplayPort", "organsDisplayPort", "tissueDisplayPort", "cellDisplayPort", "modelDisplayPort"];
 	for (var i = 0; i < portArrays.length; i++) {
@@ -52,6 +60,7 @@ var expandCollapse = function(source, portName) {
 		portElement.className = "fullPortDisplay";
 		portElement.style.display = "block";
 		source.value = "Collapse";
+		previousSource = source;
 	}
 	else {
 		toggleSplitDisplay("block");
