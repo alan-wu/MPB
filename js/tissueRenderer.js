@@ -16,7 +16,17 @@ PJP.TissueViewer = function(PanelName)  {
 	var guiControls;
 	var constitutiveLawsLink = "https://models.physiomeproject.org/mechanical_constitutive_laws";
 	var UIIsReady = false;
+	var cellPanel = undefined;
+	var modelPanel = undefined;
 	var _this = this;
+	
+	this.setCellPanel = function(CellPanelIn) {
+		cellPanel = CellPanelIn;
+	}
+	
+	this.setModelPanel = function(ModelPanelIn) {
+		modelPanel = ModelPanelIn;
+	}
 	
 	var showCellTooltip = function(id, x, y) {
 		tiptextElement.innerHTML = "Cell model " + id;
@@ -42,9 +52,12 @@ PJP.TissueViewer = function(PanelName)  {
 	
 	var openCellModelUI = function(id) {
 		var cellTitle = "<strong>Cell: <span style='color:#FF4444'>" + id + "</span></strong>";
-		cellPanel.setCellPanelTitle(cellTitle);
-		cellPanel.openCell();
-		modelPanel.openModel("Myocyte_v6_Grouped.svg");
+		if (cellPanel) {
+			cellPanel.setCellPanelTitle(cellTitle);
+			cellPanel.openCell();
+		}
+		if (modelPanel)
+			modelPanel.openModel("Myocyte_v6_Grouped.svg");
 	}
 	
 	var _pickingCellCallback = function() {
@@ -164,7 +177,6 @@ PJP.TissueViewer = function(PanelName)  {
 			var blueValue = parseInt(value[2]);
 			
 			var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-			//document.getElementById("mainBody").style.backgroundColor = backgroundColourString;
 			var colour = new THREE.Color(backgroundColourString);
 			var renderer = tissueRenderer.getThreeJSRenderer();
 			renderer.setClearColor( colour, 1 );

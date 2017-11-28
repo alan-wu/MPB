@@ -1,5 +1,8 @@
 var PJP = { VERSION: '0.1' };
 var currentHoverId = -1;
+var tooltipcontainerElement = undefined;
+var tipElement = undefined;
+var tiptextElement = undefined;
 
 PJP.ITEM_LOADED = { FALSE: -1, DOWNLOADING: 0, TRUE: 1 };
 
@@ -35,22 +38,52 @@ var toggleSplitDisplay = function(displayStyle) {
 	var portArrays = ["bodyDisplayPort", "organsDisplayPort", "tissueDisplayPort", "cellDisplayPort", "modelDisplayPort"];
 	for (var i = 0; i < portArrays.length; i++) {
 		var portElement = document.getElementById(portArrays[i]);
-		portElement.className = portArrays[i] + "Collapse";
-		portElement.style.display = displayStyle;
+		if (portElement) {
+			portElement.className = portArrays[i] + "Collapse";
+			portElement.style.display = displayStyle;
+		}
 	}
 }
 
 var expandCollapse = function(source, portName) {
 	if (source.value=="Expand") {
-		source.value = "Collapse";
 		toggleSplitDisplay("none");
 		var portElement = document.getElementById(portName);
 		portElement.className = "fullPortDisplay";
 		portElement.style.display = "block";
+		source.value = "Collapse";
 	}
-	else { 
-		source.value = "Expand";
+	else {
 		toggleSplitDisplay("block");
+		source.value = "Expand";
 	}
-
 }
+
+loadToolTipHTMLComplete = function(link) {
+	return function(event) {
+		var localDOM = document.body;
+		var childNodes = null;
+		if (link.import.body !== undefined)
+			childNodes = link.import.body.childNodes;
+		else if (link.childNodes !== undefined)
+			childNodes = link.childNodes;
+		for (i = 0; i < childNodes.length; i++) {
+			localDOM.appendChild(childNodes[i]);
+		}
+		tooltipcontainerElement = document.getElementById('tooltipcontainer');
+		tipElement = document.getElementById('tip');
+		tiptextElement = document.getElementById('tiptext');
+		document.head.removeChild(link);
+	}
+}
+
+PJP.setupToolTipContainer = function() {
+	var link = document.createElement('link');
+	link.rel = 'import';
+	link.href = 'snippets/toolTip.html';
+	link.onload = loadToolTipHTMLComplete(link);
+	link.onerror = loadToolTipHTMLComplete(link);
+	document.head.appendChild(link);	
+}
+
+PJP.setupToolTipContainer();

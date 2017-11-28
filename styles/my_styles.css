@@ -142,6 +142,8 @@ input:checked + .switchSlider:before {
     z-index:2;
 }
 
+
+
 .bodyDisplayPortCollapse {
 	position:absolute;
 	height:100%;
@@ -186,6 +188,15 @@ input:checked + .switchSlider:before {
 	display: block;
 }
 
+.apinatomyDisplayPortCollapse {
+	position:absolute;
+	height:30%;
+	width:100%;
+	top:70%;
+	border-top: 1px solid black;
+	display: block;
+}
+
 .fullPortDisplay {
 	position:relative;
 	height:100%;
@@ -208,7 +219,7 @@ input:checked + .switchSlider:before {
     position:relative;
     width:100%;
 }
-
+display:none
 .titleContainer {
     position:relative;
     width:100%;
@@ -338,9 +349,35 @@ img.model {
 	text-align:center;
 	visibility:hidden;
 	display:block;
+}.leftTopButton {
+    position:absolute;
+    left: 1%;
+    z-index:2;
 }
 
 .fullPortDisplay #modelsController{
 	display:flex;
 }
 
+.hideApinatomyButton {
+    position:absolute;
+    left: 1%;
+    z-index:2;
+}
+
+.showApinatomyButton {
+    position:absolute;
+    left: 1%;
+    bottom: 1%;
+    z-index:2;
+    visibility:hidden;
+}
+	
+
+.topPanelExpand {
+	height:100%;
+}
+
+.topPanelCollapse {
+	height:70%;
+}

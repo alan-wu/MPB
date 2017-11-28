@@ -1,5 +1,5 @@
 
-PJP.OrgansViewer = function(PanelName)  {
+PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var pickerScene = undefined;
 	var displayScene = undefined;
 	var defaultScene = undefined;
@@ -23,6 +23,10 @@ PJP.OrgansViewer = function(PanelName)  {
 		  this.Background = [ 255, 255, 255 ]; // RGB array
 	};
 	var UIIsReady = false;
+	var tissueViewer = undefined;
+	var cellPanel = undefined;
+	var modelPanel = undefined;
+	var modelsLoader = ModelsLoaderIn;
 	
 	var _this = this;
 	
@@ -83,6 +87,18 @@ PJP.OrgansViewer = function(PanelName)  {
 			meta: "respiratory/lungs_1.json",
 			picker: undefined,
 			associateData: undefined};
+	
+	this.setTissueViewer = function(TissueViewerIn) {
+		tissueViewer = TissueViewerIn;
+	}
+	
+	this.setCellPanel = function(CellPanelIn) {
+		cellPanel = CellPanelIn;
+	}
+	
+	this.setModelPanel = function(ModelPanelIn) {
+		modelPanel = ModelPanelIn;
+	}
 	
 	var getPos = function(el) {
 	    for (var lx=0, ly=0;
@@ -145,15 +161,20 @@ PJP.OrgansViewer = function(PanelName)  {
 					currentHoverId = id;
 					showTooltip(window_x, window_y);
 					var tissueTitle = "<strong>Tissue: <span style='color:#FF4444'>" + id + "</span></strong>";
-					tissueViewer.setTissueTitleString(tissueTitle);
-					tissueViewer.showButtons(true);
-					tissueViewer.showCollagenVisible(true);
+					if (tissueViewer) {
+						tissueViewer.setTissueTitleString(tissueTitle);
+						tissueViewer.showButtons(true);
+						tissueViewer.showCollagenVisible(true);
+					}
 				} else if (displayScene.sceneName.includes("Cardiovascular/Arterial")) {
 					setToolTipText("Click to show vascular model");
 					showTooltip(window_x, window_y);
-					tissueViewer.resetTissuePanel();
-					cellPanel.resetCellPanel();
-					modelPanel.openModel("BG_Circulation_Model.svg");
+					if (tissueViewer)
+						tissueViewer.resetTissuePanel();
+					if (cellPanel)
+						cellPanel.resetCellPanel();
+					if (modelPanel)
+						modelPanel.openModel("BG_Circulation_Model.svg");
 				}
 			}
 		}	
@@ -240,7 +261,6 @@ PJP.OrgansViewer = function(PanelName)  {
 			var blueValue = parseInt(value[2]);
 			
 			var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-			//document.getElementById("mainBody").style.backgroundColor = backgroundColourString;
 			var colour = new THREE.Color(backgroundColourString);
 			var internalRenderer = organsRenderer.getThreeJSRenderer();
 			internalRenderer.setClearColor( colour, 1 );

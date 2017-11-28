@@ -1,4 +1,4 @@
-PJP.BodyViewer = function(PanelName)  {
+PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 
 	var bodyScene = undefined;
 	var modelsTransformationMap = new Array();
@@ -9,6 +9,8 @@ PJP.BodyViewer = function(PanelName)  {
 	var systemGuiFolder = new Array();
 	var remvoeWhenNotVisibile = false;
 	var UIIsReady = false;
+	var organsViewer = undefined;
+	var modelsLoader = ModelsLoaderIn;
 	
 	systemGuiFolder["Musculo-skeletal"] = undefined;
 	systemGuiFolder["Cardiovascular"] = undefined;
@@ -65,6 +67,10 @@ PJP.BodyViewer = function(PanelName)  {
 			folder: "respiratory",
 			system: "Respiratory"};
 	
+	this.setOrgansViewer = function(OrgansViewerIn) {
+		organsViewer = OrgansViewerIn;
+	}
+	
 	var showBodyTooltip = function(name, x, y) {
 		tiptextElement.innerHTML = name;
 		tooltipcontainerElement.style.left = x +"px";
@@ -88,7 +94,8 @@ PJP.BodyViewer = function(PanelName)  {
 			for (var i = 0; i < intersects.length; i++) {
 				if (intersects[i] !== undefined && (intersects[ i ].object.name !== undefined)) {
 					if (!intersects[ i ].object.name.includes("Body")) {
-						organsViewer.loadOrgans(intersects[ i ].object.userData[0], intersects[ i ].object.name);
+						if (organsViewer)
+							organsViewer.loadOrgans(intersects[ i ].object.userData[0], intersects[ i ].object.name);
 						if (currentSelectedMaterial && currentSelectedMaterial != intersects[ i ].object.material) {
 							if (currentSelectedMaterial == currentHoveredMaterial)
 								currentSelectedMaterial.emissive.setHex(0x0000FF);
@@ -103,7 +110,7 @@ PJP.BodyViewer = function(PanelName)  {
 					}
 				}
 			}
-			if (bodyClicked) {
+			if (bodyClicked && organsViewer) {
 				organsViewer.loadOrgans("Skin (integument)", "Body");
 			}
 		}	
@@ -335,7 +342,6 @@ PJP.BodyViewer = function(PanelName)  {
 			var blueValue = parseInt(value[2]);
 			
 			var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-			//document.getElementById("mainBody").style.backgroundColor = backgroundColourString;
 			var colour = new THREE.Color(backgroundColourString);
 			var internalRenderer = bodyRenderer.getThreeJSRenderer();
 			internalRenderer.setClearColor( colour, 1 );

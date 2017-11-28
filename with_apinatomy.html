@@ -26,50 +26,10 @@
 		<link rel="stylesheet" href="styles/my_styles.css">
 		<link rel="stylesheet" href="styles/bootstrap.min.css">
 		<link rel="stylesheet" href="styles/w3.css">
-		<script>
-	    	var dojoConfig = {
-				async: true,
-				// This code registers the correct location of the "demo" package
-				// so we can load Dojo from the CDN whilst still being able to
-				// load local modules
-				packages: [{
-					name: "js",
-					location: location.pathname.replace(/\/[^/]+$/, '')  + '/js'
-				}]
-			};
-    	</script>
     	<script src="js/html-imports.min.js"></script>
 	</head>
 
-	<body style="height:100%;" id="mainBody">
-		<div style="position:absolute;height:70%;width:100%;">
-				
-			<div id="tooltipcontainer">
-				<div class="tooltip" id="tip">
-	  				<span class="tooltiptext" id="tiptext"> Tooltip text</span>
-				</div>
-			</div>
-	
-			<div id="bodyDisplayPort" class="bodyDisplayPortCollapse">
-			</div>		
-		
-			<div id="organsDisplayPort" class="organsDisplayPortCollapse">
-			</div>
-			
-			<div id="tissueDisplayPort" class="tissueDisplayPortCollapse">
-			</div>
-			
-			<div id="cellDisplayPort" class="cellDisplayPortCollapse">
-			</div>
-			
-			<div id="modelDisplayPort" class="modelDisplayPortCollapse">
-			</div>
-		</div>
-		<div style="position:absolute;height:30%;width:100%;top:70%;border-top: 1px solid black;">
-			<div id="circuitboard"></div>
-			<div id="three-d-canvas"></div>
-		</div>
-
+	<body style="height:100%;">
 		<script src="js/three.min.js"></script>
 		<script src="js/OBJLoader.js"></script>
 		<script src="js/STLLoader.js"></script>
@@ -86,33 +46,6 @@
 		<script src="js/cell_panel.js"></script>
 		<script src="js/model_panel.js"></script>
 		<script src="js/svgController.js"></script>
-		<script src="apinatomy/example.js"></script>
-		<script>
-			var bodyViewer = undefined;
-			var organsViewer = undefined;
-			var tissueViewer = undefined;
-			var cellPanel = undefined;
-			var modelPanel = undefined;
-			var tooltipcontainerElement = document.getElementById('tooltipcontainer');
-			var tipElement = document.getElementById('tip');
-			var tiptextElement = document.getElementById('tiptext');
-			
-			var systemMetaReadyCallback = function() {
-				return function() {
-					bodyViewer.readSystemMeta();
-				}
-			}
-			
-			bodyViewer = new PJP.BodyViewer("bodyDisplayPort");			
-			organsViewer = new PJP.OrgansViewer("organsDisplayPort");
-			var modelsLoader = new PJP.ModelsLoader();
-			modelsLoader.addSystemMetaIsReadyCallback(systemMetaReadyCallback());
-			modelsLoader.initialiseLoading();
-			tissueViewer = new PJP.TissueViewer("tissueDisplayPort");
-			cellPanel = new PJP.CellPanel("cellDisplayPort");
-			modelPanel = new PJP.ModelPanel("modelDisplayPort");
-
-		</script>
-
+		<script src="js/with_apinatomy.js"></script>		
 	</body>
 </html>
