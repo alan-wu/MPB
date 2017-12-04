@@ -11,7 +11,7 @@ PJP.setupRenderer = function (elementID) {
 	document.getElementById(elementID).appendChild( localContainer );
 	localContainer.style.height = "100%"
 	var localRenderer = new Zinc.Renderer(localContainer, window);
-	Zinc.defaultMaterialColor = 0xFFFF9C
+	Zinc.defaultMaterialColor = 0xFFFF9C;
 	localRenderer.initialiseVisualisation();
 	localRenderer.playAnimation = false;	
 	return localRenderer;

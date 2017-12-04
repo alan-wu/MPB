@@ -1,12 +1,19 @@
-<div style="position:absolute;width:100%;">
+<div style="position:absolute;width:100%;z-index:2;">
 	<div class="titleContainer">
 		<p class="titleText" id="OrganTitle"><strong>Organ</strong></p>
 	</div>
-	<input class="screenButton" id="organsScreenButton" type="button" onclick="expandCollapse(this, 'organsDisplayPort')" value="Expand">
+	<input class="screenButton" id="organsScreenButton" type="button" value="Expand">
 	<div  id="organGui">
 	</div>
 </div>
-<div id="organsDisplayArea" style="height:100%;">
+<div id="organsDisplayArea" style="height:100%;width:100%;">
+</div>
+<div id="organsSecondaryDisplayArea" style="height:50%;width:50%;left:50%;top:0%;border-left: 2px solid #000000;position:absolute;display:none">
+</div>
+<div id="organsTertiaryDisplayArea" style="height:50%;width:50%;left:50%;top:50%;border-top: 2px solid #000000;border-left: 2px solid #000000;position:absolute;display:none;">
+	<div style="text-align:center;top: 2%;height: 96%;left: 2%;width: 96%;position: absolute;">
+		<img align="middle" src="models/organsViewerModels/digestive/stomach/nerve_map/texture/ratstomach_innervation_square.png" style="max-height: 96%;max-width: 96%;position: relative;">
+	</div>
 </div>
 <div style="text-align:center;width:100%;position: absolute;bottom: 3%;">
 	<input id="organLinkButton" type="button" value="Models & data">

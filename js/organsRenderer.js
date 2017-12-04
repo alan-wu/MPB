@@ -3,17 +3,22 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var pickerScene = undefined;
 	var displayScene = undefined;
 	var defaultScene = undefined;
+	var secondaryScene = undefined;
+	var tertiaryScene = undefined;
+	var nerveMapScene = undefined;
 	var windowWidth, windowHeight;
 	var organGui;
 	var organGuiControls = new function() {
 		this.Time = 0.0;
 		this.Speed = 500;
 	};
+	var currentName = "";
 	var associateData = undefined;
 	var dataFields = undefined;
 	var externalOrganLink = undefined;
+	var nerveMap = undefined;
 	var timeoutID = 0;
-	
+	var fullScreen = false;
 	var organPartsGui;
 	var organPartGuiControls = function() {
 	};
@@ -27,10 +32,13 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var cellPanel = undefined;
 	var modelPanel = undefined;
 	var modelsLoader = ModelsLoaderIn;
+	var nerveMapIsActive = false;
 	
 	var _this = this;
 	
 	var organsRenderer = null;
+	var secondaryRenderer = null;
+	var tertiaryRenderer = null;
 	
 	var organsFileMap = new Array();
 	
@@ -71,8 +79,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			 fields: [{SystemName: "Cardiovascular", PartName: "Arterial Flow"},
 			          {SystemName: "Cardiovascular", PartName: "Arterial Pressure"},
 			          {SystemName: "Cardiovascular", PartName: "Arterial Velocity"}]};
-	organsFileMap["Cardiovascular"]
-	
 	organsFileMap["Cardiovascular"]["Left Upper Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
 	organsFileMap["Cardiovascular"]["Left Lower Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
 	organsFileMap["Cardiovascular"]["Right Upper Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
@@ -81,7 +87,14 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			view: undefined,
 			meta: "digestive/stomach_1.json",
 			picker: undefined,
-			associateData: undefined};
+			associateData: undefined,
+			nerveMap: new Array()};
+	organsFileMap["Digestive"]["Stomach"].nerveMap["threed"] = {meta: "digestive/stomach/nerve_map/3d/stomach_nerve_3d_1.json", 
+			view: "digestive/stomach/nerve_map/3d/stomach_nerve_3d_view.json"};
+	organsFileMap["Digestive"]["Stomach"].nerveMap["twod"] = {meta: "digestive/stomach/nerve_map/2d/stomach_nerve_2d_1.json",
+			view: "digestive/stomach/nerve_map/2d/stomach_nerve_2d_view.json"};
+	organsFileMap["Digestive"]["Stomach"].nerveMap["normalised"] = {meta: "digestive/stomach_1.json", view: undefined};
+	
 	organsFileMap["Respiratory"]["Lungs"] = {
 			view: "respiratory/lungs_view.json",
 			meta: "respiratory/lungs_1.json",
@@ -109,10 +122,14 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	
 	var timeSliderChanged = function() {
 		return function(value) {
-			if (pickerScene)
-				pickerScene.setMorphsTime(value * 30);
-			if (displayScene)
-				displayScene.setMorphsTime(value * 30);
+			if (!nerveMapIsActive) {
+				if (pickerScene)
+					pickerScene.setMorphsTime(value * 30);
+				if (displayScene)
+					displayScene.setMorphsTime(value * 30);
+			} else if (nerveMapScene) {
+					nerveMapScene.setMorphsTime(value * 30);
+			}
 		}
 	}
 	
@@ -120,7 +137,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		var currentTime = organsRenderer.getCurrentTime();
 		var sliderValue = currentTime / 30.0;
 		organGuiControls.Time = sliderValue;
-		if (pickerScene)
+		if (!nerveMapIsActive && pickerScene)
 			pickerScene.setMorphsTime(currentTime);
 		timeSlider.updateDisplay();	
 	}
@@ -177,7 +194,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 						modelPanel.openModel("BG_Circulation_Model.svg");
 				}
 			}
-		}	
+		}
 	};
 	
 	var _hoverCallback = function() {
@@ -226,10 +243,11 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
-	var _addDataGeometryCallback = function() {
+	var _addGeometryCallback = function(GroupName, color) {
 		return function(geometry) {
-			geometry.groupName = "Data Geometry";
-			geometry.morph.material.color = new THREE.Color("#0099ff");
+			geometry.groupName = GroupName;
+			if (color)
+				geometry.morph.material.color = color;
 		}
 	}
 	
@@ -243,15 +261,118 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 					var systemMeta = modelsLoader.getSystemMeta();
 					var metaItem = systemMeta[associateData[i].SystemName][associateData[i].PartName];
 					var downloadPath = metaItem["BodyURL"];
+					var color = new THREE.Color("#0099ff");
 					if (metaItem["FileFormat"] == "JSON")
-						displayScene.loadMetadataURL(downloadPath, _addDataGeometryallback());
+						displayScene.loadMetadataURL(downloadPath, _addGeometryCallback("Data Geometry", color));
 					else if (metaItem["FileFormat"] == "STL")
-						displayScene.loadSTL(downloadPath, "Data Geometry", _addDataGeometryCallback());
+						displayScene.loadSTL(downloadPath, "Data Geometry", _addGeometryCallback("Data Geometry", color));
 					else if (metaItem["FileFormat"] == "OBJ") 
-						displayScene.loadOBJ(downloadPath, "Data Geometry", _addDataGeometryCallback());
+						displayScene.loadOBJ(downloadPath, "Data Geometry", _addGeometryCallback("Data Geometry", color));
 				}
 			}
 		}
+	}
+	
+	var updateLayout = function() {
+		if (nerveMapIsActive && fullScreen) {
+			var element = document.getElementById("organsDisplayArea");
+			element.style.width = "50%";
+			element = document.getElementById("organsSecondaryDisplayArea");
+			element.style.display = "block";
+			element = document.getElementById("organsTertiaryDisplayArea");
+			element.style.display = "block";
+		} else {
+			var element = document.getElementById("organsDisplayArea");
+			element.style.width = "100%";
+			element = document.getElementById("organsSecondaryDisplayArea");
+			element.style.display = "none";
+			element = document.getElementById("organsTertiaryDisplayArea");
+			element.style.display = "none";
+		}
+	}
+	
+	var setupNerveMapPrimaryRenderer = function() {
+		var sceneName = currentName + "_nervemap";
+		nerveMapScene = organsRenderer.getSceneByName(sceneName);
+		if (nerveMapScene == undefined) {
+			var downloadPath = modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.threed.meta;
+			nerveMapScene = organsRenderer.createScene(sceneName);
+			nerveMapScene.loadMetadataURL(downloadPath, _addGeometryCallback("threed"));
+			if (nerveMap.threed.view !== undefined)
+				nerveMapScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.threed.view);
+			else {
+				nerveMapScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
+			}
+			nerveMapScene.ambient.intensity = 8.0;
+			nerveMapScene.directionalLight.intensity = 0;
+			var zincCameraControl = nerveMapScene.getZincCameraControls();
+			zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
+			zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
+		}
+		organsRenderer.setCurrentScene(nerveMapScene);	
+	}
+	
+	var setupNerveMapSecondaryRenderer = function() {
+		if (secondaryRenderer == null)
+			secondaryRenderer = PJP.setupRenderer("organsSecondaryDisplayArea");
+		var sceneName = currentName + "_twod";
+		secondaryScene = secondaryRenderer.getSceneByName(sceneName);
+		if (secondaryScene == undefined) {
+			var downloadPath = modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.twod.meta;
+			secondaryScene = secondaryRenderer.createScene(sceneName);
+			secondaryScene.loadMetadataURL(downloadPath, _addGeometryCallback("twod"));
+			if (nerveMap.twod.view !== undefined)
+				secondaryScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.twod.view);
+			else {
+				secondaryScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
+			}
+			secondaryScene.ambient.intensity = 8.0;
+			secondaryScene.directionalLight.intensity = 0;
+			var zincCameraControl = secondaryScene.getZincCameraControls();
+			zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
+			zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
+		}
+		secondaryRenderer.setCurrentScene(secondaryScene);
+		secondaryRenderer.animate();
+	}
+	
+	var setupNerveMapTertiaryRenderer = function() {
+		if (tertiaryRenderer == null)
+			tertiaryRenderer = PJP.setupRenderer("organsTertiaryDisplayArea");
+		var sceneName = currentName + "_normalised";
+		tertiaryScene = tertiaryRenderer.getSceneByName(sceneName);
+		if (tertiaryScene == undefined) {
+			var downloadPath = modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.normalised.meta;
+			tertiaryScene = tertiaryRenderer.createScene(sceneName);
+			tertiaryScene.loadMetadataURL(downloadPath, _addGeometryCallback("normalised"));
+			if (nerveMap.normalised.view !== undefined)
+				tertiaryScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.normalised.view);
+			else {
+				tertiaryScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
+			}
+			tertiaryScene.directionalLight.intensity = 1.4;
+		}
+		tertiaryRenderer.setCurrentScene(tertiaryScene);
+		tertiaryRenderer.animate();
+	}
+	
+	var activateAdditionalNerveMapRenderer = function() {
+		updateLayout();
+		if (fullScreen && nerveMapIsActive) {
+			setupNerveMapSecondaryRenderer();
+		//	setupNerveMapTertiaryRenderer();
+		}
+	}
+	
+	var changeNerveMapVisibility = function() {
+		nerveMapIsActive = !nerveMapIsActive;
+		if (nerveMapIsActive)
+			setupNerveMapPrimaryRenderer();
+		else {
+			organsRenderer.setCurrentScene(displayScene);
+			
+		}
+		activateAdditionalNerveMapRenderer();
 	}
 	
 	var organsBackGroundChanged = function() {
@@ -261,10 +382,29 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			var blueValue = parseInt(value[2]);
 			
 			var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
+			document.getElementById("organsTertiaryDisplayArea").style.backgroundColor = backgroundColourString;
 			var colour = new THREE.Color(backgroundColourString);
 			var internalRenderer = organsRenderer.getThreeJSRenderer();
 			internalRenderer.setClearColor( colour, 1 );
+			if (secondaryRenderer) {
+				internalRenderer = secondaryRenderer.getThreeJSRenderer();
+				internalRenderer.setClearColor( colour, 1 );
+			}
+			if (tertiaryRenderer) {
+				internalRenderer = tertiaryRenderer.getThreeJSRenderer();
+				internalRenderer.setClearColor( colour, 1 );
+			}
 		}
+	}
+	
+	var expandCollapseOrgans = function(source, portName) {
+		if (source.value == "Expand") {
+			fullScreen = true;
+		} else {
+			fullScreen = false;
+		}
+		expandCollapse(source, portName);
+		activateAdditionalNerveMapRenderer();
 	}
 	
 	var initialiseOrgansVisualisation = function() {
@@ -296,6 +436,8 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var addUICallback = function() {
 		var callbackElement = document.getElementById("organLinkButton");
 		callbackElement.onclick = function() { openOrganModelLink() };
+		var callbackElement = document.getElementById("organsScreenButton");
+		callbackElement.onclick = function() { expandCollapseOrgans(callbackElement, 'organsDisplayPort') };
 	}
 	
 	var loadHTMLComplete = function(link) {
@@ -386,25 +528,31 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		organPartsGui.open();
 		if (associateData) {
 			organPartGuiControls["Data Geometry"] = false;
-			organPartsGui.add(organPartGuiControls, "Data Geometry").onChange(changeDataGeometryVisibility("Data Geometry"));
+			organPartsGui.add(organPartGuiControls, "Data Geometry").onChange(changeDataGeometryVisibility());
 		}
 		if (dataFields) {
 			organPartGuiControls.Field = -1;
 			var fieldPairs = {};
-			fieldPairs["None"] = -1
+			fieldPairs["None"] = -1;
 			for ( var i = 0; i < dataFields.length; i ++ ) {
 				fieldPairs[dataFields[i].PartName] = i; 
 			}
-			organGui.add(organPartGuiControls, 'Field', fieldPairs ).onChange(toggleFieldVisibility(dataFields));
+			organPartsGui.add(organPartGuiControls, 'Field', fieldPairs ).onChange(toggleFieldVisibility(dataFields));
+		}
+		if (nerveMap) {
+			var nerveMapButton = { 'Toggle nerve':function(){ changeNerveMapVisibility() }};
+			organPartsGui.add(nerveMapButton, 'Toggle nerve');
 		}
 	}
 	
 	this.loadOrgans = function(systemName, partName) {
 		if (UIIsReady) {
 			if (systemName && partName) {
+				nerveMapIsActive = false;
 				var systemMeta = modelsLoader.getSystemMeta();
 				var metaItem = systemMeta[systemName][partName];
 				var name = systemName + "/" + partName;
+				currentName = name;
 				var organsDetails = getOrganDetails(systemName, partName);
 				associateData = undefined;
 				dataFields = undefined;
@@ -416,6 +564,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 					if (organsDetails.fields)
 						dataFields = organsDetails.fields;
 					externalOrganLink = organsDetails.externalLink;
+					nerveMap = organsDetails.nerveMap;
 				}
 				var button = document.getElementById("organLinkButton");
 				if (externalOrganLink) {
