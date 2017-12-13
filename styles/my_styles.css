@@ -381,3 +381,19 @@ img.model {
 .topPanelCollapse {
 	height:70%;
 }
+
+.organsImg {
+	max-height: 100%;
+	max-width: 100%;
+	position: absolute;
+	display:none;
+}
+
+.organsImgContainer {
+	text-align:left;
+	top: 2%;
+	height: 96%;
+	left: 30%;
+	width: 68%;
+	position: absolute;
+}

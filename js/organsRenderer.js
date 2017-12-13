@@ -27,6 +27,8 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var organsControl = function() {
 		  this.Background = [ 255, 255, 255 ]; // RGB array
 	};
+	var imageCombiner = undefined;
+	
 	var UIIsReady = false;
 	var tissueViewer = undefined;
 	var cellPanel = undefined;
@@ -145,7 +147,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var updateTimeSliderCallback = function() {
 		return function() {
 			updateTimeSlider();
-		}	
+		}
 	}
 	
 	var speedSliderChanged = function() {
@@ -243,10 +245,10 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
-	var _addGeometryCallback = function(GroupName, color) {
+	var _addDataGeometryCallback = function(GroupName, color) {
 		return function(geometry) {
 			geometry.groupName = GroupName;
-			if (color)
+			if (color && geometry.morph)
 				geometry.morph.material.color = color;
 		}
 	}
@@ -263,11 +265,11 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 					var downloadPath = metaItem["BodyURL"];
 					var color = new THREE.Color("#0099ff");
 					if (metaItem["FileFormat"] == "JSON")
-						displayScene.loadMetadataURL(downloadPath, _addGeometryCallback("Data Geometry", color));
+						displayScene.loadMetadataURL(downloadPath, _addDataGeometryCallback("Data Geometry", color));
 					else if (metaItem["FileFormat"] == "STL")
-						displayScene.loadSTL(downloadPath, "Data Geometry", _addGeometryCallback("Data Geometry", color));
+						displayScene.loadSTL(downloadPath, "Data Geometry", _addDataGeometryCallback("Data Geometry", color));
 					else if (metaItem["FileFormat"] == "OBJ") 
-						displayScene.loadOBJ(downloadPath, "Data Geometry", _addGeometryCallback("Data Geometry", color));
+						displayScene.loadOBJ(downloadPath, "Data Geometry", _addDataGeometryCallback("Data Geometry", color));
 				}
 			}
 		}
@@ -291,13 +293,25 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
+	var _addNerveMapGeometryCallback = function(GroupName) {
+		return function(geometry) {
+			geometry.groupName = GroupName;
+			if (imageCombiner && geometry.morph && geometry.morph.material.map) {
+				geometry.morph.material.map = new THREE.Texture(imageCombiner.getCombinedImage());
+				geometry.morph.material.map.needsUpdate = true;
+				geometry.morph.material.needsUpdate = true;
+			}
+		}
+	}
+	
+	
 	var setupNerveMapPrimaryRenderer = function() {
 		var sceneName = currentName + "_nervemap";
 		nerveMapScene = organsRenderer.getSceneByName(sceneName);
 		if (nerveMapScene == undefined) {
 			var downloadPath = modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.threed.meta;
 			nerveMapScene = organsRenderer.createScene(sceneName);
-			nerveMapScene.loadMetadataURL(downloadPath, _addGeometryCallback("threed"));
+			nerveMapScene.loadMetadataURL(downloadPath, _addNerveMapGeometryCallback("threed"));
 			if (nerveMap.threed.view !== undefined)
 				nerveMapScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.threed.view);
 			else {
@@ -311,7 +325,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 		organsRenderer.setCurrentScene(nerveMapScene);	
 	}
-	
+
 	var setupNerveMapSecondaryRenderer = function() {
 		if (secondaryRenderer == null)
 			secondaryRenderer = PJP.setupRenderer("organsSecondaryDisplayArea");
@@ -320,7 +334,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		if (secondaryScene == undefined) {
 			var downloadPath = modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.twod.meta;
 			secondaryScene = secondaryRenderer.createScene(sceneName);
-			secondaryScene.loadMetadataURL(downloadPath, _addGeometryCallback("twod"));
+			secondaryScene.loadMetadataURL(downloadPath, _addNerveMapGeometryCallback("twod"));
 			if (nerveMap.twod.view !== undefined)
 				secondaryScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.twod.view);
 			else {
@@ -344,7 +358,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		if (tertiaryScene == undefined) {
 			var downloadPath = modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.normalised.meta;
 			tertiaryScene = tertiaryRenderer.createScene(sceneName);
-			tertiaryScene.loadMetadataURL(downloadPath, _addGeometryCallback("normalised"));
+			tertiaryScene.loadMetadataURL(downloadPath, _addNerveMapGeometryCallback("normalised"));
 			if (nerveMap.normalised.view !== undefined)
 				tertiaryScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.normalised.view);
 			else {
@@ -356,11 +370,28 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		tertiaryRenderer.animate();
 	}
 	
+	
+	var setTextureForGeometryCallback = function(texture) {
+		return function(geometry) {
+			if (geometry.morph && geometry.morph.material.map) {
+				geometry.morph.material.map = texture;
+				geometry.morph.material.needsUpdate = true;
+				texture.needsUpdate = true;
+			}
+		}
+	}
+	
+	var setTextureForScene = function(targetScene, bitmap) {
+		if (targetScene) {
+			var texture = new THREE.Texture(bitmap);
+			targetScene.forEachGeometry(setTextureForGeometryCallback(texture));
+		}
+	}
+
 	var activateAdditionalNerveMapRenderer = function() {
 		updateLayout();
 		if (fullScreen && nerveMapIsActive) {
 			setupNerveMapSecondaryRenderer();
-		//	setupNerveMapTertiaryRenderer();
 		}
 	}
 	
@@ -406,7 +437,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		expandCollapse(source, portName);
 		activateAdditionalNerveMapRenderer();
 	}
-	
+	       
 	var initialiseOrgansVisualisation = function() {
 		organsRenderer = PJP.setupRenderer("organsDisplayArea");
 		organsRenderer.addPreRenderCallbackFunction(updateTimeSliderCallback());
@@ -464,7 +495,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		link.href = 'snippets/organsViewer.html';
 		link.onload = loadHTMLComplete(link);
 		link.onerror = loadHTMLComplete(link);
-		document.head.appendChild(link);	
+		document.head.appendChild(link);
 	}
 	
 	var getOrganDetails = function(systemName, partName) {
@@ -686,6 +717,107 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	}
 	
 	initialise();
+	
+	
+    require([
+             "dojo/ready",
+             "dojo/dom",
+             "cbtree/Tree",                     // Checkbox tree
+             "cbtree/model/TreeStoreModel",   // Object Store Forest Model
+             "cbtree/store/ObjectStore"         // Object Store with Hierarchy
+             ], function( ready, dom, Tree, ObjectStoreModel, ObjectStore) {
 
+               var store = new ObjectStore( { url:"models/organsViewerModels/digestive/stomach/store/neuritemap.json", idProperty:"id"});
+               var model = new ObjectStoreModel( { store: store,
+                                                    query: {name: "Root"},
+                                                    rootLabel: "All",
+                                                    checkedRoot: true
+                                                  });
+               var imgEle = {};
+               var imgPrefix = "models/organsViewerModels/digestive/stomach/nerve_map/texture/";
+               var tree = undefined;
+               var imageUpdated = false;
+            	   
+               function modelItemChanged(item, propertyName, newValue, oldValue) {
+            	  if (item.img) {
+            		  if (propertyName == "checked") {
+            			  var elem = imgEle[item.id];
+            			  if (newValue == false) {
+            				  elem.style.display = "none";
+                			  imageCombiner.removeElement(elem);
+            			  } else {
+            				  elem.style.display = "inline";
+            				  imageCombiner.addElement(elem);
+            			  }
+            			  imageUpdated = true;
+            		  }
+            	  }
+               }
+               
+               function checkBoxClicked(item, node, event) {
+            	   if (imageUpdated) {
+            		   var bitmap = imageCombiner.getCombinedImage();
+            		   setTextureForScene(nerveMapScene, bitmap);
+            		   setTextureForScene(secondaryScene, bitmap);
+            		   imageUpdated = false;
+            	   }
+               }
+               
+               function forEachChildrenCreateImageElements(container) {
+            	   return function (childrenArray) {
+            		   for (var i = 0; i < childrenArray.length; i++) {
+            			  var currentItem = childrenArray[i];
+            			  if (currentItem.img) {
+            				  var imgURL = imgPrefix + currentItem.img;
+            				  var elem = document.createElement("img");
+            				  elem.className = "organsImg";
+            				  elem.src = imgURL; 
+            				  container.appendChild(elem);
+            				  imgEle[currentItem.id] = elem;
+            				  
+            			  }
+            			  if (currentItem.colour) {
+            				  if (tree._itemNodesMap[currentItem.id]) {
+            					  var nodeElem = tree._itemNodesMap[currentItem.id][0].labelNode;
+            					  if (nodeElem) {
+            						  nodeElem.style.color = "#" + currentItem.colour;
+            					  }	  
+            				  }
+            			  }
+            			  model.getChildren(currentItem, forEachChildrenCreateImageElements(container));
+            		   }
+            	   }
+               }
+				
+               function rootIsReady() {
+					return function(root) {
+						var height = document.getElementById("organsRootImage").height;
+						var width = document.getElementById("organsRootImage").width;
+			            imageCombiner = new ImageCombiner();
+						imageCombiner.setSize(width, height);
+						imageCombiner.addElement(document.getElementById("organsRootImage"));
+						var container = dom.byId("organsImgContainer");
+						model.getChildren(root, forEachChildrenCreateImageElements(container));
+						var bitmap = imageCombiner.getCombinedImage();
+						setTextureForScene(nerveMapScene, bitmap);
+						setTextureForScene(secondaryScene, bitmap);
+					}
+				}
+
+               ready( function () {
+            	   tree = new Tree( { model: model,
+            		   id: "neuritemap",
+                       autoExpand:true,
+                       branchIcons:false,
+                       leafIcons: false,
+            		  } );
+            	   tree.domNode.style.height = "100%";
+            	   tree.domNode.style.fontSize = "70%";
+            	   model.getRoot(rootIsReady());
+            	   model.on("change", modelItemChanged);
+            	   tree.on("checkBoxClick", checkBoxClicked);
+            	   tree.placeAt( "CheckboxTree" );
+            	   tree.startup();
+               });
+    });
 }
-
