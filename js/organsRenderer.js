@@ -9,7 +9,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var windowWidth, windowHeight;
 	var organGui;
 	var organGuiControls = new function() {
-		this.Time = 0.0;
 		this.Speed = 500;
 	};
 	var currentName = "";
@@ -123,30 +122,37 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	}
 	
 	var timeSliderChanged = function() {
-		return function(value) {
-			if (!nerveMapIsActive) {
-				if (pickerScene)
-					pickerScene.setMorphsTime(value * 30);
-				if (displayScene)
-					displayScene.setMorphsTime(value * 30);
-			} else if (nerveMapScene) {
-					nerveMapScene.setMorphsTime(value * 30);
-			}
+		if (!nerveMapIsActive) {
+			if (pickerScene)
+				pickerScene.setMorphsTime(timeSlider.value * 30);
+			if (displayScene)
+				displayScene.setMorphsTime(timeSlider.value * 30);
+		} else if (nerveMapScene) {
+				nerveMapScene.setMorphsTime(timeSlider.value * 30);
 		}
 	}
 	
 	var updateTimeSlider = function() {
 		var currentTime = organsRenderer.getCurrentTime();
 		var sliderValue = currentTime / 30.0;
-		organGuiControls.Time = sliderValue;
+		timeSlider.value = sliderValue;
 		if (!nerveMapIsActive && pickerScene)
 			pickerScene.setMorphsTime(currentTime);
-		timeSlider.updateDisplay();	
 	}
 	
 	var updateTimeSliderCallback = function() {
 		return function() {
 			updateTimeSlider();
+		}
+	}
+	
+	var playPauseAnimation = function(element) {
+		if (element.className == "play") {
+			element.className = "pause";
+			organsRenderer.playAnimation = true;
+		} else {
+			element.className = "play";
+			organsRenderer.playAnimation = false;	
 		}
 	}
 	
@@ -283,8 +289,12 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			element.style.display = "block";
 			element = document.getElementById("organsTertiaryDisplayArea");
 			element.style.display = "block";
+			element = document.getElementById("timeSliderContainer");
+			element.style.width = "50%";
 		} else {
 			var element = document.getElementById("organsDisplayArea");
+			element.style.width = "100%";
+			element = document.getElementById("timeSliderContainer");
 			element.style.width = "100%";
 			element = document.getElementById("organsSecondaryDisplayArea");
 			element.style.display = "none";
@@ -451,11 +461,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		var customContainer = document.getElementById("organGui").append(organGui.domElement);
 		var resetViewButton = { 'Reset View':function(){ organsRenderer.resetView() }};
 		var viewAllButton = { 'View All':function(){ organsRenderer.viewAll() }};
-		var playButton = { 'Play/Pause':function(){ triggerAnimation() }};
-		organGuiControls.Time = 0.0;
 		organGuiControls.Speed = 500.0;
-		timeSlider = organGui.add(organGuiControls, 'Time', 0.0, 100.0).step(0.1).onChange(timeSliderChanged());
-		organGui.add(playButton, 'Play/Pause');
 		speedSlider = organGui.add(organGuiControls, 'Speed', 0, 5000).step(50).onChange(speedSliderChanged());
 		organGui.add(resetViewButton, 'Reset View');
 		organGui.add(viewAllButton, 'View All');
@@ -465,10 +471,14 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	}
 	
 	var addUICallback = function() {
-		var callbackElement = document.getElementById("organLinkButton");
-		callbackElement.onclick = function() { openOrganModelLink() };
-		var callbackElement = document.getElementById("organsScreenButton");
-		callbackElement.onclick = function() { expandCollapseOrgans(callbackElement, 'organsDisplayPort') };
+		var organLinkeButton = document.getElementById("organLinkButton");
+		organLinkeButton.onclick = function() { openOrganModelLink() };
+		var organsScreenButton = document.getElementById("organsScreenButton");
+		organsScreenButton.onclick = function() { expandCollapseOrgans(organsScreenButton, 'organsDisplayPort') };
+		timeSlider = document.getElementById("organ_animation_slider");
+		timeSlider.oninput= function() { timeSliderChanged() };
+		var organsPlayToggle = document.getElementById("organsPlayToggle");
+		organsPlayToggle.onclick = function() { playPauseAnimation(organsPlayToggle) };
 	}
 	
 	var loadHTMLComplete = function(link) {
@@ -774,7 +784,10 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
             				  elem.src = imgURL; 
             				  container.appendChild(elem);
             				  imgEle[currentItem.id] = elem;
-            				  
+            				  if (currentItem.checked == true) {
+            					  elem.style.display = "inline";
+            					  imageCombiner.addElement(elem);
+            				  }
             			  }
             			  if (currentItem.colour) {
             				  if (tree._itemNodesMap[currentItem.id]) {
