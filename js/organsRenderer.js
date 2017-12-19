@@ -287,8 +287,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			element.style.width = "50%";
 			element = document.getElementById("organsSecondaryDisplayArea");
 			element.style.display = "block";
-			element = document.getElementById("organsTertiaryDisplayArea");
-			element.style.display = "block";
 			element = document.getElementById("timeSliderContainer");
 			element.style.width = "50%";
 		} else {
@@ -297,8 +295,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			element = document.getElementById("timeSliderContainer");
 			element.style.width = "100%";
 			element = document.getElementById("organsSecondaryDisplayArea");
-			element.style.display = "none";
-			element = document.getElementById("organsTertiaryDisplayArea");
 			element.style.display = "none";
 		}
 	}
@@ -338,7 +334,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 
 	var setupNerveMapSecondaryRenderer = function() {
 		if (secondaryRenderer == null)
-			secondaryRenderer = PJP.setupRenderer("organsSecondaryDisplayArea");
+			secondaryRenderer = PJP.setupRenderer("organsSecondaryDisplayRenderer");
 		var sceneName = currentName + "_twod";
 		secondaryScene = secondaryRenderer.getSceneByName(sceneName);
 		if (secondaryScene == undefined) {
@@ -359,27 +355,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		secondaryRenderer.setCurrentScene(secondaryScene);
 		secondaryRenderer.animate();
 	}
-	
-	var setupNerveMapTertiaryRenderer = function() {
-		if (tertiaryRenderer == null)
-			tertiaryRenderer = PJP.setupRenderer("organsTertiaryDisplayArea");
-		var sceneName = currentName + "_normalised";
-		tertiaryScene = tertiaryRenderer.getSceneByName(sceneName);
-		if (tertiaryScene == undefined) {
-			var downloadPath = modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.normalised.meta;
-			tertiaryScene = tertiaryRenderer.createScene(sceneName);
-			tertiaryScene.loadMetadataURL(downloadPath, _addNerveMapGeometryCallback("normalised"));
-			if (nerveMap.normalised.view !== undefined)
-				tertiaryScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.normalised.view);
-			else {
-				tertiaryScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
-			}
-			tertiaryScene.directionalLight.intensity = 1.4;
-		}
-		tertiaryRenderer.setCurrentScene(tertiaryScene);
-		tertiaryRenderer.animate();
-	}
-	
 	
 	var setTextureForGeometryCallback = function(texture) {
 		return function(geometry) {
@@ -423,7 +398,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			var blueValue = parseInt(value[2]);
 			
 			var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-			document.getElementById("organsTertiaryDisplayArea").style.backgroundColor = backgroundColourString;
+			document.getElementById("organsSecondaryDisplayArea").style.backgroundColor = backgroundColourString;
 			var colour = new THREE.Color(backgroundColourString);
 			var internalRenderer = organsRenderer.getThreeJSRenderer();
 			internalRenderer.setClearColor( colour, 1 );
@@ -470,6 +445,18 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		organsRenderer.animate();
 	}
 	
+	var radioClickedCallback = function(radioButton) {
+		var renderer = document.getElementById("organsSecondaryDisplayRenderer");
+		var imgContainer = document.getElementById("organsImgContainer");
+		if (radioButton.value == "2D") {
+			renderer.style.display = "none";
+			imgContainer.style.display = "block";
+		} else if (radioButton.value == "3D") {
+			renderer.style.display = "block";
+			imgContainer.style.display = "none";
+		}
+	}
+	
 	var addUICallback = function() {
 		var organLinkeButton = document.getElementById("organLinkButton");
 		organLinkeButton.onclick = function() { openOrganModelLink() };
@@ -479,6 +466,12 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		timeSlider.oninput= function() { timeSliderChanged() };
 		var organsPlayToggle = document.getElementById("organsPlayToggle");
 		organsPlayToggle.onclick = function() { playPauseAnimation(organsPlayToggle) };
+		var rad = document.radio_switch.organs_radio;
+	    for(var i = 0; i < rad.length; i++) {
+	        rad[i].onclick = function() {
+	        	radioClickedCallback(this);
+	        }
+	    }
 	}
 	
 	var loadHTMLComplete = function(link) {

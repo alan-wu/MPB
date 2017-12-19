@@ -19,17 +19,22 @@
 		<div class="col-sm-1" >
 		</div>
 		<div class="col-sm-9">
-			<input id="organ_animation_slider" type="range" min="0" max="100" value ="0" step="1" oninput="updateSlider(this.value)" style="height: 64px;"/>
+			<input id="organ_animation_slider" type="range" min="0" max="100" value ="0" step="1" oninput="updateSlider(this.value)" style="height: 48px;"/>
 		</div>
 	</div>
-</div>
-<div id="organsSecondaryDisplayArea" style="height:50%;width:50%;left:50%;top:0%;border-left: 2px solid #000000;position:absolute;display:none">
-</div>
-<div id="organsTertiaryDisplayArea" style="height:50%;width:50%;left:50%;top:50%;border-top: 2px solid #000000;border-left: 2px solid #000000;position:absolute;display:none;">
-	<div class="claro" style="top: 1%;height: 99%;position: absolute;" id="CheckboxTree">
-	</div>
-	<div id="organsImgContainer" style="text-align:left;top: 2%;height: 96%;left: 30%;width: 68%;position: absolute;">
-		<img id="organsRootImage" style="max-height: 100%;max-width: 100%;position: absolute;display:inline;" src="models/organsViewerModels/digestive/stomach/nerve_map/texture/All_In_One_Contour_101717.png" alt="">
+
+	<div id="organsSecondaryDisplayArea" style="height:100%;width:50%;left:50%;top:0%;border-left: 2px solid #000000;position:absolute;display:none">
+		<div class="claro" style="top:10%;height: 89%;position: absolute;" id="CheckboxTree">
+		</div>
+		<form name="radio_switch" style="position:absolute;bottom: 6%;width:100%;text-align:center;z-index:3;">
+	        <input type="radio" name="organs_radio" value="2D" style="vertical-align: middle;text-align:center;" checked=false>2D
+	       	<input type="radio" name="organs_radio" value="3D" style="vertical-align: middle;text-align:center;" checked=true>3D
+		</form>
+		<div id="organsSecondaryDisplayRenderer" style="height:100%;width:100%;display:block">
+		</div>	
+		<div id="organsImgContainer" style="text-align:left;top: 15%;height: 75%;left: 30%;width: 68%;position: absolute;display:none;">
+			<img id="organsRootImage" style="max-height: 100%;max-width: 100%;position: absolute;display:inline;" src="models/organsViewerModels/digestive/stomach/nerve_map/texture/All_In_One_Contour_101717.png" alt="">
+		</div>
 	</div>
 </div>
 

@@ -64,8 +64,8 @@ input:checked + .switchSlider:before {
 }
 
 .play {
-  width:64px;
-  height:64px;
+  width:48px;
+  height:48px;
   right: 10px;
   background-image: url(./images/play_small.png);
 }
@@ -75,8 +75,8 @@ input:checked + .switchSlider:before {
 }
 	
 .pause {
-  width:64px;
-  height:64px;
+  width:48px;
+  height:48px;
   right: 10px;
   background-image: url(./images/pause_small.png);
 }
