@@ -347,7 +347,17 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 				element = document.getElementById("organsTertieryDisplayArea");
 				element.style.display = "none";
 			}
+		} else {
+			var element = document.getElementById("organsDisplayArea");
+			element.style.width = "100%";
+			element = document.getElementById("timeSliderContainer");
+			element.style.width = "100%";
+			element = document.getElementById("organsSecondaryDisplayArea");
+			element.style.display = "none";
+			element = document.getElementById("organsTertieryDisplayArea");
+			element.style.display = "none";
 		}
+		
 		if (nerveMapIsActive) {
 			element = document.getElementById("texSlider");
 			element.style.display = "block";
