@@ -10,6 +10,7 @@
 <div style="height:100%;width:100%;">
 	<div id="organsDisplayArea" style="height:100%;width:100%;">
 	</div>
+	<input id="texSlider" orient="vertical" style="display:none;position:absolute;left: 2%;top:25%; -webkit-appearance: slider-vertical; width: 3%; height: 50%;" type="range"  step="0.01" step="0.01" value="1" min="0" max="1" oninput="updatePosSlider(this.value)"/>
 	<div id="timeSliderContainer" class="row" style="position:absolute;bottom: 6%;width:100%;">
 		<div class="col-sm-1" >
 		</div>
@@ -23,18 +24,17 @@
 		</div>
 	</div>
 
-	<div id="organsSecondaryDisplayArea" style="height:100%;width:50%;left:50%;top:0%;border-left: 2px solid #000000;position:absolute;display:none">
+	<div id="organsSecondaryDisplayArea" class="organsSecondSceneDisplay" style="display:none">
 		<div class="claro" style="top:10%;height: 89%;position: absolute;" id="CheckboxTree">
 		</div>
-		<form name="radio_switch" style="position:absolute;bottom: 6%;width:100%;text-align:center;z-index:3;">
-	        <input type="radio" name="organs_radio" value="2D" style="vertical-align: middle;text-align:center;" checked=false>2D
-	       	<input type="radio" name="organs_radio" value="3D" style="vertical-align: middle;text-align:center;" checked=true>3D
-		</form>
-		<div id="organsSecondaryDisplayRenderer" style="height:100%;width:100%;display:block">
-		</div>	
-		<div id="organsImgContainer" style="text-align:left;top: 15%;height: 75%;left: 30%;width: 68%;position: absolute;display:none;">
+		<div id="organsSecondaryDisplayRenderer" style="height:100%;width:100%;display:none">
+		</div>
+		<div id="organsImgContainer" style="text-align:left;top: 15%;height: 75%;left: 30%;width: 68%;position: absolute;display:block;">
 			<img id="organsRootImage" style="max-height: 100%;max-width: 100%;position: absolute;display:inline;" src="models/organsViewerModels/digestive/stomach/nerve_map/texture/All_In_One_Contour_101717.png" alt="">
 		</div>
+	</div>
+	<div id="organsTertieryDisplayArea" class="organsSVGDisplay" style="display:none">
+		<object class="svgContainer" id="organSVG" align="middle" type="image/svg+xml">SVGs not loaded yet.</object>
 	</div>
 </div>
 

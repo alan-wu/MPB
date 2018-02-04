@@ -4,7 +4,11 @@ PJP.ModelsLoader = function()  {
 	var bodyDirectoryPrefix = "models/body";
 	var organsDirectoryPrefix = "models/organsViewerModels";
 	var metaURL = bodyDirectoryPrefix + "/" + "bodyMeta.json";
-	var systemMeta = [];
+	var systemMeta = new Array();
+	systemMeta['human'] = new Array();
+	systemMeta['pig'] = new Array();
+	systemMeta['rat'] = new Array();
+	systemMeta['mouse'] = new Array();
 	var systemColour = new Array();
 	var numberOfDownloadings = 0;
 	var systemMetaReadyCallbackFunctions = [];
@@ -31,8 +35,8 @@ PJP.ModelsLoader = function()  {
 		}
 	}
 	
-	this.getSystemMeta = function() {
-		return systemMeta;
+	this.getSystemMeta = function(speciesName) {
+		return systemMeta[speciesName];
 	}
 	
 	this.getBodyDirectoryPrefix = function() {
@@ -53,7 +57,7 @@ PJP.ModelsLoader = function()  {
 		xmlhttp.onreadystatechange = function() {
 		    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
 		        var metadata = JSON.parse(xmlhttp.responseText);
-		        systemMeta[metadata["System"]] = metadata["Part"];
+		        systemMeta['human'][metadata["System"]] = metadata["Part"];
 		        numberOfDownloadings = numberOfDownloadings - 1;
 		        if (numberOfDownloadings == 0) {
 		        	metaFilesReady = true;

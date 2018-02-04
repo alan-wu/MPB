@@ -397,3 +397,45 @@ img.model {
 	width: 68%;
 	position: absolute;
 }
+
+.range-slider {
+  // Slider
+  .input-range {
+    -webkit-appearance: none;
+    height: 200px;
+    border-radius: 5px;
+    background: #ccc;
+    outline: none;
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* WebKit */
+    
+  }
+}
+
+.organsSecondSceneDisplay {
+	height:100%;
+	width:50%;
+	left:50%;
+	top:0%;
+	border-left: 2px solid #000000;
+	position:absolute;
+}
+
+.organsSecondNerveDisplay {
+	height:100%;
+	width:33%;
+	left:33%;
+	top:0%;
+	border-left: 2px solid #000000;
+	position:absolute;
+}
+
+.organsSVGDisplay {
+	height:100%;
+	width:33%;
+	left:66%;
+	top:0%;
+	border-left: 2px solid #000000;
+	position:absolute;
+}
+

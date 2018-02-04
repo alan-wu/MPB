@@ -1,5 +1,6 @@
 
 PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
+	var currentSpecies = undefined;
 	var pickerScene = undefined;
 	var displayScene = undefined;
 	var defaultScene = undefined;
@@ -11,7 +12,12 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var organGuiControls = new function() {
 		this.Speed = 500;
 	};
+	var comparedSceneIsOn = false;
+	var additionalSpecies = undefined;
 	var currentName = "";
+	var currentSystem = "";
+	var currentPart = "";
+	var currentSpecies  = "";
 	var associateData = undefined;
 	var dataFields = undefined;
 	var externalOrganLink = undefined;
@@ -22,6 +28,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var organPartGuiControls = function() {
 	};
 	var timeSlider = undefined;
+	var texSlider = undefined;
 	var speedSlider = undefined;
 	var organsControl = function() {
 		  this.Background = [ 255, 255, 255 ]; // RGB array
@@ -43,31 +50,44 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	
 	var organsFileMap = new Array();
 	
-	organsFileMap["Cardiovascular"] = new Array();
-	organsFileMap["Digestive"] = new Array();
-	organsFileMap["Respiratory"] = new Array();
-	organsFileMap["Cardiovascular"]["Heart"] = {
+	
+	var ratOrgansFileMap = new Array();
+	
+	ratOrgansFileMap["Cardiovascular"] = new Array();
+	ratOrgansFileMap["Cardiovascular"]["Kidneys-Arteries"] = {
+			view: "rat/cardiovascular/arteries/rat_kidneys_view.json",
+			meta: "rat/cardiovascular/arteries/rat_kidneys_1.json",
+			picker: undefined,
+			associateData: undefined	
+	};
+	
+	var humanOrgansFileMap = new Array();
+	
+	humanOrgansFileMap["Cardiovascular"] = new Array();
+	humanOrgansFileMap["Digestive"] = new Array();
+	humanOrgansFileMap["Respiratory"] = new Array();
+	humanOrgansFileMap["Cardiovascular"]["Heart"] = {
 			view: "cardiovascular/heart/heart_view.json",
 			meta: "cardiovascular/heart/animated_nerve_1.json",
 			picker: "cardiovascular/heart/picking_node_1.json",
 			associateData: undefined,
 			externalLink: "https://models.cellml.org/e/bd/deforming_heart.rdf/view"};
-	organsFileMap["Cardiovascular"]["Arterial Flow"] = {
+	humanOrgansFileMap["Cardiovascular"]["Arterial Flow"] = {
 			view: undefined,
 			meta: "cardiovascular/arteries/arterial_flow_1.json",
 			picker: undefined,
 			associateData: undefined};
-	organsFileMap["Cardiovascular"]["Arterial Pressure"] = {
+	humanOrgansFileMap["Cardiovascular"]["Arterial Pressure"] = {
 			view: undefined,
 			meta: "cardiovascular/arteries/arterial_pressure_1.json",
 			picker: undefined,
 			associateData: undefined};
-	organsFileMap["Cardiovascular"]["Arterial Velocity"] = {
+	humanOrgansFileMap["Cardiovascular"]["Arterial Velocity"] = {
 			view: undefined,
 			meta: "cardiovascular/arteries/arterial_velocity_1.json",
 			picker: undefined,
 			associateData: undefined};
-	organsFileMap["Cardiovascular"]["Aorta"] = {
+	humanOrgansFileMap["Cardiovascular"]["Aorta"] = {
 			view: undefined,
 			meta: "cardiovascular/arteries/arteries_1.json",
 			picker: undefined,
@@ -80,27 +100,31 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			 fields: [{SystemName: "Cardiovascular", PartName: "Arterial Flow"},
 			          {SystemName: "Cardiovascular", PartName: "Arterial Pressure"},
 			          {SystemName: "Cardiovascular", PartName: "Arterial Velocity"}]};
-	organsFileMap["Cardiovascular"]["Left Upper Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
-	organsFileMap["Cardiovascular"]["Left Lower Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
-	organsFileMap["Cardiovascular"]["Right Upper Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
-	organsFileMap["Cardiovascular"]["Right Lower Limb"] = organsFileMap["Cardiovascular"]["Aorta"];
-	organsFileMap["Digestive"]["Stomach"] = {
+	humanOrgansFileMap["Cardiovascular"]["Left Upper Limb"] = humanOrgansFileMap["Cardiovascular"]["Aorta"];
+	humanOrgansFileMap["Cardiovascular"]["Left Lower Limb"] = humanOrgansFileMap["Cardiovascular"]["Aorta"];
+	humanOrgansFileMap["Cardiovascular"]["Right Upper Limb"] = humanOrgansFileMap["Cardiovascular"]["Aorta"];
+	humanOrgansFileMap["Cardiovascular"]["Right Lower Limb"] = humanOrgansFileMap["Cardiovascular"]["Aorta"];
+	humanOrgansFileMap["Digestive"]["Stomach"] = {
 			view: undefined,
 			meta: "digestive/stomach_1.json",
 			picker: undefined,
 			associateData: undefined,
 			nerveMap: new Array()};
-	organsFileMap["Digestive"]["Stomach"].nerveMap["threed"] = {meta: "digestive/stomach/nerve_map/3d/stomach_nerve_3d_1.json", 
+	humanOrgansFileMap["Digestive"]["Stomach"].nerveMap["threed"] = {meta: "digestive/stomach/nerve_map/3d/stomach_nerve_3d_1.json", 
 			view: "digestive/stomach/nerve_map/3d/stomach_nerve_3d_view.json"};
-	organsFileMap["Digestive"]["Stomach"].nerveMap["twod"] = {meta: "digestive/stomach/nerve_map/2d/stomach_nerve_2d_1.json",
+	humanOrgansFileMap["Digestive"]["Stomach"].nerveMap["twod"] = {meta: "digestive/stomach/nerve_map/2d/stomach_nerve_2d_1.json",
 			view: "digestive/stomach/nerve_map/2d/stomach_nerve_2d_view.json"};
-	organsFileMap["Digestive"]["Stomach"].nerveMap["normalised"] = {meta: "digestive/stomach_1.json", view: undefined};
+	humanOrgansFileMap["Digestive"]["Stomach"].nerveMap["normalised"] = {meta: "digestive/stomach_1.json", view: undefined};
+	humanOrgansFileMap["Digestive"]["Stomach"].nerveMap["svg"] = {url: 'svg/Myocyte_v6_Grouped.svg'};
 	
-	organsFileMap["Respiratory"]["Lungs"] = {
+	humanOrgansFileMap["Respiratory"]["Lungs"] = {
 			view: "respiratory/lungs_view.json",
 			meta: "respiratory/lungs_1.json",
 			picker: undefined,
 			associateData: undefined};
+	
+	organsFileMap['human'] = humanOrgansFileMap;
+	organsFileMap['rat'] = ratOrgansFileMap;
 	
 	this.setTissueViewer = function(TissueViewerIn) {
 		tissueViewer = TissueViewerIn;
@@ -129,6 +153,8 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 				displayScene.setMorphsTime(timeSlider.value * 30);
 		} else if (nerveMapScene) {
 				nerveMapScene.setMorphsTime(timeSlider.value * 30);
+				if (nerveMap && nerveMap.additionalReader)
+					nerveMap.additionalReader.setTime(timeSlider.value / 100.0);
 		}
 	}
 	
@@ -138,6 +164,8 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		timeSlider.value = sliderValue;
 		if (!nerveMapIsActive && pickerScene)
 			pickerScene.setMorphsTime(currentTime);
+		if (nerveMap && nerveMap.additionalReader)
+			nerveMap.additionalReader.setTime(currentTime / 3000.0);
 	}
 	
 	var updateTimeSliderCallback = function() {
@@ -168,6 +196,12 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		speedSlider.updateDisplay();	
 	}
 	
+	var texSliderChanged = function() {
+		if (nerveMap && nerveMap.additionalReader)
+			nerveMap.additionalReader.setSliderPos(texSlider.value);
+	}
+	
+	
 	var setOrgansString = function(name) {
 	 	var text_display = document.getElementById('OrganTitle');
 		text_display.innerHTML = "<strong>Organ: <span style='color:#FF4444'>" + name + "</span></strong>";
@@ -180,7 +214,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var _pickingCallback = function() {
 		return function(intersects, window_x, window_y) {
 			if (intersects[0] !== undefined) {
-				if (displayScene.sceneName == "Cardiovascular/Heart") {
+				if (displayScene.sceneName == "human/Cardiovascular/Heart") {
 					var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
 					setToolTipText("Node " + id);
 					currentHoverId = id;
@@ -191,7 +225,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 						tissueViewer.showButtons(true);
 						tissueViewer.showCollagenVisible(true);
 					}
-				} else if (displayScene.sceneName.includes("Cardiovascular/Arterial")) {
+				} else if (displayScene.sceneName.includes("human/Cardiovascular/Arterial")) {
 					setToolTipText("Click to show vascular model");
 					showTooltip(window_x, window_y);
 					if (tissueViewer)
@@ -208,13 +242,13 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var _hoverCallback = function() {
 		return function(intersects, window_x, window_y) {
 			if (intersects[0] !== undefined) {
-				if (displayScene.sceneName == "Cardiovascular/Heart") {
+				if (displayScene.sceneName == "human/Cardiovascular/Heart") {
 					var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
 					setToolTipText("Node " + id);
 					currentHoverId = id;
 					document.getElementById("organsDisplayArea").style.cursor = "pointer";
 					showTooltip(window_x, window_y);
-				} else if (displayScene.sceneName.includes("Cardiovascular/Arterial")) {
+				} else if (displayScene.sceneName.includes("human/Cardiovascular/Arterial")) {
 					document.getElementById("organsDisplayArea").style.cursor = "pointer";
 					setToolTipText("Click to show vascular model");
 					showTooltip(window_x, window_y);
@@ -266,7 +300,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 				changeOrganPartsVisibility("Data Geometry", value);
 			} else {
 				for ( var i = 0; i < associateData.length; i ++ ) {
-					var systemMeta = modelsLoader.getSystemMeta();
+					var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
 					var metaItem = systemMeta[associateData[i].SystemName][associateData[i].PartName];
 					var downloadPath = metaItem["BodyURL"];
 					var color = new THREE.Color("#0099ff");
@@ -282,20 +316,58 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	}
 	
 	var updateLayout = function() {
-		if (nerveMapIsActive && fullScreen) {
-			var element = document.getElementById("organsDisplayArea");
-			element.style.width = "50%";
-			element = document.getElementById("organsSecondaryDisplayArea");
+		if (fullScreen) {
+			if (comparedSceneIsOn) {
+				var element = document.getElementById("organsDisplayArea");
+				element.style.width = "50%";
+				element = document.getElementById("organsSecondaryDisplayArea");
+				element.className = "organsSecondSceneDisplay";
+				element.style.display = "block";
+				element = document.getElementById("timeSliderContainer");
+				element.style.width = "50%";
+				element = document.getElementById("organsTertieryDisplayArea");
+				element.style.display = "none";
+			} else if (nerveMapIsActive) {
+				var element = document.getElementById("organsDisplayArea");
+				element.style.width = "33%";
+				element = document.getElementById("organsSecondaryDisplayArea");
+				element.className = "organsSecondNerveDisplay";
+				element.style.display = "block";
+				element = document.getElementById("timeSliderContainer");
+				element.style.width = "33%";
+				element = document.getElementById("organsTertieryDisplayArea");
+				element.style.display = "block";
+			} else {
+				var element = document.getElementById("organsDisplayArea");
+				element.style.width = "100%";
+				element = document.getElementById("timeSliderContainer");
+				element.style.width = "100%";
+				element = document.getElementById("organsSecondaryDisplayArea");
+				element.style.display = "none";
+				element = document.getElementById("organsTertieryDisplayArea");
+				element.style.display = "none";
+			}
+		}
+		if (nerveMapIsActive) {
+			element = document.getElementById("texSlider");
 			element.style.display = "block";
-			element = document.getElementById("timeSliderContainer");
-			element.style.width = "50%";
-		} else {
-			var element = document.getElementById("organsDisplayArea");
-			element.style.width = "100%";
-			element = document.getElementById("timeSliderContainer");
-			element.style.width = "100%";
-			element = document.getElementById("organsSecondaryDisplayArea");
+			element = document.getElementById("organsImgContainer");
+			element.style.display = "block";
+			element = document.getElementById("organsSecondaryDisplayRenderer");
 			element.style.display = "none";
+			element = document.getElementById("CheckboxTree");
+			element.style.display = "block";
+			
+		} else {
+			element = document.getElementById("texSlider");
+			element.style.display = "none";
+			element = document.getElementById("organsImgContainer");
+			element.style.display = "none";
+			element = document.getElementById("organsSecondaryDisplayRenderer");
+			element.style.display = "block";
+			element = document.getElementById("CheckboxTree");
+			element.style.display = "none";
+				
 		}
 	}
 	
@@ -328,26 +400,39 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			var zincCameraControl = nerveMapScene.getZincCameraControls();
 			zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
 			zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
+			nerveMap.additionalReader = new PJP.VaryingTexCoordsReader(nerveMapScene);
+			var urlsArray = [ modelsLoader.getOrgansDirectoryPrefix() + "/digestive/stomach/nerve_map/3d/xi1_time_0.json",
+			                  modelsLoader.getOrgansDirectoryPrefix() + "/digestive/stomach/nerve_map/3d/xi1_time_1.json",
+			                  modelsLoader.getOrgansDirectoryPrefix() + "/digestive/stomach/nerve_map/3d/xi0_time_0.json"];
+			nerveMap.additionalReader.loadURLsIntoBufferGeometry(urlsArray);
 		}
 		organsRenderer.setCurrentScene(nerveMapScene);	
 	}
+	
+	var setupOrgansNerveSVG = function() {
+			var svgObject = document.getElementById("organSVG");
+			console.log(nerveMap["svg"]["url"])
+			if (nerveMap["svg"]["url"]) {
+				console.log(nerveMap["svg"]["url"])
+				svgObject.setAttribute('data', nerveMap["svg"]["url"] );	
+			}
+	}
 
-	var setupNerveMapSecondaryRenderer = function() {
+	var setupSecondaryRenderer = function(species) {
 		if (secondaryRenderer == null)
 			secondaryRenderer = PJP.setupRenderer("organsSecondaryDisplayRenderer");
-		var sceneName = currentName + "_twod";
+		var sceneName = currentSpecies + "/" + currentName;
 		secondaryScene = secondaryRenderer.getSceneByName(sceneName);
 		if (secondaryScene == undefined) {
-			var downloadPath = modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.twod.meta;
+			var details = organsFileMap[species][currentSystem][currentPart];
 			secondaryScene = secondaryRenderer.createScene(sceneName);
-			secondaryScene.loadMetadataURL(downloadPath, _addNerveMapGeometryCallback("twod"));
-			if (nerveMap.twod.view !== undefined)
-				secondaryScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.twod.view);
+			secondaryScene.loadMetadataURL(modelsLoader.getOrgansDirectoryPrefix()  + "/" +details.meta);
+			if (details.view !== undefined)
+				secondaryScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix()  + "/" + details.view);
 			else {
 				secondaryScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
 			}
-			secondaryScene.ambient.intensity = 8.0;
-			secondaryScene.directionalLight.intensity = 0;
+			secondaryScene.directionalLight.intensity = 1.4;
 			var zincCameraControl = secondaryScene.getZincCameraControls();
 			zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
 			zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
@@ -370,23 +455,23 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		if (targetScene) {
 			var texture = new THREE.Texture(bitmap);
 			targetScene.forEachGeometry(setTextureForGeometryCallback(texture));
+			if (nerveMap)
+				nerveMap.additionalReader.setTexture(texture);
 		}
 	}
 
 	var activateAdditionalNerveMapRenderer = function() {
 		updateLayout();
-		if (fullScreen && nerveMapIsActive) {
-			setupNerveMapSecondaryRenderer();
-		}
+		setupOrgansNerveSVG();
 	}
 	
 	var changeNerveMapVisibility = function() {
 		nerveMapIsActive = !nerveMapIsActive;
+		
 		if (nerveMapIsActive)
 			setupNerveMapPrimaryRenderer();
 		else {
 			organsRenderer.setCurrentScene(displayScene);
-			
 		}
 		activateAdditionalNerveMapRenderer();
 	}
@@ -444,19 +529,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		organPartsGui.open();
 		organsRenderer.animate();
 	}
-	
-	var radioClickedCallback = function(radioButton) {
-		var renderer = document.getElementById("organsSecondaryDisplayRenderer");
-		var imgContainer = document.getElementById("organsImgContainer");
-		if (radioButton.value == "2D") {
-			renderer.style.display = "none";
-			imgContainer.style.display = "block";
-		} else if (radioButton.value == "3D") {
-			renderer.style.display = "block";
-			imgContainer.style.display = "none";
-		}
-	}
-	
+		
 	var addUICallback = function() {
 		var organLinkeButton = document.getElementById("organLinkButton");
 		organLinkeButton.onclick = function() { openOrganModelLink() };
@@ -464,14 +537,10 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		organsScreenButton.onclick = function() { expandCollapseOrgans(organsScreenButton, 'organsDisplayPort') };
 		timeSlider = document.getElementById("organ_animation_slider");
 		timeSlider.oninput= function() { timeSliderChanged() };
+		texSlider = document.getElementById("texSlider");
+		texSlider.oninput= function() { texSliderChanged() };
 		var organsPlayToggle = document.getElementById("organsPlayToggle");
 		organsPlayToggle.onclick = function() { playPauseAnimation(organsPlayToggle) };
-		var rad = document.radio_switch.organs_radio;
-	    for(var i = 0; i < rad.length; i++) {
-	        rad[i].onclick = function() {
-	        	radioClickedCallback(this);
-	        }
-	    }
 	}
 	
 	var loadHTMLComplete = function(link) {
@@ -501,10 +570,12 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		document.head.appendChild(link);
 	}
 	
-	var getOrganDetails = function(systemName, partName) {
-		if (systemName && partName) {
-			if (organsFileMap.hasOwnProperty(systemName) && organsFileMap[systemName].hasOwnProperty(partName))
-				return organsFileMap[systemName][partName];
+	var getOrganDetails = function(speciesName, systemName, partName) {
+		if (speciesName && systemName && partName) {
+			if (organsFileMap.hasOwnProperty(speciesName) &&
+				organsFileMap[speciesName].hasOwnProperty(systemName) &&
+				organsFileMap[speciesName][systemName].hasOwnProperty(partName))
+				return organsFileMap[speciesName][systemName][partName];
 		}
 		return undefined;
 	}
@@ -518,7 +589,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 				}
 				if (useDefautColour)
 					modelsLoader.setGeometryColour(geometry, systemName, partName);
-				var organDetails = getOrganDetails(systemName, partName);
+				var organDetails = getOrganDetails(currentSpecies, systemName, partName);
 				if (organDetails === undefined || organDetails.view == undefined)
 				{
 					displayScene.viewAll();
@@ -554,6 +625,29 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
+	var getAvailableSpecies = function() {
+		var availableSpecies = new Array();
+		availableSpecies.push("none");
+		var keysArray = Object.keys(organsFileMap);
+		for (index in keysArray) {
+			var species = keysArray[index];
+			if (species != currentSpecies) {
+				if (organsFileMap[species].hasOwnProperty(currentSystem) &&
+						organsFileMap[species][currentSystem].hasOwnProperty(currentPart)) {
+					availableSpecies.push(species);
+				}
+			}
+		}
+		return availableSpecies;
+	}
+	
+	var changeComparedSpecies = function(species) {
+		nerveMapIsActive = false;
+		comparedSceneIsOn = true;
+		updateLayout();
+		setupSecondaryRenderer(species);
+	}
+	
 	var resetOrganSpecificGui = function() {
 		organPartGuiControls = function() {
 		};
@@ -577,23 +671,40 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			var nerveMapButton = { 'Toggle nerve':function(){ changeNerveMapVisibility() }};
 			organPartsGui.add(nerveMapButton, 'Toggle nerve');
 		}
+		var otherSpecies = getAvailableSpecies();
+		if (otherSpecies.length > 1) {
+			organPartGuiControls["Compared With"] = "none";
+			var comparedSelected = organPartsGui.add(organPartGuiControls, 'Compared With', otherSpecies);
+			comparedSelected.onChange(function(species) {
+				changeComparedSpecies(species);
+			} );
+			
+		}
+				
+		var element = document.getElementById("texSlider");
+		element.style.display = "none";
 	}
 	
-	this.loadOrgans = function(systemName, partName) {
+	this.loadOrgans = function(speciesName, systemName, partName) {
 		if (UIIsReady) {
-			if (systemName && partName) {
+			if (speciesName && systemName && partName) {
+				currentSpecies = speciesName;
+				currentSystem = systemName;
+				currentPart = partName;
 				nerveMapIsActive = false;
-				var systemMeta = modelsLoader.getSystemMeta();
+				comparedSceneIsOn = false;
+				var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
 				var metaItem = systemMeta[systemName][partName];
-				var name = systemName + "/" + partName;
+				var name = speciesName + "/" + systemName + "/" + partName;
 				currentName = name;
-				var organsDetails = getOrganDetails(systemName, partName);
+				var organsDetails = getOrganDetails(currentSpecies, systemName, partName);
 				associateData = undefined;
 				dataFields = undefined;
 				externalOrganLink = undefined;
+				nerveMap = undefined;
 				if (organsDetails !== undefined){
 					if (organsDetails.sceneName !== undefined)
-						name = organsDetails.sceneName;
+						name = speciesName + "/" +organsDetails.sceneName;
 					associateData = organsDetails.associateData;
 					if (organsDetails.fields)
 						dataFields = organsDetails.fields;
@@ -667,14 +778,14 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			}
 		} else {
 			if (timeoutID == 0)
-				timeoutID = setTimeout(loadOrgansTimeputCallback(systemName, partName), 500);
+				timeoutID = setTimeout(loadOrgansTimeoutCallback(speciesName, systemName, partName), 500);
 		}
 	}
 	
-	var loadOrgansTimeputCallback = function(systemName, partName) {
+	var loadOrgansTimeoutCallback = function(speciesName, systemName, partName) {
 		return function () {
 			timeoutID = 0;
-			_this.loadOrgans(systemName, partName);
+			_this.loadOrgans(speciesName, systemName, partName);
 		}
 	}
 	
@@ -761,7 +872,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
             	   if (imageUpdated) {
             		   var bitmap = imageCombiner.getCombinedImage();
             		   setTextureForScene(nerveMapScene, bitmap);
-            		   setTextureForScene(secondaryScene, bitmap);
             		   imageUpdated = false;
             	   }
                }

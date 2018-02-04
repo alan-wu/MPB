@@ -1,17 +1,23 @@
 PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 
-	var bodyScene = undefined;
+	var currentScene = undefined;
+	var currentSpecies = 'human';
+	var bodyScenes = new Array();
+	bodyScenes['human'] = undefined;
+	bodyScenes['pig'] = undefined;
+	bodyScenes['mouse'] = undefined;
+	bodyScenes['rat'] = undefined;
 	var modelsTransformationMap = new Array();
 	var bodyGui;
 	var bodyPartsGui;
 	var currentHoveredMaterial = undefined;
 	var currentSelectedMaterial = undefined;
-	var systemGuiFolder = new Array();
 	var remvoeWhenNotVisibile = false;
 	var UIIsReady = false;
 	var organsViewer = undefined;
 	var modelsLoader = ModelsLoaderIn;
-	
+
+	var systemGuiFolder = new Array();
 	systemGuiFolder["Musculo-skeletal"] = undefined;
 	systemGuiFolder["Cardiovascular"] = undefined;
 	systemGuiFolder["Respiratory"] = undefined;
@@ -95,7 +101,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 				if (intersects[i] !== undefined && (intersects[ i ].object.name !== undefined)) {
 					if (!intersects[ i ].object.name.includes("Body")) {
 						if (organsViewer)
-							organsViewer.loadOrgans(intersects[ i ].object.userData[0], intersects[ i ].object.name);
+							organsViewer.loadOrgans(currentSpecies, intersects[ i ].object.userData[0], intersects[ i ].object.name);
 						if (currentSelectedMaterial && currentSelectedMaterial != intersects[ i ].object.material) {
 							if (currentSelectedMaterial == currentHoveredMaterial)
 								currentSelectedMaterial.emissive.setHex(0x0000FF);
@@ -111,7 +117,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 				}
 			}
 			if (bodyClicked && organsViewer) {
-				organsViewer.loadOrgans("Skin (integument)", "Body");
+				organsViewer.loadOrgans(currentSpecies, "Skin (integument)", "Body");
 			}
 		}	
 	};
@@ -158,9 +164,9 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 	
 	var removeGeometry = function(systemName, name) {
 		if (remvoeWhenNotVisibile) {
-			var systemMeta = modelsLoader.getSystemMeta();
+			var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
 			if (systemMeta[systemName].hasOwnProperty(name) && systemMeta[systemName][name].geometry) {
-				bodyScene.removeZincGeometry(systemMeta[systemName][name].geometry);
+				currentScene.removeZincGeometry(systemMeta[systemName][name].geometry);
 				systemMeta[systemName][name]["loaded"] = PJP.ITEM_LOADED.FALSE;
 				systemMeta[systemName][name].geometry = undefined;
 			}
@@ -170,7 +176,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 	
 	var changeBodyPartsVisibility = function(name, systemName) {
 		return function(value) { 
-			var systemMeta = modelsLoader.getSystemMeta();
+			var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
 			if (systemMeta[systemName].hasOwnProperty(name) && systemMeta[systemName][name].geometry) {
 				systemMeta[systemName][name].geometry.setVisibility(value);
 			}
@@ -228,7 +234,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 		for (var partName in systemPartsGuiControls[systemName]) {
 			if (partName != "All" && systemPartsGuiControls[systemName].hasOwnProperty(partName)) {
 				if (systemPartsGuiControls[systemName][partName] != value) {
-					var systemMeta = modelsLoader.getSystemMeta();
+					var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
 					if (systemMeta[systemName].hasOwnProperty(partName)) {
 						systemPartsGuiControls[systemName][partName] = value;
 						if (systemMeta[systemName][partName].geometry) {
@@ -243,7 +249,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 			}
 		}
 		for (var i = 0; i < systemGuiFolder[systemName].__controllers.length; i++) {
-			systemGuiFolder[systemName].__controllers[i].updateD
+			systemGuiFolder[systemName].__controllers[i].updateDisplay();
 			readModel(systemName, partName, true);
 			systemGuiFolder[systemName].__controllers[i].__prev = 
 				systemGuiFolder[systemName].__controllers[i].__checkbox.checked;
@@ -306,7 +312,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 			item["loaded"] = PJP.ITEM_LOADED.TRUE;
 			item.geometry = geometry;
 			if (startup)
-				_addSystemPartGuiControl(systemName, partName, item, geometry, (item["loaded"] ==  PJP.ITEM_LOADED.TRUE));
+				_addSystemPartGuiControl(systemName, partName, item, geometry, (item["loaded"] == PJP.ITEM_LOADED.TRUE));
 			if (scaling == true) {
 				geometry.morph.scale.x = 1.00;
 				geometry.morph.scale.y = 1.00;
@@ -359,9 +365,10 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 		addSystemFolder();
 		var customContainer = document.getElementById("bodyGui").append(bodyGui.domElement);
 		var resetViewButton = { 'Reset View':function(){ bodyRenderer.resetView() }};
-		var scene = bodyRenderer.getCurrentScene();
+		var scene = bodyRenderer.createScene("human");
+		bodyRenderer.setCurrentScene(scene);
 		scene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
-		bodyScene=scene;
+		currentScene = scene;
 		var directionalLight = scene.directionalLight;
 		directionalLight.intensity = 1.4;
 		var zincCameraControl = scene.getZincCameraControls();
@@ -379,14 +386,25 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
+	var changeSpecies = function(element) {
+		currentSpecies = element.value;
+		var scene = bodyRenderer.getSceneByName(element.value);
+		if (scene == undefined) {
+			scene = bodyRenderer.createScene(element.value);
+		}
+		currentScene = scene;
+		bodyRenderer.setCurrentScene(scene);
+	}
+	
 	var addUICallback = function() {
 		var callbackContainer = document.getElementById("systemToggle");
 		var inputs, index;
 		inputs = callbackContainer.getElementsByTagName('input');
 		for (var i = 0; i < inputs.length; ++i) {
-			
 			inputs[i].onclick = systemButtonPressCallback(inputs[i]); 
 		}
+		var speciesSelected = document.getElementById("bodySpeciesSelect");
+		speciesSelected.onchange = function() { changeSpecies(speciesSelected) };
 	}
 	
 	var loadHTMLComplete = function(link) {
@@ -417,7 +435,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 	}
 	
 	var readModel = function(systemName, partName, startup) {
-		var systemMeta = modelsLoader.getSystemMeta();
+		var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
 		item = systemMeta[systemName][partName];
 		if (item["loaded"] ==  PJP.ITEM_LOADED.FALSE) {
 			var downloadPath = item["BodyURL"];
@@ -426,12 +444,12 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 			if (item["FileFormat"] == "JSON") {
 				if (systemName == "Musculo-skeletal" || systemName == "Skin (integument)")
 					scaling = true;
-				bodyScene.loadMetadataURL(downloadPath, _addBodyPartCallback(systemName, partName, item, scaling, false, startup));
+				currentScene.loadMetadataURL(downloadPath, _addBodyPartCallback(systemName, partName, item, scaling, false, startup));
 			}
 			else if (item["FileFormat"] == "STL")
-				bodyScene.loadSTL(downloadPath, partName, _addBodyPartCallback(systemName, partName, item, scaling, true, startup));
+				currentScene.loadSTL(downloadPath, partName, _addBodyPartCallback(systemName, partName, item, scaling, true, startup));
 			else if (item["FileFormat"] == "OBJ") 
-				bodyScene.loadOBJ(downloadPath, partName, _addBodyPartCallback(systemName, partName, item, scaling, true, startup));
+				currentScene.loadOBJ(downloadPath, partName, _addBodyPartCallback(systemName, partName, item, scaling, true, startup));
 		}
 	}
 	
@@ -451,7 +469,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 	
 	this.readSystemMeta = function() {
 		if (UIIsReady) {
-			var systemMeta = modelsLoader.getSystemMeta();
+			var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
 			for (var systemItem  in systemMeta) {
 				readBodyRenderModel(systemItem, systemMeta[systemItem]);	
 			}
