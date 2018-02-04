@@ -90,6 +90,7 @@ PJP.TissueViewer = function(PanelName)  {
 		} else {
 			materialSecondPass.uniforms.black_flip.value = true;
 		}
+		materialSecondPass.uniforms.slides_per_side.value = 16;
 	}
 	
 	var renderFirstPass = function() {
@@ -222,7 +223,7 @@ PJP.TissueViewer = function(PanelName)  {
 		cubeTextures['crop'] = THREE.ImageUtils.loadTexture('textures/crop.jpg');
 		cubeTextures['collagen_large'] = THREE.ImageUtils.loadTexture('textures/collagen_large.png');
 		cubeTextures['crop_large'] = THREE.ImageUtils.loadTexture('textures/crop_large.jpg');
-	
+
 		//Don't let it generate mipmaps to save memory and apply linear filtering to prevent use of LOD.
 		cubeTextures['collagen'].generateMipmaps = false;
 		cubeTextures['collagen'].minFilter = THREE.LinearFilter;
@@ -247,7 +248,8 @@ PJP.TissueViewer = function(PanelName)  {
 		cubeTextures['crop_large'].magFilter = THREE.LinearFilter;
 		cubeTextures['crop_large'].wrapS = THREE.RepeatWrapping;
 		cubeTextures['crop_large'].wrapT = THREE.RepeatWrapping;
-	
+	 
+	 
 		var screenSize = new THREE.Vector2( container.clientWidth, container.clientHeight );
 		rtTexture = new THREE.WebGLRenderTarget( screenSize.x, screenSize.y,
 												{ 	minFilter: THREE.LinearFilter,
@@ -286,6 +288,7 @@ PJP.TissueViewer = function(PanelName)  {
 						max_y : {type: "1f" , value: guiControls.max_y },
 						min_z : {type: "1f" , value: guiControls.min_z },
 						max_z : {type: "1f" , value: guiControls.max_z },
+						slides_per_side : {type: "1f" , value: 16 },
 						black_flip : {value: true}}
 		 });
 	
