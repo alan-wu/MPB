@@ -17,6 +17,18 @@ PJP.setupRenderer = function (elementID) {
 	return localRenderer;
 }
 
+var findCSSRule = function(sheetTitle, selectorText) {
+	for (var i = 0; i < document.styleSheets.length; i++ ) {
+		if (document.styleSheets[i].title === sheetTitle) {
+			var cssRules = document.styleSheets[i].cssRules || document.styleSheets[n].rules;
+			for (var n = 0; n < cssRules.length; n++ ) {
+				if (cssRules[n].selectorText === selectorText)
+					return cssRules[n];
+			}
+		}
+	}
+}
+
 var showTooltip = function(x, y) {
 	tooltipcontainerElement.style.left = x +"px";
 	tooltipcontainerElement.style.top = (y - 20) + "px";

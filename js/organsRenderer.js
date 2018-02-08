@@ -9,9 +9,11 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var nerveMapScene = undefined;
 	var windowWidth, windowHeight;
 	var organGui;
+	var currentImgZoom = 1.0;
 	var organGuiControls = new function() {
 		this.Speed = 500;
 	};
+	var imgRightClickDown = false;
 	var comparedSceneIsOn = false;
 	var additionalSpecies = undefined;
 	var currentName = "";
@@ -423,7 +425,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			var svgObject = document.getElementById("organSVG");
 			console.log(nerveMap["svg"]["url"])
 			if (nerveMap["svg"]["url"]) {
-				console.log(nerveMap["svg"]["url"])
 				svgObject.setAttribute('data', nerveMap["svg"]["url"] );	
 			}
 	}
@@ -539,6 +540,83 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		organPartsGui.open();
 		organsRenderer.animate();
 	}
+
+	var imgZoom = function() {
+		console.log(document.styleSheets);
+		var cssRule = findCSSRule("Basic styles", ".organsImg");
+		var zoom = currentImgZoom * 100 + "%";
+		cssRule.style["max-height"] = zoom; 
+		cssRule.style["max-width"] = zoom;
+	}
+
+	var imgZoomIn = function(ratio) {
+		currentImgZoom = currentImgZoom + ratio;
+		imgZoom();
+	}
+
+	var imgZoomOut = function(ratio) {
+		currentImgZoom = currentImgZoom - ratio;
+		imgZoom();
+	}
+	
+	var resetZoom = function() {
+		currentImgZoom = 1.0;
+		imgZoom();
+	}
+
+	var onImageScrollEvent = function(event) {
+			if (event.deltaY > 0) {
+				imgZoomIn(0.1);
+			} else if (event.deltaY < 0) {
+				imgZoomOut(0.1);
+			}
+			event.preventDefault(); 
+			event.stopPropagation();
+			event.stopImmediatePropagation(); 
+	}
+
+	function onImageMouseDown( event ) {
+	   	if (event.button == 2) {
+	   		imgRightClickDown = true;
+	   		event.preventDefault();
+	   		event.stopImmediatePropagation(); 
+	    } else {
+	    	imgRightClickDown = false;
+	    }
+	}
+
+	function onImageMouseMove( event ) {
+		if (imgRightClickDown == true) {
+			targetElement = document.getElementById("organsImgContainer");
+			targetElement.scrollTop += event.movementY;
+			targetElement.scrollLeft -= event.movementX;
+		}
+	}
+
+	function onImageMouseUp( event ) {
+	   	if (event.button == 2) {
+	   		event.preventDefault();
+	   		event.stopPropagation();
+	   		event.stopImmediatePropagation(); 
+	    }
+		imgRightClickDown = false;
+	}
+
+	function onImageMouseLeave( event ) {
+		imgRightClickDown = false;
+	}
+	
+	
+	var enableImageMouseInteraction = function(targetElement) {
+		if (targetElement.addEventListener) {
+			targetElement.addEventListener( 'mousedown', onImageMouseDown, false );
+			targetElement.addEventListener( 'mousemove', onImageMouseMove, false );
+			targetElement.addEventListener( 'mouseup', onImageMouseUp, false );
+			targetElement.addEventListener( 'mouseleave', onImageMouseLeave, false );
+			targetElement.oncontextmenu = function() { return false;};
+			targetElement.addEventListener( 'wheel', function ( event ) { onImageScrollEvent(event); }, true);
+	    }
+	}
 		
 	var addUICallback = function() {
 		var organLinkeButton = document.getElementById("organLinkButton");
@@ -551,6 +629,8 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		texSlider.oninput= function() { texSliderChanged() };
 		var organsPlayToggle = document.getElementById("organsPlayToggle");
 		organsPlayToggle.onclick = function() { playPauseAnimation(organsPlayToggle) };
+		var element = document.getElementById("organsImgContainer");
+		enableImageMouseInteraction(element);
 	}
 	
 	var loadHTMLComplete = function(link) {
@@ -712,6 +792,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 				dataFields = undefined;
 				externalOrganLink = undefined;
 				nerveMap = undefined;
+				resetZoom();
 				if (organsDetails !== undefined){
 					if (organsDetails.sceneName !== undefined)
 						name = speciesName + "/" +organsDetails.sceneName;
@@ -895,6 +976,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
             				  var elem = document.createElement("img");
             				  elem.className = "organsImg";
             				  elem.src = imgURL; 
+            				  elem.style.display = "none";
             				  container.appendChild(elem);
             				  imgEle[currentItem.id] = elem;
             				  if (currentItem.checked == true) {
@@ -926,7 +1008,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 						model.getChildren(root, forEachChildrenCreateImageElements(container));
 						var bitmap = imageCombiner.getCombinedImage();
 						setTextureForScene(nerveMapScene, bitmap);
-						setTextureForScene(secondaryScene, bitmap);
 					}
 				}
 
