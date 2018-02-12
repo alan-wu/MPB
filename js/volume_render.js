@@ -13,7 +13,7 @@ var cellPickerScene;
 var gui;
 
 var showCellTooltip = function(id, x, y) {
-	tiptextElement.innerHTML = "Cell model " + id;
+	setToolTipText("Cell model " + id);
 	var pos = getPos(document.getElementById("displayPort"));
 	tooltipcontainerElement.style.left = x - pos.x +"px";
 	tooltipcontainerElement.style.top = (y - 20) - pos.y + "px";

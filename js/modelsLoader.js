@@ -1,3 +1,11 @@
+/**
+ * Provides utilities function for files IO, this is used primarily by
+ * {@link PJP.BodyViewer}.
+ * 
+ * @class
+ * @author Alan Wu
+ * @returns {PJP.ModelsLoader}
+ */
 PJP.ModelsLoader = function()  {
 	var _this = this;
 	var metaFilesReady = false;
@@ -35,19 +43,37 @@ PJP.ModelsLoader = function()  {
 		}
 	}
 	
+	/**
+	 * Provide meta for available data with the provided species name.
+	 * 
+	 * @param {string} speciesName
+	 * @returns {PJP.ModelsLoader~systemMeta}
+	 */
 	this.getSystemMeta = function(speciesName) {
 		return systemMeta[speciesName];
 	}
 	
+	/**
+	 * Provide prefix for all the data URLs.
+	 * 
+	 * @returns {string}
+	 */
 	this.getBodyDirectoryPrefix = function() {
 		return bodyDirectoryPrefix;
 	}
 	
+	/**
+	 * Provide prefix for all the model URLs.
+	 * 
+	 * @returns {string}
+	 */
 	this.getOrgansDirectoryPrefix = function() {
 		return organsDirectoryPrefix;
 	}
 	
-	
+	/**
+	 * Call the provided function which will be triggered when the system meta is ready.
+	 */
 	this.addSystemMetaIsReadyCallback = function(callbackFunctions) {		
 		systemMetaReadyCallbackFunctions.push(callbackFunctions);
 	}

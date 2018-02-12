@@ -29,7 +29,7 @@ PJP.TissueViewer = function(PanelName)  {
 	}
 	
 	var showCellTooltip = function(id, x, y) {
-		tiptextElement.innerHTML = "Cell model " + id;
+		setToolTipText("Cell model " + id);
 		tooltipcontainerElement.style.left = x +"px";
 		tooltipcontainerElement.style.top = (y - 20) + "px";
 		tipElement.style.visibility = "visible";

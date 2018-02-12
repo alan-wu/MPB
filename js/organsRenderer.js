@@ -1,4 +1,13 @@
-
+/**
+ * Viewer of 3D-organs models. Users can toggle on/off different views. Data is displayed instead
+ * if models are not available.
+ * 
+ * @class
+ * @param {PJP.ModelsLoader} ModelsLoaderIn - defined in modelsLoade.js, providing locations of files.
+ * @param {String} PanelName - Id of the target element to create the  {@link PJP.OrgansViewer} on.
+ * @author Alan Wu
+ * @returns {PJP.OrgansViewer}
+ */
 PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var currentSpecies = undefined;
 	var pickerScene = undefined;
@@ -20,21 +29,29 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var currentSystem = "";
 	var currentPart = "";
 	var currentSpecies  = "";
+	//Current model's associate data, data fields, external link, nerve map informations,
+	//these are proived in the organsFileMap array.
 	var associateData = undefined;
 	var dataFields = undefined;
 	var externalOrganLink = undefined;
 	var nerveMap = undefined;
+	var nerveMapIsActive = false;
 	var timeoutID = 0;
 	var fullScreen = false;
 	var organPartsGui;
+	// data used by dat.gui to control model specific controls. 
 	var organPartGuiControls = function() {
 	};
 	var timeSlider = undefined;
 	var texSlider = undefined;
 	var speedSlider = undefined;
+	// data used by dat.gui to control non-model specific controls. 
 	var organsControl = function() {
 		  this.Background = [ 255, 255, 255 ]; // RGB array
 	};
+	/**
+	 * {ImageCombiner}.
+	 */
 	var imageCombiner = undefined;
 	
 	var UIIsReady = false;
@@ -42,19 +59,18 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var cellPanel = undefined;
 	var modelPanel = undefined;
 	var modelsLoader = ModelsLoaderIn;
-	var nerveMapIsActive = false;
-	
 	var _this = this;
 	
+	//ZincRenderer for the primary display of model.
 	var organsRenderer = null;
+	//Secondary renderer, used for comparing species models.
 	var secondaryRenderer = null;
-	var tertiaryRenderer = null;
 	
+	//Array for storing different species models urls.
 	var organsFileMap = new Array();
 	
-	
+	//Array for storing rat's models urls and its associated data.
 	var ratOrgansFileMap = new Array();
-	
 	ratOrgansFileMap["Cardiovascular"] = new Array();
 	ratOrgansFileMap["Cardiovascular"]["Kidneys-Arteries"] = {
 			view: "rat/cardiovascular/arteries/rat_kidneys_view.json",
@@ -63,8 +79,8 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			associateData: undefined	
 	};
 	
+	//Array for storing human's models urls and its associated data.
 	var humanOrgansFileMap = new Array();
-	
 	humanOrgansFileMap["Cardiovascular"] = new Array();
 	humanOrgansFileMap["Digestive"] = new Array();
 	humanOrgansFileMap["Respiratory"] = new Array();
@@ -118,7 +134,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			view: "digestive/stomach/nerve_map/2d/stomach_nerve_2d_view.json"};
 	humanOrgansFileMap["Digestive"]["Stomach"].nerveMap["normalised"] = {meta: "digestive/stomach_1.json", view: undefined};
 	humanOrgansFileMap["Digestive"]["Stomach"].nerveMap["svg"] = {url: 'svg/Myocyte_v6_Grouped.svg'};
-	
 	humanOrgansFileMap["Respiratory"]["Lungs"] = {
 			view: "respiratory/lungs_view.json",
 			meta: "respiratory/lungs_1.json",
@@ -127,6 +142,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	
 	organsFileMap['human'] = humanOrgansFileMap;
 	organsFileMap['rat'] = ratOrgansFileMap;
+	
 	
 	this.setTissueViewer = function(TissueViewerIn) {
 		tissueViewer = TissueViewerIn;
@@ -147,6 +163,9 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		return {x: lx,y: ly};
 	}
 	
+	/**
+	 * Used to update internal timeer in scene when time slider has changed.
+	 */
 	var timeSliderChanged = function() {
 		if (!nerveMapIsActive) {
 			if (pickerScene)
@@ -160,6 +179,9 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
+	/**
+	 * Update the time slider and other renderers/scenes when time has changed.
+	 */
 	var updateTimeSlider = function() {
 		var currentTime = organsRenderer.getCurrentTime();
 		var sliderValue = currentTime / 30.0;
@@ -186,6 +208,10 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
+	/**
+	 * Speed slider has moved, adjust the play speed of the renderer.
+	 * @callback
+	 */
 	var speedSliderChanged = function() {
 		return function(value) {
 			organsRenderer.setPlayRate(value);
@@ -203,16 +229,17 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			nerveMap.additionalReader.setSliderPos(texSlider.value);
 	}
 	
-	
-	var setOrgansString = function(name) {
+	var setOrgansPanelTitle = function(name) {
 	 	var text_display = document.getElementById('OrganTitle');
 		text_display.innerHTML = "<strong>Organ: <span style='color:#FF4444'>" + name + "</span></strong>";
 	}
-	
-	var setToolTipText = function(text) {
-		tiptextElement.innerHTML = text;
-	}
-	
+
+	/** 
+	 * Callback function when a pickable object has been picked. It will then call functions in tissueViewer
+	 * and cellPanel to show corresponding informations.
+	 * 
+	 * @callback
+	 */
 	var _pickingCallback = function() {
 		return function(intersects, window_x, window_y) {
 			if (intersects[0] !== undefined) {
@@ -241,6 +268,12 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	};
 	
+	/** 
+	 * Callback function when a pickable object has been hovered over. It will show
+	 * objecty id/name as tooltip text.
+	 * 
+	 * @callback
+	 */
 	var _hoverCallback = function() {
 		return function(intersects, window_x, window_y) {
 			if (intersects[0] !== undefined) {
@@ -262,16 +295,18 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			}
 		}
 	};
-	
+
 	var updateOrganPartsVisibilty = function(name, flag) {
 		return function(zincGeometry) {
 			if (zincGeometry.groupName && zincGeometry.groupName == name) {
-				
 				zincGeometry.setVisibility(flag);
 			}
 		}
 	}
 	
+	/**
+	 * Change visibility for parts of the current scene.
+	 */
 	var changeOrganPartsVisibility = function(name, value) {
 		displayScene.forEachGeometry(updateOrganPartsVisibilty(name, value));
 		displayScene.forEachGlyphset(updateOrganPartsVisibilty(name, value));
@@ -295,6 +330,10 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
+	/**
+	 * Callback function when a data geometry has been toggled on/off the scene.
+	 * 
+	 */
 	var changeDataGeometryVisibility = function() {
 		return function(value) {
 			if ((displayScene.findGeometriesWithGroupName("Data Geometry").length > 0) ||
@@ -317,6 +356,12 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
+	/** 
+	 * Update layout of the organs panel, there are three different layouts at this moment.
+	 * 1. Normal display - Fullscreen/split screen with a single display.
+	 * 2. Nerve map display - Three panels when it is on fullscreen display.
+	 * 3. Species comparison display - Two panels when it is on fullscreen display.
+	 */
 	var updateLayout = function() {
 		if (fullScreen) {
 			if (comparedSceneIsOn) {
@@ -394,7 +439,10 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
-	
+	/**
+	 * Read in the nerve map models onto the primary renderer when nerve map has been
+	 * toggled on.
+	 */
 	var setupNerveMapPrimaryRenderer = function() {
 		var sceneName = currentName + "_nervemap";
 		nerveMapScene = organsRenderer.getSceneByName(sceneName);
@@ -421,6 +469,9 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		organsRenderer.setCurrentScene(nerveMapScene);	
 	}
 	
+	/**
+	 * Load the appropriate svg diagram to the svg viewer on the organs panel.
+	 */
 	var setupOrgansNerveSVG = function() {
 			var svgObject = document.getElementById("organSVG");
 			console.log(nerveMap["svg"]["url"])
@@ -429,6 +480,9 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			}
 	}
 
+	/**
+	 * Create/Get the secondary renderer and display relavant models on it. 
+	 */
 	var setupSecondaryRenderer = function(species) {
 		if (secondaryRenderer == null)
 			secondaryRenderer = PJP.setupRenderer("organsSecondaryDisplayRenderer");
@@ -476,9 +530,11 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		setupOrgansNerveSVG();
 	}
 	
+	/**
+	 * Nerve map has been toggled on/off, change organs renderer layput.
+	 */
 	var changeNerveMapVisibility = function() {
 		nerveMapIsActive = !nerveMapIsActive;
-		
 		if (nerveMapIsActive)
 			setupNerveMapPrimaryRenderer();
 		else {
@@ -502,10 +558,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 				internalRenderer = secondaryRenderer.getThreeJSRenderer();
 				internalRenderer.setClearColor( colour, 1 );
 			}
-			if (tertiaryRenderer) {
-				internalRenderer = tertiaryRenderer.getThreeJSRenderer();
-				internalRenderer.setClearColor( colour, 1 );
-			}
 		}
 	}
 	
@@ -518,7 +570,10 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		expandCollapse(source, portName);
 		activateAdditionalNerveMapRenderer();
 	}
-	       
+	
+	/**
+	 * Initialise organs panel, setup primary renderer and dat.gui UI.
+	 */ 
 	var initialiseOrgansVisualisation = function() {
 		organsRenderer = PJP.setupRenderer("organsDisplayArea");
 		organsRenderer.addPreRenderCallbackFunction(updateTimeSliderCallback());
@@ -542,7 +597,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	}
 
 	var imgZoom = function() {
-		console.log(document.styleSheets);
 		var cssRule = findCSSRule("Basic styles", ".organsImg");
 		var zoom = currentImgZoom * 100 + "%";
 		cssRule.style["max-height"] = zoom; 
@@ -564,7 +618,12 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		imgZoom();
 	}
 
+	/** 
+	 * Trigger zoom event on the nerve map composite image.
+	 * @callback
+	 */
 	var onImageScrollEvent = function(event) {
+			console.log(event)
 			if (event.deltaY > 0) {
 				imgZoomIn(0.1);
 			} else if (event.deltaY < 0) {
@@ -614,10 +673,13 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			targetElement.addEventListener( 'mouseup', onImageMouseUp, false );
 			targetElement.addEventListener( 'mouseleave', onImageMouseLeave, false );
 			targetElement.oncontextmenu = function() { return false;};
-			targetElement.addEventListener( 'wheel', function ( event ) { onImageScrollEvent(event); }, true);
+			targetElement.addEventListener( 'wheel', function ( event ) { onImageScrollEvent(event); }, false);
 	    }
 	}
-		
+	
+	/**
+	 * Add UI callbacks after html page has been loaded.
+	 */
 	var addUICallback = function() {
 		var organLinkeButton = document.getElementById("organLinkButton");
 		organLinkeButton.onclick = function() { openOrganModelLink() };
@@ -651,6 +713,10 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
+	/**
+	 * initialise loading of the html layout for the organs panel.
+	 * @async 
+	 */
 	var initialise = function() {
 		var link = document.createElement('link');
 		link.rel = 'import';
@@ -670,6 +736,10 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		return undefined;
 	}
 	
+	/**
+	 * New organs geometry has been added to the scene, add UIs and make sure
+	 * the viewport is correct.
+	 */
 	var _addOrganPartCallback = function(systemName, partName, useDefautColour) {
 		return function(geometry) {
 			if (geometry.groupName) {
@@ -692,6 +762,10 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
+	/** 
+	 * Toggle data field displays. Data fields displays flow/pressure and other activities of the
+	 * organs.
+	 */
 	var toggleFieldVisibility = function(dataFields) {
 		return function(value) {
 			for ( var i = 0; i < dataFields.length; i ++ ) {
@@ -715,6 +789,10 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
+	/**
+	 * Return an array containing name(s) of species that also contains the currently displayed organs.
+	 * @returns {Array} containing species name 
+	 */
 	var getAvailableSpecies = function() {
 		var availableSpecies = new Array();
 		availableSpecies.push("none");
@@ -732,13 +810,22 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	}
 	
 	var changeComparedSpecies = function(species) {
-		nerveMapIsActive = false;
-		comparedSceneIsOn = true;
-		updateLayout();
-		setupSecondaryRenderer(species);
+		if (species == "none") {
+			comparedSceneIsOn = false;
+			updateLayout();
+		} else{
+			nerveMapIsActive = false;
+			comparedSceneIsOn = true;
+			updateLayout();
+			setupSecondaryRenderer(species);
+		}
 	}
-	
-	var resetOrganSpecificGui = function() {
+
+	/**
+	 * Reset dat.gui ui and also update it to fit the current displaying
+	 * organs.
+	 */
+	var updateOrganSpecificGui = function() {
 		organPartGuiControls = function() {
 		};
 		organGui.removeFolder('Visibility Control');
@@ -775,9 +862,22 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		element.style.display = "none";
 	}
 	
+	/**
+	 * Load organ(s) with the provided species, system and part. This will update
+	 * the UIs, load in the models.
+	 * If models are not available, it will attempt to display the data instead (same
+	 * geometry as shown on the {@link PJP.BodyViewer}
+	 * 
+	 * @param {String} speciesName
+	 * @param {String} systemName
+	 * @param {String} systemName  
+	 * @async
+	 */
 	this.loadOrgans = function(speciesName, systemName, partName) {
+		//Do the work now if UI is ready otherwise try again later with a timeout setup.
 		if (UIIsReady) {
 			if (speciesName && systemName && partName) {
+				resetZoom();
 				currentSpecies = speciesName;
 				currentSystem = systemName;
 				currentPart = partName;
@@ -785,17 +885,18 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 				comparedSceneIsOn = false;
 				var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
 				var metaItem = systemMeta[systemName][partName];
+				// This is used as title
 				var name = speciesName + "/" + systemName + "/" + partName;
 				currentName = name;
+				//Get informations from the array
 				var organsDetails = getOrganDetails(currentSpecies, systemName, partName);
 				associateData = undefined;
 				dataFields = undefined;
 				externalOrganLink = undefined;
 				nerveMap = undefined;
-				resetZoom();
 				if (organsDetails !== undefined){
 					if (organsDetails.sceneName !== undefined)
-						name = speciesName + "/" +organsDetails.sceneName;
+						name = speciesName + "/" + organsDetails.sceneName;
 					associateData = organsDetails.associateData;
 					if (organsDetails.fields)
 						dataFields = organsDetails.fields;
@@ -808,10 +909,11 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 				} else {
 					button.style.visibility = "hidden";
 				}
-					
+
+				// Check if organ scene exist, create one and load in the models or data if it does not exist.
 				var organScene = organsRenderer.getSceneByName(name);
 				if (organScene == undefined) {
-					resetOrganSpecificGui();
+					updateOrganSpecificGui();
 					organScene = organsRenderer.createScene(name);
 					displayScene = organScene;
 					var directionalLight = organScene.directionalLight;
@@ -855,7 +957,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 					directionalLight.intensity = 1.4;
 					organsRenderer.setCurrentScene(organScene);
 				} else if (displayScene != organScene){
-					resetOrganSpecificGui();
+					updateOrganSpecificGui();
 					organsRenderer.setCurrentScene(organScene);
 					displayScene = organScene;
 					var pickerSceneName = name + "_picker_scene";
@@ -863,7 +965,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 					displayScene.forEachGeometry(_addOrganPartCallback());
 					displayScene.forEachGlyphset(_addOrganPartCallback());
 				}
-				setOrgansString(name);
+				setOrgansPanelTitle(name);
 				updateTimeSlider();
 				updateSpeedSlider();
 			}
@@ -880,24 +982,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
-	var showHideOrgans = function(flag) {
-		return function(zincGeometry) {
-				zincGeometry.setVisibility(flag);
-		}
-	}
-	
-	var showOrgans = function() {
-		organsRenderer.setCurrentScene(displayScene);
-		if (pickerScene)
-			pickerScene.forEachGlyphset(showHideOrgans(true));
-	}
-	
-	var hideOrgans = function() {
-		organsRenderer.setCurrentScene(defaultScene);
-		if (pickerScene)
-			pickerScene.forEachGlyphset(showHideOrgans(false));
-	
-	}
 	
 	var triggerAnimation = function() {
 		if (organsRenderer.playAnimation == true) {
@@ -922,7 +1006,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	}
 	
 	initialise();
-	
 	
     require([
              "dojo/ready",
@@ -997,6 +1080,10 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
             	   }
                }
 				
+           	/**
+           	 * Setup the tree for toggling parts of the nerve map texture/image.
+           	 * Uses dojo tree and checkbox for the UI and ImageCombiner for image composition.
+           	 */
                function rootIsReady() {
 					return function(root) {
 						var height = document.getElementById("organsRootImage").height;

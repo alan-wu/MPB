@@ -1,3 +1,10 @@
+/**
+ * Provides a global namespace for the physiome journey portal and some utilties functions for it.
+ * 
+ * @namespace
+ * @author Alan Wu
+ * @returns {PJP.ModelsLoader}
+ */
 var PJP = { VERSION: '0.1' };
 var currentHoverId = -1;
 var tooltipcontainerElement = undefined;
@@ -6,6 +13,12 @@ var tiptextElement = undefined;
 
 PJP.ITEM_LOADED = { FALSE: -1, DOWNLOADING: 0, TRUE: 1 };
 
+
+/**
+ * Create a {@link Zinc.Renderer} on the dom element with corresponding elementID.
+ * @param {String} elementID - id of the target dom element.
+ * @returns {Zinc.Renderer}
+ */
 PJP.setupRenderer = function (elementID) {
 	var localContainer = document.createElement( 'div' );
 	document.getElementById(elementID).appendChild( localContainer );
@@ -17,6 +30,12 @@ PJP.setupRenderer = function (elementID) {
 	return localRenderer;
 }
 
+/**
+ * Find the {@link CSSStyleRule} with the provided css sheet title and selector name.
+ * @param {String} sheetTitle - Style sheet with the same title.
+ * @param {String} selectorText - selector string to match.
+ * @returns {CSSStyleRule}
+ */
 var findCSSRule = function(sheetTitle, selectorText) {
 	for (var i = 0; i < document.styleSheets.length; i++ ) {
 		if (document.styleSheets[i].title === sheetTitle) {
@@ -29,6 +48,11 @@ var findCSSRule = function(sheetTitle, selectorText) {
 	}
 }
 
+/**
+ * Show tool tip on the specified windows coordinates.
+ * @param {Number} x - Style sheet with the same title.
+ * @param {Number} y - selector string to match.
+ */
 var showTooltip = function(x, y) {
 	tooltipcontainerElement.style.left = x +"px";
 	tooltipcontainerElement.style.top = (y - 20) + "px";
@@ -44,6 +68,14 @@ var hideTooltip = function() {
 	tipElement.style.opacity = 0;
 	tiptextElement.style.visibility = "hidden";
 	tiptextElement.style.opacity = 0;
+}
+
+/**
+ * Change the tooltip text.
+ * @param {String} text - Text to update the tooltip to.
+ */
+var setToolTipText = function(text) {
+	tiptextElement.innerHTML = text;
 }
 
 var previousSource = undefined;
@@ -65,10 +97,16 @@ var toggleSplitDisplay = function(displayStyle) {
 	}
 }
 
-var expandCollapse = function(source, portName) {
+/**
+ * This will expand/collapse according to the current state of the target panel.
+ * 
+ * @param {String} source - source Expand/Collapse button, used to check current state.
+ * @param {String} portid - id of the div element to expand/collapse.
+ */
+var expandCollapse = function(source, portid) {
 	if (source.value=="Expand") {
 		toggleSplitDisplay("none");
-		var portElement = document.getElementById(portName);
+		var portElement = document.getElementById(portid);
 		portElement.className = "fullPortDisplay";
 		portElement.style.display = "block";
 		source.value = "Collapse";

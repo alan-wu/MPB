@@ -1,3 +1,13 @@
+/**
+ * Provides rendering of the 3D-scaffold data in the dom of the provided id with models
+ * defined in the modelsLoader.
+ * @class
+ * @param {PJP.ModelsLoader} ModelsLoaderIn - defined in modelsLoade.js, providing locations of files.
+ * @param {String} PanelName - Id of the target element to create the  {@link PJP.BodyViewer} on.
+ * 
+ * @author Alan Wu
+ * @returns {PJP.BodyViewer}
+ */
 PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 
 	var currentScene = undefined;
@@ -12,11 +22,14 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 	var bodyPartsGui;
 	var currentHoveredMaterial = undefined;
 	var currentSelectedMaterial = undefined;
-	var remvoeWhenNotVisibile = false;
+	// Flag for removing geometry from ZincScene when not visible, thus freeing the memory. Default is false.
+	var removeWhenNotVisible = false;
 	var UIIsReady = false;
 	var organsViewer = undefined;
 	var modelsLoader = ModelsLoaderIn;
 
+	
+	//Represents each physiological organ systems as folder in the dat.gui.
 	var systemGuiFolder = new Array();
 	systemGuiFolder["Musculo-skeletal"] = undefined;
 	systemGuiFolder["Cardiovascular"] = undefined;
@@ -31,6 +44,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 	systemGuiFolder["Male Reproductive"] = undefined;
 	systemGuiFolder["Special sense organs"] = undefined;
 	
+	//Stores physiological organ systems specific gui settings in dat.gui. 
 	var systemPartsGuiControls = new Array();
 	systemPartsGuiControls["Musculo-skeletal"] = function() {};
 	systemPartsGuiControls["Cardiovascular"] = function() {};
@@ -45,14 +59,17 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 	systemPartsGuiControls["Male Reproductive"] = function() {};
 	systemPartsGuiControls["Special sense organs"] = function() {};
 	
+	//Array of settings of the body viewer gui controls.
 	var bodyControl = function() {
 		  this.Background = [ 255, 255, 255 ]; // RGB array
 	};
 	
 	var _this = this;
 	
+	//ZincRenderer for this viewer.
 	var bodyRenderer = null;
 	
+	//Following matrices offset data that are offset from their proposed location
 	var transformationMatrix = new THREE.Matrix4();
 	transformationMatrix.set(0.493844, -0.823957, 0.277871, 30,
 										  0.0782172, 0.6760355, 0.92953, -130,
@@ -73,12 +90,24 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 			folder: "respiratory",
 			system: "Respiratory"};
 	
+	/**
+	 * Set the organs viewer this {@link PJP.BodyViewer} fires event to.
+	 * 
+	 * @param {PJP.OrgansViewer} OrgansViewerIn - target Organs Viewer to fire the event to.
+	 */
 	this.setOrgansViewer = function(OrgansViewerIn) {
 		organsViewer = OrgansViewerIn;
 	}
 	
+	/**
+	 * Display the provided name with a tool tip.
+	 * 
+	 * @param {String} name - String to display
+	 * @param {Number} x - windows x coordinates
+	 * @param {Number} y - windows y coordinates
+	 */
 	var showBodyTooltip = function(name, x, y) {
-		tiptextElement.innerHTML = name;
+		setToolTipText(name);
 		tooltipcontainerElement.style.left = x +"px";
 		tooltipcontainerElement.style.top = (y - 20) + "px";
 		tipElement.style.visibility = "visible";
@@ -94,6 +123,10 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 		tiptextElement.style.opacity = 0;
 	}
 	
+	/**
+	 * This callback is triggered when a body part is clicked.
+	 * @callback
+	 */
 	var _pickingBodyCallback = function() {
 		return function(intersects, window_x, window_y) {
 			var bodyClicked = false;
@@ -122,6 +155,10 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 		}	
 	};
 	
+	/**
+	 * This callback is triggered when a body part is hovered over by the mosue.
+	 * @callback
+	 */
 	var _hoverBodyCallback = function() {
 		return function(intersects, window_x, window_y) {
 			var bodyHovered = false;
@@ -163,7 +200,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 	};
 	
 	var removeGeometry = function(systemName, name) {
-		if (remvoeWhenNotVisibile) {
+		if (removeWhenNotVisible) {
 			var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
 			if (systemMeta[systemName].hasOwnProperty(name) && systemMeta[systemName][name].geometry) {
 				currentScene.removeZincGeometry(systemMeta[systemName][name].geometry);
@@ -174,6 +211,11 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
+	
+	/**
+	 * This is called when a body part visibility control is switch on/off.
+	 * @callback
+	 */
 	var changeBodyPartsVisibility = function(name, systemName) {
 		return function(value) { 
 			var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
@@ -330,7 +372,10 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	};
 	
-	var addSystemFolder = function() {
+	/** This method add all system folders to the dat.gui user interface.
+	 * 
+	 */
+	var addSystemFolders = function() {
 		for (var key in systemGuiFolder) {
 			if (systemGuiFolder.hasOwnProperty(key) && systemPartsGuiControls.hasOwnProperty(key)) {
 				systemGuiFolder[key] = bodyGui.addFolder(key);
@@ -354,7 +399,11 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
-	var initialiseBodyPanel = function() {
+	/** Initialise everything in the bodyRender, including the 3D renderer,
+	 *  dat.gui UI and picker for the 3D renderer.
+	 * 
+	 */
+	var initialiseBodyRenderer = function() {
 		bodyRenderer = PJP.setupRenderer("bodyDisplayArea");
 		bodyGui = new dat.GUI({autoPlace: false});
 		bodyGui.domElement.id = 'gui';
@@ -362,7 +411,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 		var controller = bodyGui.addColor(control, 'Background');
 		controller.onChange(bodyBackGroundChanged());
 		bodyGui.close();
-		addSystemFolder();
+		addSystemFolders();
 		var customContainer = document.getElementById("bodyGui").append(bodyGui.domElement);
 		var resetViewButton = { 'Reset View':function(){ bodyRenderer.resetView() }};
 		var scene = bodyRenderer.createScene("human");
@@ -419,12 +468,16 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 				localDOM.appendChild(childNodes[i]);
 			}	
 			addUICallback();
-			initialiseBodyPanel();
+			initialiseBodyRenderer();
 			document.head.removeChild(link);
 			UIIsReady = true;
 		}
 	}
 	
+	/**
+	 * Initialise the {@link PJP.BodyViewer}, it will load snippets/bodyViewer.html which contains
+	 * the general layout of this viewer.
+	 */
 	var initialise = function() {
 		var link = document.createElement('link');
 		link.rel = 'import';
@@ -467,6 +520,10 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
+	/**
+	 * Signal the {@link PJP.BodyViewer} to start reading the meta file once the UI is ready.
+	 * @async
+	 */
 	this.readSystemMeta = function() {
 		if (UIIsReady) {
 			var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
