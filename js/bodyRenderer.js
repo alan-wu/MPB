@@ -473,10 +473,11 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 			UIIsReady = true;
 		}
 	}
-	
+		
 	/**
-	 * Initialise the {@link PJP.BodyViewer}, it will load snippets/bodyViewer.html which contains
-	 * the general layout of this viewer.
+	 * Initialise the {@link PJP.BodyViewer}, it will load snippets/bodyViewer.html 
+	 * which contains the general layout of this viewer, this is called when 
+	 * the {@link PJP.BodyViewer} is created.
 	 */
 	var initialise = function() {
 		var link = document.createElement('link');

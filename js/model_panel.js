@@ -1,3 +1,12 @@
+/**
+ * Used for displaying bond graph model.
+ * 
+ * @param {String} PanelName - Id of the target element to create the  {@link PJP.ModelPanel} on.
+ * @class
+ * 
+ * @author Alan Wu
+ * @returns {PJP.ModelPanel}
+ */
 PJP.ModelPanel = function(PanelName)  {
 
 	var modelGui = undefined;
@@ -9,6 +18,12 @@ PJP.ModelPanel = function(PanelName)  {
 		  this.Background = [ 255, 255, 255 ]; // RGB array
 	};
 	
+	/**
+	 * Display model with the provided name, this function also updates the "run simulation" link.
+	 *  
+	 * @param {String} svgName - name of the svg.
+	 * 
+	 */
 	this.openModel = function(svgName) {
 		var svgObject = document.getElementById("testsvg");
 		var svgFullName = "svg/" + svgName;
@@ -28,11 +43,13 @@ PJP.ModelPanel = function(PanelName)  {
 		document.getElementById("modelsContainer").style.visibility = "visible";
 	}
 	
+	//open run simulation link and run attempt to run it with OpenCOR
 	var runModel = function() {
 		var opencorURL = 'opencor://openFile/' + runModelURL;
 		
 		window.open(opencorURL, '_self');
 	}
+	
 	
 	var modelBackGroundChanged = function() {
 		return function(value) {
@@ -79,6 +96,11 @@ PJP.ModelPanel = function(PanelName)  {
 		}
 	}
 	
+	/**
+	 * Initialise loading of the page, this is called when 
+	 * the {@link PJP.ModelPanel} is created.
+	 * @async
+	 */
 	var initialise = function() {
 		var link = document.createElement('link');
 		link.rel = 'import';

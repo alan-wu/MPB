@@ -332,7 +332,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	
 	/**
 	 * Callback function when a data geometry has been toggled on/off the scene.
-	 * 
 	 */
 	var changeDataGeometryVisibility = function() {
 		return function(value) {
@@ -428,6 +427,10 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		}
 	}
 	
+	/**
+	 * Change some of the ZincGeometry property for never map geometry
+	 * @callback
+	 */
 	var _addNerveMapGeometryCallback = function(GroupName) {
 		return function(geometry) {
 			geometry.groupName = GroupName;
@@ -474,7 +477,6 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	 */
 	var setupOrgansNerveSVG = function() {
 			var svgObject = document.getElementById("organSVG");
-			console.log(nerveMap["svg"]["url"])
 			if (nerveMap["svg"]["url"]) {
 				svgObject.setAttribute('data', nerveMap["svg"]["url"] );	
 			}
@@ -714,7 +716,9 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	}
 	
 	/**
-	 * initialise loading of the html layout for the organs panel.
+	 * initialise loading of the html layout for the organs panel, 
+	 * this is called when the {@link PJP.OrgansViewer} is created.
+	 * 
 	 * @async 
 	 */
 	var initialise = function() {
@@ -910,15 +914,19 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 					button.style.visibility = "hidden";
 				}
 
-				// Check if organ scene exist, create one and load in the models or data if it does not exist.
 				var organScene = organsRenderer.getSceneByName(name);
+				// Check if organ scene exist,
+				// Exist: Set it as current scene and update the gui.
+				// Not: Create a new scene
 				if (organScene == undefined) {
 					updateOrganSpecificGui();
 					organScene = organsRenderer.createScene(name);
 					displayScene = organScene;
 					var directionalLight = organScene.directionalLight;
 					directionalLight.intensity = 1.4;
+					// Models with the same name exists, read in the models.
 					if (organsDetails != undefined) {
+						//Use organs specific viewports if it exists, otherwise use the default viewport.
 						if (organsDetails.view !== undefined)
 							organScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.view);
 						else {
@@ -929,6 +937,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 						var zincCameraControl = organScene.getZincCameraControls();
 						zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
 						zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
+						//Create a picker scene if it exists.
 						if (organsDetails.picker != undefined) {
 							var pickerSceneName = name + "_picker_scene";
 							pickerScene = organsRenderer.createScene(pickerSceneName);

@@ -1,7 +1,16 @@
+/**
+ * Used for viewing 3D tissue image stacks, it may include clickable points.
+ * 
+ * @param {String} PanelName - Id of the target element to create the  {@link PJP.TissueViewer} on.
+ * @class
+ * 
+ * @author Alan Wu
+ * @returns {PJP.TissueViewer}
+ */
 PJP.TissueViewer = function(PanelName)  {
-
+	//ZincScene for this renderer.
 	var textureScene;
-	var sceneFirstPass, sceneSecondPass, renderer;
+	var sceneFirstPass, renderer;
 	
 	var rtTexture, transferTexture;
 	var cubeTextures = ['collagen', 'crop', 'collagen_large', 'crop'];
@@ -12,8 +21,10 @@ PJP.TissueViewer = function(PanelName)  {
 	var tissueScene;
 	var meshFirstPass, meshSecondPass;
 	var cellPickerScene;
+	//dat.gui container
 	var gui;
 	var guiControls;
+	// a link to the constitutive laws of the cardiac cells
 	var constitutiveLawsLink = "https://models.physiomeproject.org/mechanical_constitutive_laws";
 	var UIIsReady = false;
 	var cellPanel = undefined;
@@ -46,10 +57,12 @@ PJP.TissueViewer = function(PanelName)  {
 		tiptextElement.style.opacity = 0;
 	}
 	
+	
 	var openConstitutiveLawsLink = function() {
 		window.open(constitutiveLawsLink, '');
 	}
 	
+	//A cell has been picked, display something on the cell and model panels
 	var openCellModelUI = function(id) {
 		var cellTitle = "<strong>Cell: <span style='color:#FF4444'>" + id + "</span></strong>";
 		if (cellPanel) {
@@ -60,6 +73,12 @@ PJP.TissueViewer = function(PanelName)  {
 			modelPanel.openModel("Myocyte_v6_Grouped.svg");
 	}
 	
+	/** 
+	 * Callback function when a pickable object has been picked. It will then call functions in cell panel
+	 * and model panel to show corresponding informations.
+	 * 
+	 * @callback
+	 */
 	var _pickingCellCallback = function() {
 		return function(intersects, window_x, window_y) {
 			if (intersects[0] !== undefined) {
@@ -68,6 +87,10 @@ PJP.TissueViewer = function(PanelName)  {
 		}	
 	};
 	
+	/**
+	 * Callback function when a pickable object has been hovered over. It will show
+	 * objecty id/name as tooltip text.
+	 */
 	var _hoverCellCallback = function() {
 		return function(intersects, window_x, window_y) {
 			if (intersects[0] !== undefined && intersects[0].object !== undefined &&
@@ -93,6 +116,7 @@ PJP.TissueViewer = function(PanelName)  {
 		materialSecondPass.uniforms.slides_per_side.value = 16;
 	}
 	
+	//Callback function for rendering the first pass scene
 	var renderFirstPass = function() {
 		return function() {
 			//Render first pass and store the world space coords of the back face fragments into the texture.
@@ -100,6 +124,7 @@ PJP.TissueViewer = function(PanelName)  {
 		}	
 	}
 	
+	//Update dat.gui widget
 	var updateDatGui = function()
 	{
 		for (var i in gui.__controllers) {
@@ -107,7 +132,8 @@ PJP.TissueViewer = function(PanelName)  {
 		}
 	}
 	
-	var updateUniforms = function() {
+	//Update the shader uniforms defining the boundaries 
+	var updateBoundaryUniforms = function() {
 		materialFirstPass.uniforms.min_x.value = guiControls.min_x;
 		materialFirstPass.uniforms.max_x.value = guiControls.max_x;
 		materialFirstPass.uniforms.min_y.value = guiControls.min_y;
@@ -130,10 +156,11 @@ PJP.TissueViewer = function(PanelName)  {
 		guiControls.max_y = 1.0;
 		guiControls.min_z = 0;
 		guiControls.max_z = 1.0;
-		updateUniforms();
+		updateBoundaryUniforms();
 		updateDatGui();	
 	}
 	
+	//boundary has been changed from dat.gui, update the values and send to the shaders
 	var changeBoundary = function(name) {
 		return function(value) {
 			if (name == "min_x")
@@ -166,7 +193,7 @@ PJP.TissueViewer = function(PanelName)  {
 				if (guiControls.max_z <= guiControls.min_z)
 					guiControls.min_z = guiControls.max_z - 0.01;
 			}
-			updateUniforms();		
+			updateBoundaryUniforms();		
 			updateDatGui();
 		}	
 	}
@@ -184,7 +211,17 @@ PJP.TissueViewer = function(PanelName)  {
 		}
 	}
 	
+	//Set default parameters for texture
+	var setDefaultTextureParameters = function(textureName) {
+		var texture = cubeTextures[textureName];
+		texture.generateMipmaps = false;
+		texture.minFilter = THREE.LinearFilter;
+		texture.magFilter = THREE.LinearFilter;
+		texture.wrapS = THREE.RepeatWrapping;
+		texture.wrapT = THREE.RepeatWrapping;
+	}
 	
+	//Setup volume renderer
 	var volumeRenderStart = function(shaderText) {
 	
 		guiControls = new function() {
@@ -202,6 +239,7 @@ PJP.TissueViewer = function(PanelName)  {
 		
 		activated = false;
 		
+		//create the renderer
 		var container = document.createElement( 'div' );
 		document.getElementById("tissueDisplayArea").appendChild( container );
 		container.style.height = "100%"
@@ -210,6 +248,7 @@ PJP.TissueViewer = function(PanelName)  {
 		tissueRenderer.initialiseVisualisation();
 		tissueRenderer.playAnimation = false;
 		
+		//create the scene for visualisations
 		tissueScene = tissueRenderer.getCurrentScene();
 		var renderer = tissueRenderer.getThreeJSRenderer();
 		renderer.setClearColor( 0xffffff, 1 );
@@ -223,33 +262,15 @@ PJP.TissueViewer = function(PanelName)  {
 		cubeTextures['crop'] = THREE.ImageUtils.loadTexture('textures/crop.jpg');
 		cubeTextures['collagen_large'] = THREE.ImageUtils.loadTexture('textures/collagen_large.png');
 		cubeTextures['crop_large'] = THREE.ImageUtils.loadTexture('textures/crop_large.jpg');
-
+		
 		//Don't let it generate mipmaps to save memory and apply linear filtering to prevent use of LOD.
-		cubeTextures['collagen'].generateMipmaps = false;
-		cubeTextures['collagen'].minFilter = THREE.LinearFilter;
-		cubeTextures['collagen'].magFilter = THREE.LinearFilter;
-		cubeTextures['collagen'].wrapS = THREE.RepeatWrapping;
-		cubeTextures['collagen'].wrapT = THREE.RepeatWrapping;
-		
-		cubeTextures['crop'].generateMipmaps = false;
-		cubeTextures['crop'].minFilter = THREE.LinearFilter;
-		cubeTextures['crop'].magFilter = THREE.LinearFilter;
-		cubeTextures['crop'].wrapS = THREE.RepeatWrapping;
-		cubeTextures['crop'].wrapT = THREE.RepeatWrapping;
-		
-		cubeTextures['collagen_large'].generateMipmaps = false;
-		cubeTextures['collagen_large'].minFilter = THREE.LinearFilter;
-		cubeTextures['collagen_large'].magFilter = THREE.LinearFilter;
-		cubeTextures['collagen_large'].wrapS = THREE.RepeatWrapping;
-		cubeTextures['collagen_large'].wrapT = THREE.RepeatWrapping;
-		
-		cubeTextures['crop_large'].generateMipmaps = false;
-		cubeTextures['crop_large'].minFilter = THREE.LinearFilter;
-		cubeTextures['crop_large'].magFilter = THREE.LinearFilter;
-		cubeTextures['crop_large'].wrapS = THREE.RepeatWrapping;
-		cubeTextures['crop_large'].wrapT = THREE.RepeatWrapping;
+		setDefaultTextureParameters('collagen');
+		setDefaultTextureParameters('crop');
+		setDefaultTextureParameters('collagen_large');
+		setDefaultTextureParameters('crop_large');
 	 
-	 
+		//Create a render target for preprocessing, first pass material and mesh will be render into 
+		//rtTexture
 		var screenSize = new THREE.Vector2( container.clientWidth, container.clientHeight );
 		rtTexture = new THREE.WebGLRenderTarget( screenSize.x, screenSize.y,
 												{ 	minFilter: THREE.LinearFilter,
@@ -259,7 +280,7 @@ PJP.TissueViewer = function(PanelName)  {
 													format: THREE.RGBFormat,
 													generateMipmaps: false} );
 	
-	
+		//First pass material
 		materialFirstPass = new THREE.ShaderMaterial( {
 			vertexShader: shaderText[0],
 			fragmentShader: shaderText[1],
@@ -272,6 +293,7 @@ PJP.TissueViewer = function(PanelName)  {
 				max_z : {type: "1f" , value: guiControls.max_z }}
 		} );
 	
+		//Second pass material
 		materialSecondPass = new THREE.ShaderMaterial( {
 			vertexShader: shaderText[2],
 			fragmentShader: shaderText[3],
@@ -292,8 +314,10 @@ PJP.TissueViewer = function(PanelName)  {
 						black_flip : {value: true}}
 		 });
 	
+		//First pass scene
 		sceneFirstPass = new THREE.Scene();
 	
+		// Create a new box geometry in which the volume render is located
 		var boxGeometry = new THREE.BoxGeometry(1.0, 1.0, 1.0);
 		boxGeometry.doubleSided = true;
 	
@@ -304,6 +328,7 @@ PJP.TissueViewer = function(PanelName)  {
 		tissueScene.addObject( meshSecondPass );
 		
 		
+		//Create sphere and add it to tissueScene for display
 		var geometry = new THREE.SphereGeometry( 0.02, 16, 16 );
 		var material = new THREE.MeshPhongMaterial( { color: 0x3920d9, shading: THREE.SmoothShading,  shininess: 0.5 } );
 		
@@ -321,6 +346,7 @@ PJP.TissueViewer = function(PanelName)  {
 		sphere2.visible = false;
 		tissueScene.addObject( sphere2 );
 	
+		//Create sphere and picker scene for object picking
 		cellPickerScene = tissueRenderer.createScene("cell_picker_scene");
 		var zincCameraControl = tissueScene.getZincCameraControls();
 		zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
@@ -340,8 +366,10 @@ PJP.TissueViewer = function(PanelName)  {
 		cellPickerScene.addObject( pickerSphere );
 		cellPickerScene.addObject( pickerSphere2 );
 		zincCameraControl.enableRaycaster(cellPickerScene, _pickingCellCallback(), _hoverCellCallback());
+		//Disable autoclear
 		tissueScene.autoClearFlag = false;
 		
+		//setup dat.gui
 		gui = new dat.GUI({autoPlace: false});
 		gui.domElement.id = 'gui';
 		gui.close();
@@ -364,6 +392,7 @@ PJP.TissueViewer = function(PanelName)  {
 		
 		resetSlider();
 		materialSecondPass.visible = false;
+		//add a prerender callback to always render the first pass before the second pass
 		tissueRenderer.addPreRenderCallbackFunction(renderFirstPass());
 		tissueRenderer.animate();
 	}
@@ -377,6 +406,7 @@ PJP.TissueViewer = function(PanelName)  {
 		callbackElement.onclick = function() { openConstitutiveLawsLink(); };
 	}
 	
+	//initialising the loading of the volume renderer
 	var volumeRenderInit = function() {
 		loadExternalFiles(['shaders/tissueShaderFirstPass.vs', 'shaders/tissueShaderFirstPass.fs',
 		                   'shaders/tissueShaderSecondPass.vs', 'shaders/tissueShaderSecondPass.fs'], 
@@ -404,6 +434,12 @@ PJP.TissueViewer = function(PanelName)  {
 		}
 	}
 	
+	
+	/**
+	 * Initialise loading of the page, this is called when 
+	 * the {@link PJP.TissueViewer} is created.
+	 * @async
+	 */
 	var initialise = function() {
 		var link = document.createElement('link');
 		link.rel = 'import';
@@ -413,18 +449,25 @@ PJP.TissueViewer = function(PanelName)  {
 		document.head.appendChild(link);	
 	}
 	
+	/**
+	 * Set the title string for {@link PJP.TissueViewer}.
+	 * @param {String} text - Tissue viewer title to be set.
+	 */
 	this.setTissueTitleString = function(text) {
 	 	var text_display = document.getElementById('TissueTitle');
 	 	text_display.innerHTML = text;
 	}
-	
+ 
 	this.showButtons = function(flag) {
 		if (flag)
 			document.getElementById("cellButtonContainer").style.visibility = "visible";
 		else
-			document.getElementById("cellButtonContainer").style.visibility = "hidden";
+			document.getElementById("cellButtonContainer").style.visibility = "hiddenlink ";
 	}
 	
+	/**
+	 * Display the volume rendering
+	 */
 	this.showCollagenVisible = function(flag) {
 		changeModels(guiControls.model);
 		materialSecondPass.visible = flag;
@@ -435,6 +478,9 @@ PJP.TissueViewer = function(PanelName)  {
 		pickerSphere2.visible = flag;
 	}
 	
+	/**
+	 * Reset the panel and hide all displays
+	 */
 	this.resetTissuePanel = function() {
 	 	var text_display = document.getElementById('TissueTitle');
 	 	text_display.innerHTML = "<strong>Tissue</strong>";

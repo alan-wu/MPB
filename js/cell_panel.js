@@ -1,5 +1,15 @@
+/**
+ * Used for viewing cell model. This currently contains an image.
+ * 
+ * @param {String} PanelName - Id of the target element to create the  {@link PJP.CellPanel} on.
+ * @class
+ * 
+ * @author Alan Wu
+ * @returns {PJP.CellPanel}
+ */
 PJP.CellPanel = function(PanelName)  {
 
+	//dat.gui container for cellGui
 	var cellGui = undefined;
 	var otherCellControls = undefined;
 	
@@ -9,14 +19,24 @@ PJP.CellPanel = function(PanelName)  {
 		  this.Background = [ 255, 255, 255 ]; // RGB array
 	};
 	
+	/**
+	 * Display cell model image in the {@link PJP.CellPanel}.
+	 */
 	this.openCell = function() {
 		document.getElementById("imageContainer").style.visibility = "visible";
 	}
 	
+	/**
+	 * Hide cell model image in the {@link PJP.CellPanel}.
+	 */
 	var hideCell = function() {
 		document.getElementById("imageContainer").style.visibility = "hidden";
 	}
 	
+	/**
+	 * Set the title string for {@link PJP.CellPanel}.
+	 * @param {String} text - Cell panel title to be set.
+	 */
 	this.setCellPanelTitle = function(text) {
 		var titleDisplay = document.getElementById('CellTitle');
 		titleDisplay.innerHTML = text;
@@ -27,6 +47,9 @@ PJP.CellPanel = function(PanelName)  {
 		titleDisplay.innerHTML = "<strong>Cell<span style='color:#FF4444'>";
 	}
 	
+	/**
+	 * Reset the title of cell panel. 
+	 */
 	this.resetCellPanel = function() {
 		hideCell();
 		resetCellTitle();
@@ -42,6 +65,11 @@ PJP.CellPanel = function(PanelName)  {
 		}
 	}
 	
+	/**
+	 * Initialise loading of the page, this is called when 
+	 * the {@link PJP.CellPanel} is created.
+	 * @async
+	 */
 	var initialiseCellPanel = function() {
 		cellGui = new dat.GUI({autoPlace: false});
 		cellGui.domElement.id = 'gui';
