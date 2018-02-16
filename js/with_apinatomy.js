@@ -57,6 +57,7 @@ PJP.Main = function()  {
 		tissueViewer = new PJP.TissueViewer("tissueDisplayPort");
 		cellPanel = new PJP.CellPanel("cellDisplayPort");
 		modelPanel = new PJP.ModelPanel("modelDisplayPort");
+		modelPanel.enableSVGController('testsvg');
 		_this.apinatomyPanel = document.getElementById("apinatomyDisplayPort");
 		_this.topPanel = document.getElementById("topPanel");
 		_this.showApinatomyButton = document.getElementById("showApinatomyButton");
