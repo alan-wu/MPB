@@ -1,33 +1,9 @@
-var expandCollapseApinatomy = function(source, portName) {
-	if (source.value == "Expand")
-		resetExpandButton();
-	expandCollapse(source, portName);
-	if (source.value == "Expand") {
-		main.apinatomyPanel.className = "apinatomyDisplayPortCollapse";
-		main.hideApinatomyButton.style.visibility = "visible";
-	} else {
-		main.hideApinatomyButton.style.visibility = "hidden";
-	}
-	window.dispatchEvent(new Event('resize'));
-};
-
-var showApinatomy = function() {
-	main.apinatomyPanel.style.visibility = "visible";
-	main.hideApinatomyButton.style.visibility = "visible";
-	main.apinatomyIsDisplayed = true;
-	main.topPanel.className = "topPanelCollapse";
-	main.showApinatomyButton.style.visibility = "hidden";
-};
-
-var hideApinatomy = function() {
-	main.apinatomyPanel.style.visibility = "hidden";
-	main.hideApinatomyButton.style.visibility = "hidden";
-	main.apinatomyIsDisplayed = false;
-	main.topPanel.className = "topPanelExpand";
-	main.showApinatomyButton.style.visibility = "visible";
-};
-
-
+/**
+ * Main loop for the PJP site, this is where everything starts. * 
+ * @class
+ * @author Alan Wu
+ * @returns {PJP.Main}
+ */
 PJP.Main = function()  {
 	var bodyViewer = undefined;
 	var organsViewer = undefined;
@@ -50,6 +26,12 @@ PJP.Main = function()  {
 		}
 	}
 	
+	/**
+	 * Initialise all the panels required for PJP to function correctly.
+	 * Modules used incude - {@link PJP.ModelsLoader}, {@link PJP.BodyViewer},
+	 * {@link PJP.OrgansViewer}, {@link PJP.TissueViewer}, {@link PJP.CellPanel}
+	 * and {@link PJP.ModelPanel}.
+	 */
 	var initialiseMain = function() {
 		modelsLoader = new PJP.ModelsLoader();
 		bodyViewer = new PJP.BodyViewer(modelsLoader, "bodyDisplayPort");
@@ -72,6 +54,42 @@ PJP.Main = function()  {
 		tissueViewer.setModelPanel(modelPanel);
 	}
 	
+	var expandCollapseApinatomy = function(source, portName) {
+		if (source.value == "Expand")
+			resetExpandButton();
+		expandCollapse(source, portName);
+		if (source.value == "Expand") {
+			main.apinatomyPanel.className = "apinatomyDisplayPortCollapse";
+			main.hideApinatomyButton.style.visibility = "visible";
+		} else {
+			main.hideApinatomyButton.style.visibility = "hidden";
+		}
+		window.dispatchEvent(new Event('resize'));
+	};
+
+	var showApinatomy = function() {
+		main.apinatomyPanel.style.visibility = "visible";
+		main.hideApinatomyButton.style.visibility = "visible";
+		main.apinatomyIsDisplayed = true;
+		main.topPanel.className = "topPanelCollapse";
+		main.showApinatomyButton.style.visibility = "hidden";
+	};
+
+	var hideApinatomy = function() {
+		main.apinatomyPanel.style.visibility = "hidden";
+		main.hideApinatomyButton.style.visibility = "hidden";
+		main.apinatomyIsDisplayed = false;
+		main.topPanel.className = "topPanelExpand";
+		main.showApinatomyButton.style.visibility = "visible";
+	};
+	
+	var addUICallback = function() {
+		_this.hideApinatomyButton.onclick = function() { hideApinatomy() };
+		_this.showApinatomyButton.onclick = function() { showApinatomy() };
+		var callbackElement = document.getElementById("apinatomyScreenButton");
+		callbackElement.onclick = function() { expandCollapseApinatomy(callbackElement, 'apinatomyDisplayPort'); };
+	}
+	
 	var loadHTMLComplete = function(link) {
 		return function(event) {
 			var localDOM = document.body;
@@ -85,6 +103,7 @@ PJP.Main = function()  {
 			}
 			initialiseMain();
 			document.head.removeChild(link);
+			addUICallback();
 			UIIsReady = true;
 		}
 	}
@@ -101,5 +120,4 @@ PJP.Main = function()  {
 	initialise();
 }
 
-var main = new PJP.Main();
 

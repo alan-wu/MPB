@@ -1,6 +1,6 @@
 /**
- * Viewer of the SVG diagram. It will also add callbacks to the svg elements and other controls if
- * they are present on the SVG.
+ * SVG diagram viewer. It will also add callbacks to the svg elements and other controls 
+ * such as zooming and translation on mouse interactions.
  * 
  * @class
  * @param {String} SVGPanelName - Id of the target element for this {@link PJP.SVGController} to control.
@@ -9,8 +9,9 @@
  */
 PJP.SVGController = function(SVGPanelName)  {
 	var svgObject = document.getElementById(SVGPanelName);
+	//used for tracking right click
 	var svgRightClickDown = false;
-	
+	// Temoporary hardcoded array on interactive elements/groups of the svg
 	var svgLayoutCallbacksElement = new Array();
 	svgLayoutCallbacksElement["Sodium_button"] = "Sodium";
 	svgLayoutCallbacksElement["Potassium_button"] = "Potassium";
@@ -26,12 +27,13 @@ PJP.SVGController = function(SVGPanelName)  {
 	var svgCannelExpressionCallbackElement = new Array();
 	svgCannelExpressionCallbackElement["v1_expression"] = " https://models.physiomeproject.org/e/430/sodium_ion_channel.cellml/view";
 	
+	var currentZoom = 1.0;
+
 	var _this = this;
 	
 	var svgElementClassToggle = function(svgClassName) {
 		  var svgDocument = svgObject.contentDocument;
 		  var svgElement = svgDocument.getElementsByClassName(svgClassName);
-		  console.log(svgElement[0].style.visibility);
 		  if (svgElement[0].style.visibility == "hidden") {
 			  svgElement[0].style.visibility = "";
 		  } else {
@@ -49,8 +51,6 @@ PJP.SVGController = function(SVGPanelName)  {
 		  }
 	}
 	
-	var currentZoom = 1.0;
-	
 	var svgZoom = function() {
 		 var heightZoom = 90 *currentZoom;
 		 var widthZoom = 100 *currentZoom;
@@ -60,16 +60,25 @@ PJP.SVGController = function(SVGPanelName)  {
 		 svgObject.style.width = widthString;
 	}
 	
+	/**
+	 * Increase zooming of the svg diagram by the given ratio.
+	 */
 	this.zoomIn = function(ratio) {
 		currentZoom = currentZoom + ratio;
 		svgZoom();
 	}
 	
+	/**
+	 * Decrease zooming of the svg diagram by the given ratio.
+	 */
 	this.zoomOut = function(ratio) {
 		currentZoom = currentZoom - ratio;
 		svgZoom();
 	}
 	
+	/**
+	 * Reset the zoom to 100%;
+	 */
 	this.zoomReset = function() {
 		currentZoom = 1.0;
 		svgObject.style.height = "90%";
@@ -87,7 +96,7 @@ PJP.SVGController = function(SVGPanelName)  {
 			event.stopImmediatePropagation(); 
 	}
 	
-	function onSVGMouseDown( event ) {
+	var onSVGMouseDown = function( event ) {
 	   	if (event.button == 2) {
 	   		svgRightClickDown = true;
 	   		event.preventDefault();
@@ -97,7 +106,7 @@ PJP.SVGController = function(SVGPanelName)  {
 	    }
 	}
 	
-	function onSVGMouseMove( event ) {
+	var onSVGMouseMove = function( event ) {
 		if (svgRightClickDown == true) {
 			targetElement = document.getElementById("modelsContainer");
 			targetElement.scrollTop += event.movementY;
@@ -105,7 +114,7 @@ PJP.SVGController = function(SVGPanelName)  {
 		}
 	}
 	
-	function onSVGMouseUp( event ) {
+	var onSVGMouseUp = function( event ) {
 	   	if (event.button == 2) {
 	   		event.preventDefault();
 	   		event.stopPropagation();
@@ -114,11 +123,12 @@ PJP.SVGController = function(SVGPanelName)  {
 		svgRightClickDown = false;
 	}
 	
-	function onSVGMouseLeave( event ) {
+	var onSVGMouseLeave = function( event ) {
 		svgRightClickDown = false;
 	}
 	
-	function enableSVGMouseInteraction(targetElement) {
+	//This enables mouse interaction with the svg diagram
+	var enableSVGMouseInteraction = function(targetElement) {
 		if (targetElement.addEventListener) {
 			targetElement.addEventListener( 'mousedown', onSVGMouseDown, false );
 			targetElement.addEventListener( 'mousemove', onSVGMouseMove, false );
@@ -129,7 +139,8 @@ PJP.SVGController = function(SVGPanelName)  {
 	    }
 	}
 	
-	function disableSVGMouseInteraction(targetElement) {
+	//This disable mouse interaction with the svg diagram
+	var disableSVGMouseInteraction= function(targetElement) {
 		if (targetElement.removeEventListener) {
 			targetElement.removeEventListener( 'mousedown', onSVGMouseDown, false );
 			targetElement.removeEventListener( 'mousemove', onSVGMouseMove, false );
@@ -161,6 +172,7 @@ PJP.SVGController = function(SVGPanelName)  {
 		}
 	}
 	
+	//Toggle a svg group based on the group name
 	var svgToggleClicked = function(gName) {
 		return function() {
 			svgElementIdToggle(gName);
@@ -173,6 +185,7 @@ PJP.SVGController = function(SVGPanelName)  {
 		}
 	}
 	
+	//Add reponses to clickable SVG groups, this is currently hardcoded
 	var addRespsonseToSVGElements = function() {
 		var svgDocument = svgObject.contentDocument;
 		for (var key in svgLayoutCallbacksElement) {
