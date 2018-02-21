@@ -1,5 +1,31 @@
 /**
- * Main loop for the PJP site, this is where everything starts. * 
+ * Main loop to start loading the Physiome Journal Portal page,
+ * it currenrly contains 5 panels containly a module each 
+ * in the following layout.
+ * 
+ * <pre>
+ * -------------------------
+ * |     |     |     |     |
+ * |     |     |  C  |     |
+ * |  A  |  B  |-----|  E  |
+ * |     |     |  D  |     |
+ * |     |     |     |     |
+ * -------------------------
+ * 
+ * A: {@link PJP.BodyViewer}
+ * B: {@link PJP.OrgansViewer}
+ * C: {@link PJP.TissueViewer}
+ * D: {@link PJP.CellPanel}
+ * E: {@link PJP.ModelPanel}
+ * </pre>
+ * 
+ * Currently the main and each of the panel layouts are loaded into the page
+ * using link element imports. 
+ * This portal currently allows users to view from the 3D anatomy models to the
+ * cell models of different parts of the bodies in selected species.
+ * More functionalities will be implemented soon including annotations of models,
+ * mesh refinement and many more.  
+ * 
  * @class
  * @author Alan Wu
  * @returns {PJP.Main}

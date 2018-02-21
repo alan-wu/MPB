@@ -1,5 +1,7 @@
 /**
- * Used for displaying bond graph model.
+ * Provide a panel for viewing system models. Currently, this panel displays
+ * bond graph of different system model in the form of interactive SVG diagram. Interactions with
+ * the SVG is implemented in {@link SVGController}.
  * 
  * @param {String} PanelName - Id of the target element to create the  {@link PJP.ModelPanel} on.
  * @class
@@ -50,7 +52,7 @@ PJP.ModelPanel = function(PanelName)  {
 		}
 	}
 	
-	//open run simulation link and run attempt to run it with OpenCOR
+	//Callback function for onclick event of "Run Simulation", it attempts to run the  cell models using OpenCOR
 	var runModel = function() {
 		var opencorURL = 'opencor://openFile/' + runModelURL;
 		

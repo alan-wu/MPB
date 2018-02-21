@@ -21,8 +21,8 @@ ImageCombiner = function()  {
 	
 	/**
 	 * Set the size of the canvas.
-	 * {Number} widthIn - parameter to set the width of the canvas, must be larger than 0.
-	 * {Number} heightIn - parameter to set the height of the canvas, must be larger than 0.
+	 * @param {Number} widthIn - parameter to set the width of the canvas, must be larger than 0.
+	 * @param {Number} heightIn - parameter to set the height of the canvas, must be larger than 0.
 	 */
 	this.setSize = function(widthIn, heightIn) {
 		if (widthIn > 0)
@@ -44,7 +44,7 @@ ImageCombiner = function()  {
 	
 	/**
 	 * Add an img element to the array of elements which will be composited together.
-	 * {object} elem - DOM image object containing an image. 
+	 * @param {object} elem - DOM image object containing an image. 
 	 */
 	this.addElement = function(elem) {
 		if (findObjectLocation(elem) == -1)

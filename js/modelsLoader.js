@@ -78,6 +78,7 @@ PJP.ModelsLoader = function()  {
 		systemMetaReadyCallbackFunctions.push(callbackFunctions);
 	}
 	
+	//Load the json file containing informations about models availability
 	var loadSystemMetaURL = function(url) {
 		var xmlhttp = new XMLHttpRequest();
 		xmlhttp.onreadystatechange = function() {
