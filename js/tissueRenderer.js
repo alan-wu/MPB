@@ -1,5 +1,6 @@
 /**
- * Used for viewing 3D tissue image stacks, it may include clickable points.
+ * Used for viewing 3D tissue image stacks, it may include clickable points which
+ * may provide additional informations and trigger actions on other panels.
  * 
  * @param {String} PanelName - Id of the target element to create the  {@link PJP.TissueViewer} on.
  * @class

@@ -3,7 +3,6 @@
  * 
  * @namespace
  * @author Alan Wu
- * @returns {PJP.ModelsLoader}
  */
 var PJP = { VERSION: '0.1' };
 var currentHoverId = -1;
