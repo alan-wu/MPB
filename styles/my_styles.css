@@ -64,8 +64,8 @@ input:checked + .switchSlider:before {
 }
 
 .play {
-  width:64px;
-  height:64px;
+  width:48px;
+  height:48px;
   right: 10px;
   background-image: url(./images/play_small.png);
 }
@@ -75,8 +75,8 @@ input:checked + .switchSlider:before {
 }
 	
 .pause {
-  width:64px;
-  height:64px;
+  width:48px;
+  height:48px;
   right: 10px;
   background-image: url(./images/pause_small.png);
 }
@@ -142,6 +142,8 @@ input:checked + .switchSlider:before {
     z-index:2;
 }
 
+
+
 .bodyDisplayPortCollapse {
 	position:absolute;
 	height:100%;
@@ -159,7 +161,7 @@ input:checked + .switchSlider:before {
 	display: block;
 }
 
-.referenceDisplayPortCollapse {
+.tissueDisplayPortCollapse {
 	position:absolute;
 	width:25%;
 	left:50%;top:0%;
@@ -186,8 +188,17 @@ input:checked + .switchSlider:before {
 	display: block;
 }
 
-.fullPortDisplay {
+.apinatomyDisplayPortCollapse {
 	position:absolute;
+	height:30%;
+	width:100%;
+	top:70%;
+	border-top: 1px solid black;
+	display: block;
+}
+
+.fullPortDisplay {
+	position:relative;
 	height:100%;
 	width:100%;
 	left:0%;
@@ -208,7 +219,7 @@ input:checked + .switchSlider:before {
     position:relative;
     width:100%;
 }
-
+display:none
 .titleContainer {
     position:relative;
     width:100%;
@@ -237,13 +248,193 @@ img.model {
 
 .cellSelectionButton {
 	text-align: center;
+	z-index:2;
+}
+
+#cellButtonDivider {
+	position:absolute;
+	width:100%;
+	text-align: center;
+	display:flex;
+}
+
+#modelsContainer {
+	text-align:center;
+	width:100%;
+	height:90%;
+	right:0%;
+	bottom:1%;
+	visibility: hidden;
+	position: relative;
+	overflow-x: auto;
+	overflow-y: auto;
+}
+
+.svgContainer {
+	height:90%;
+	width:100%;
+}
+
+.fullPortDisplay .svgContainer {
+	height:90%;
+	width:100%;
+}
+
+#ZoomControl{
+	visibility: hidden;
+}
+
+.fullPortDisplay #ZoomControl{
+	visibility: visible;
+}
+
+#systemToggle {
+	position:absolute;
+	top:20%;
+	left:2%;
+}
+
+.systemToggleButton {
+	text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+	width:37px;
+	height:30px;
+	color:#fff!important;
+	font-size:15px;
+	margin-top: 5px;
+	text-align: center;
+}
+
+.systemToggleButtonOn {
+	border-color: #00ff00;
+}
+
+.systemToggleButtonOff {
+	border-color: #ff0000;
+}
+
+.systemToggleButtonPartial {
+	border-color: #0000ff;
+}
+
+.systemToggleButtonOn:hover {
+	background-color: RED !important;
+}
+
+.systemToggleButtonPartial:hover {
+	background-color: GREEN !important;
+}
+
+.systemToggleButtonOff:hover {
+	background-color: GREEN !important;
+}
+
+#organLinkButton {
+    bottom: 3%;
+    z-index:2;
+    visibility: hidden;
+    background-color:rgb(100%, 30%, 30%);
+}
+
+.modelButton {
+	margin-top:10%;
+}
+
+.fullPortDisplay .modelButton{
+	margin-top:0%;
+	margin-left:40%;
+}
+
+#modelsController {
+	position:relative;
+	text-align:center;
+	visibility:hidden;
+	display:block;
+}.leftTopButton {
+    position:absolute;
+    left: 1%;
     z-index:2;
 }
 
-#cellButtonContainer {
-	position:absolute;
-	width:100%;
-	bottom:10%;
-	text-align: center;
-	visibility: hidden;
+.fullPortDisplay #modelsController{
+	display:flex;
 }
+
+.hideApinatomyButton {
+    position:absolute;
+    left: 1%;
+    z-index:2;
+}
+
+.showApinatomyButton {
+    position:absolute;
+    left: 1%;
+    bottom: 1%;
+    z-index:2;
+    visibility:hidden;
+}
+	
+
+.topPanelExpand {
+	height:100%;
+}
+
+.topPanelCollapse {
+	height:70%;
+}
+
+.organsImg {
+	max-height: 100%;
+	max-width: 100%;
+	position: absolute;
+}
+
+.organsImgContainer {
+	text-align:left;
+	top: 2%;
+	height: 96%;
+	left: 30%;
+	width: 68%;
+	position: absolute;
+}
+
+.range-slider {
+  // Slider
+  .input-range {
+    -webkit-appearance: none;
+    height: 200px;
+    border-radius: 5px;
+    background: #ccc;
+    outline: none;
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* WebKit */
+    
+  }
+}
+
+.organsSecondSceneDisplay {
+	height:100%;
+	width:50%;
+	left:50%;
+	top:0%;
+	border-left: 2px solid #000000;
+	position:absolute;
+}
+
+.organsSecondNerveDisplay {
+	height:100%;
+	width:33%;
+	left:33%;
+	top:0%;
+	border-left: 2px solid #000000;
+	position:absolute;
+}
+
+.organsSVGDisplay {
+	height:100%;
+	width:34%;
+	left:66%;
+	top:0%;
+	border-left: 2px solid #000000;
+	position:absolute;
+}
+

@@ -1,0 +1,25 @@
+<div class="topPanelCollapse" style="position:absolute;width:100%" id="topPanel">
+	<div id="bodyDisplayPort" class="bodyDisplayPortCollapse">
+	</div>		
+
+	<div id="organsDisplayPort" class="organsDisplayPortCollapse">
+	</div>
+	
+	<div id="tissueDisplayPort" class="tissueDisplayPortCollapse">
+	</div>
+	
+	<div id="cellDisplayPort" class="cellDisplayPortCollapse">
+	</div>
+	
+	<div id="modelDisplayPort" class="modelDisplayPortCollapse">
+	</div>
+
+</div>
+<div id="apinatomyDisplayPort" class="apinatomyDisplayPortCollapse">
+	<input class="screenButton" id="apinatomyScreenButton" type="button" onclick="expandCollapseApinatomy(this, 'apinatomyDisplayPort')" value="Expand">
+	<input class="hideApinatomyButton" id="hideApinatomyButton" type="button" onclick="hideApinatomy()" value="Hide Apinatomy">
+	<div id="circuitboard"></div>
+	<div id="three-d-canvas"></div>
+</div>
+<input class="showApinatomyButton" id="showApinatomyButton" type="button" onclick="showApinatomy()" value="Show Apinatomy">
+<script src="../apinatomy/example.js"></script>

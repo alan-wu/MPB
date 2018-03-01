@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: with_apinatomy.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: with_apinatomy.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Main loop to start loading the Physiome Journal Portal page,
+ * it currenrly contains 5 panels containly a module each 
+ * in the following layout.
+ * 
+ * &lt;pre>
+ * -------------------------
+ * |     |     |     |     |
+ * |     |     |  C  |     |
+ * |  A  |  B  |-----|  E  |
+ * |     |     |  D  |     |
+ * |     |     |     |     |
+ * -------------------------
+ * 
+ * A: {@link PJP.BodyViewer}
+ * B: {@link PJP.OrgansViewer}
+ * C: {@link PJP.TissueViewer}
+ * D: {@link PJP.CellPanel}
+ * E: {@link PJP.ModelPanel}
+ * &lt;/pre>
+ * 
+ * Currently the main and each of the panel layouts are loaded into the page
+ * using link element imports. 
+ * This portal currently allows users to view from the 3D anatomy models to the
+ * cell models of different parts of the bodies in selected species.
+ * More functionalities will be implemented soon including annotations of models,
+ * mesh refinement and many more.  
+ * 
+ * @class
+ * @author Alan Wu
+ * @returns {PJP.Main}
+ */
+PJP.Main = function()  {
+	var bodyViewer = undefined;
+	var organsViewer = undefined;
+	var tissueViewer = undefined;
+	var cellPanel = undefined;
+	var modelPanel = undefined;
+	var modelsLoader = undefined;
+	this.apinatomyPanel = undefined;
+	this.topPanel = undefined;
+	this.showApinatomyButton = undefined;
+	this.hideApinatomyButton = undefined;
+	var UIIsReady = true;
+	this.apinatomyIsDisplayed = true;
+	var _this = this;
+	this.DOM = [];
+	
+	var systemMetaReadyCallback = function() {
+		return function() {
+			bodyViewer.readSystemMeta();
+		}
+	}
+	
+	/**
+	 * Initialise all the panels required for PJP to function correctly.
+	 * Modules used incude - {@link PJP.ModelsLoader}, {@link PJP.BodyViewer},
+	 * {@link PJP.OrgansViewer}, {@link PJP.TissueViewer}, {@link PJP.CellPanel}
+	 * and {@link PJP.ModelPanel}.
+	 */
+	var initialiseMain = function() {
+		modelsLoader = new PJP.ModelsLoader();
+		bodyViewer = new PJP.BodyViewer(modelsLoader, "bodyDisplayPort");
+		organsViewer = new PJP.OrgansViewer(modelsLoader, "organsDisplayPort");
+		tissueViewer = new PJP.TissueViewer("tissueDisplayPort");
+		cellPanel = new PJP.CellPanel("cellDisplayPort");
+		modelPanel = new PJP.ModelPanel("modelDisplayPort");
+		modelPanel.enableSVGController('testsvg');
+		_this.apinatomyPanel = document.getElementById("apinatomyDisplayPort");
+		_this.topPanel = document.getElementById("topPanel");
+		_this.showApinatomyButton = document.getElementById("showApinatomyButton");
+		_this.hideApinatomyButton = document.getElementById("hideApinatomyButton");
+		modelsLoader.addSystemMetaIsReadyCallback(systemMetaReadyCallback());
+		modelsLoader.initialiseLoading();
+		bodyViewer.setOrgansViewer(organsViewer);
+		organsViewer.setTissueViewer(tissueViewer);
+		organsViewer.setCellPanel(cellPanel);
+		organsViewer.setModelPanel(modelPanel);
+		tissueViewer.setCellPanel(cellPanel);
+		tissueViewer.setModelPanel(modelPanel);
+	}
+	
+	var expandCollapseApinatomy = function(source, portName) {
+		if (source.value == "Expand")
+			resetExpandButton();
+		expandCollapse(source, portName);
+		if (source.value == "Expand") {
+			main.apinatomyPanel.className = "apinatomyDisplayPortCollapse";
+			main.hideApinatomyButton.style.visibility = "visible";
+		} else {
+			main.hideApinatomyButton.style.visibility = "hidden";
+		}
+		window.dispatchEvent(new Event('resize'));
+	};
+
+	var showApinatomy = function() {
+		main.apinatomyPanel.style.visibility = "visible";
+		main.hideApinatomyButton.style.visibility = "visible";
+		main.apinatomyIsDisplayed = true;
+		main.topPanel.className = "topPanelCollapse";
+		main.showApinatomyButton.style.visibility = "hidden";
+	};
+
+	var hideApinatomy = function() {
+		main.apinatomyPanel.style.visibility = "hidden";
+		main.hideApinatomyButton.style.visibility = "hidden";
+		main.apinatomyIsDisplayed = false;
+		main.topPanel.className = "topPanelExpand";
+		main.showApinatomyButton.style.visibility = "visible";
+	};
+	
+	var addUICallback = function() {
+		_this.hideApinatomyButton.onclick = function() { hideApinatomy() };
+		_this.showApinatomyButton.onclick = function() { showApinatomy() };
+		var callbackElement = document.getElementById("apinatomyScreenButton");
+		callbackElement.onclick = function() { expandCollapseApinatomy(callbackElement, 'apinatomyDisplayPort'); };
+	}
+	
+	var loadHTMLComplete = function(link) {
+		return function(event) {
+			var localDOM = document.body;
+			var childNodes = null;
+			if (link.import.body !== undefined)
+				childNodes = link.import.body.childNodes;
+			else if (link.childNodes !== undefined)
+				childNodes = link.childNodes;
+			for (i = 0; i &lt; childNodes.length; i++) {
+				localDOM.appendChild(childNodes[i]);
+			}
+			initialiseMain();
+			document.head.removeChild(link);
+			addUICallback();
+			UIIsReady = true;
+		}
+	}
+	
+	var initialise = function() {
+		var link = document.createElement('link');
+		link.rel = 'import';
+		link.href = 'snippets/main_with_apinatomy.html';
+		link.onload = loadHTMLComplete(link);
+		link.onerror = loadHTMLComplete(link);
+		document.head.appendChild(link);	
+	}
+
+	initialise();
+}
+
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ImageCombiner.html">ImageCombiner</a></li><li><a href="PJP.BodyViewer.html">BodyViewer</a></li><li><a href="PJP.CellPanel.html">CellPanel</a></li><li><a href="PJP.Main.html">Main</a></li><li><a href="PJP.ModelPanel.html">ModelPanel</a></li><li><a href="PJP.ModelsLoader.html">ModelsLoader</a></li><li><a href="PJP.OrgansViewer.html">OrgansViewer</a></li><li><a href="PJP.SVGController.html">SVGController</a></li><li><a href="PJP.TissueViewer.html">TissueViewer</a></li></ul><h3>Namespaces</h3><ul><li><a href="PJP.html">PJP</a></li></ul><h3>Global</h3><ul><li><a href="global.html#expandCollapse">expandCollapse</a></li><li><a href="global.html#findCSSRule">findCSSRule</a></li><li><a href="global.html#setToolTipText">setToolTipText</a></li><li><a href="global.html#showTooltip">showTooltip</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 01 2018 15:06:50 GMT+1300 (NZDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

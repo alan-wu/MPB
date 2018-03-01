@@ -1,61 +1,118 @@
-var bodyDirectoryPrefix = "models/body";
-var organsDirectoryPrefix = "models/organsViewerModels";
-var metaURL = bodyDirectoryPrefix + "/" + "bodyMeta.json";
-var systemMeta = [];
-var ITEM_LOADED = { FALSE: -1, DOWNLOADING: 0, TRUE: 1 };
-var systemColour = new Array();
-systemColour["Cardiovascular"] = new THREE.Color("rgb(50%, 12%, 0%)");
-systemColour["Digestive"] = new THREE.Color("mistyrose");
-systemColour["Respiratory"] = new THREE.Color("palevioletred");
-systemColour["Male Reproductive"] = new THREE.Color("salmon");
-systemColour["Brain & Central Nervous"] = new THREE.Color("peachpuff");
-systemColour["Skin (integument)"] = new THREE.Color("rgb(90%, 70%, 50%)");
-systemColour["Urinary"] = new THREE.Color("rgb(50%, 12%, 10%)");
-systemColour["Musculo-skeletal"] = new THREE.Color("rgb(90%, 90%, 70%)");
-
-var partColour = new Array();
-partColour["Muscle"] = new THREE.Color("rgb(50%, 12%, 10%)");
-
-var setGeometryColour = function(geometry, systemName, partName) {
-	if(systemColour.hasOwnProperty(systemName))
-		geometry.morph.material.color = systemColour[systemName];
-	for (var key in partColour) {
-		if (partName.includes(key)) {
-			if(partColour.hasOwnProperty(key))
-				geometry.morph.material.color = partColour[key];
+/**
+ * Provides utilities function for files IO, this is used primarily by
+ * {@link PJP.BodyViewer}.
+ * 
+ * @class
+ * @author Alan Wu
+ * @returns {PJP.ModelsLoader}
+ */
+PJP.ModelsLoader = function()  {
+	var _this = this;
+	var metaFilesReady = false;
+	var bodyDirectoryPrefix = "models/body";
+	var organsDirectoryPrefix = "models/organsViewerModels";
+	var metaURL = bodyDirectoryPrefix + "/" + "bodyMeta.json";
+	var systemMeta = new Array();
+	systemMeta['human'] = new Array();
+	systemMeta['pig'] = new Array();
+	systemMeta['rat'] = new Array();
+	systemMeta['mouse'] = new Array();
+	var systemColour = new Array();
+	var numberOfDownloadings = 0;
+	var systemMetaReadyCallbackFunctions = [];
+	systemColour["Cardiovascular"] = new THREE.Color("rgb(50%, 12%, 0%)");
+	systemColour["Digestive"] = new THREE.Color("mistyrose");
+	systemColour["Respiratory"] = new THREE.Color("palevioletred");
+	systemColour["Male Reproductive"] = new THREE.Color("salmon");
+	systemColour["Brain & Central Nervous"] = new THREE.Color("peachpuff");
+	systemColour["Skin (integument)"] = new THREE.Color("rgb(90%, 70%, 50%)");
+	systemColour["Urinary"] = new THREE.Color("rgb(50%, 12%, 10%)");
+	systemColour["Musculo-skeletal"] = new THREE.Color("rgb(90%, 90%, 70%)");
+	
+	var partColour = new Array();
+	partColour["Muscle"] = new THREE.Color("rgb(50%, 12%, 10%)");
+	
+	this.setGeometryColour = function(geometry, systemName, partName) {
+		if(systemColour.hasOwnProperty(systemName))
+			geometry.morph.material.color = systemColour[systemName];
+		for (var key in partColour) {
+			if (partName.includes(key)) {
+				if(partColour.hasOwnProperty(key))
+					geometry.morph.material.color = partColour[key];
+			}
 		}
 	}
-}
-
-
-var readMetaFile = function(systemName, partMap) {
-	systemMeta[systemName] = partMap;
-	readBodyRenderModel(systemName, partMap);
-}
-
-var loadSystemMetaURL = function(url) {
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.onreadystatechange = function() {
-	    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-	        var metadata = JSON.parse(xmlhttp.responseText);
-	        readMetaFile(metadata["System"], metadata["Part"]);
-	    }
+	
+	/**
+	 * Provide meta for available data with the provided species name.
+	 * 
+	 * @param {string} speciesName
+	 * @returns {PJP.ModelsLoader~systemMeta}
+	 */
+	this.getSystemMeta = function(speciesName) {
+		return systemMeta[speciesName];
 	}
-	var requestURL = bodyDirectoryPrefix + "/" + url;
-	xmlhttp.open("GET", requestURL, true);
-	xmlhttp.send();	
-}
-
-var initialiseLoading = function() {
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.onreadystatechange = function() {
-	    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-	        var metadata = JSON.parse(xmlhttp.responseText);
-	        var metaLocations = metadata["SystemMetaLocation"];
-	        for (var i = 0; i < metaLocations.length; i++)
-	        	loadSystemMetaURL(metaLocations[i]);
-	    }
+	
+	/**
+	 * Provide prefix for all the data URLs.
+	 * 
+	 * @returns {string}
+	 */
+	this.getBodyDirectoryPrefix = function() {
+		return bodyDirectoryPrefix;
 	}
-	xmlhttp.open("GET", metaURL, true);
-	xmlhttp.send();	
+	
+	/**
+	 * Provide prefix for all the model URLs.
+	 * 
+	 * @returns {string}
+	 */
+	this.getOrgansDirectoryPrefix = function() {
+		return organsDirectoryPrefix;
+	}
+	
+	/**
+	 * Call the provided function which will be triggered when the system meta is ready.
+	 */
+	this.addSystemMetaIsReadyCallback = function(callbackFunctions) {		
+		systemMetaReadyCallbackFunctions.push(callbackFunctions);
+	}
+	
+	//Load the json file containing informations about models availability
+	var loadSystemMetaURL = function(url) {
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function() {
+		    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+		        var metadata = JSON.parse(xmlhttp.responseText);
+		        systemMeta['human'][metadata["System"]] = metadata["Part"];
+		        numberOfDownloadings = numberOfDownloadings - 1;
+		        if (numberOfDownloadings == 0) {
+		        	metaFilesReady = true;
+		        	for (i = 0; i < systemMetaReadyCallbackFunctions.length; i++) {
+		        		systemMetaReadyCallbackFunctions[i].call();
+		        	}
+		        }
+		    }
+		}
+		var requestURL = url;
+		xmlhttp.open("GET", requestURL, true);
+		xmlhttp.send();
+	}
+
+	this.initialiseLoading = function() {
+		if (metaFilesReady == false) {
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.onreadystatechange = function() {
+			    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			        var metadata = JSON.parse(xmlhttp.responseText);
+			        var metaLocations = metadata["SystemMetaLocation"];
+			        numberOfDownloadings = metaLocations.length;
+			        for (var i = 0; i < metaLocations.length; i++)
+			        	loadSystemMetaURL(metaLocations[i]);
+			    }
+			}
+			xmlhttp.open("GET", metaURL, true);
+			xmlhttp.send();
+		}
+	}
 }
