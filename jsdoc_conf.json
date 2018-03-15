@@ -17,6 +17,6 @@
         "monospaceLinks": false
     },
     "opts": {
-        "destination": "./docs/"
+        "destination": "./docs/jsdoc/"
     }
 }
