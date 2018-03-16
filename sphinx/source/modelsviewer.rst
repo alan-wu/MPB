@@ -21,7 +21,7 @@ Currently the model viewer is used for displaying bond graph diagram, users may 
    
 .. _modelsgui:
 
-Models Control Gui
+Models Control GUI
 ------------------
 
 Background colour is the only control available at the moment.
@@ -44,8 +44,7 @@ to toggle the visibility of the ions channel on/off.
 Run Models Simulation
 ---------------------
 
-Once pressed OpenCOR(if installed) will be launched and allow user to run simulation on the models displayed, the cardiac model 
-introduced by Denis Noble in 1962 will be run in this case.
+Once pressed OpenCOR(if installed) will be launched and user may run simulations of the models on display, the cardiac model introduced by Denis Noble in 1962 will be ran in this case.
 
 .. _modelszoomcontrol:
 

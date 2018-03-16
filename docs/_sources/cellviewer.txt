@@ -3,7 +3,7 @@
 Cell Viewer
 ===========
 
-Cell Viewer displays cell model (a diagram t this time being).
+Cell Viewer displays cell model (a diagram at the time being).
 
 .. figure:: img/cell1.png
    :width: 100 %
@@ -17,7 +17,7 @@ Cell Viewer displays cell model (a diagram t this time being).
    
 .. _cellgui:
 
-Cell Control Gui
+Cell Control GUI
 ------------------
 
 Background colour is the only control available at the moment.
@@ -27,4 +27,4 @@ Background colour is the only control available at the moment.
 Cell Display
 -------------
 
-Cell diagram displaying cell information. A page to the appropriate CellML model will be opened when pressed.
+Cell diagram providing cell information. A page to the appropriate CellML model will be opened when pressed.

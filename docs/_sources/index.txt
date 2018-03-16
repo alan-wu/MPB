@@ -3,13 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-================================================
-Physiome Journal Portal(PJP) Prototype Version 1
-================================================
+=================================================
+Physiome Journal Portal (PJP) Prototype Version 1
+=================================================
 
 Welcome to the user documentation of Physiome Journal Portal Prototye v1.
 This document will give an overview of the components, how users may interact with
-each component and the interactions between each component.
+each component and the interactions between each component. You may also find API 
+Documentation.
 
 Overview
 ========
@@ -40,7 +41,7 @@ For User documentations, please go to :ref:`layout`.
 Physiome Journal Portal
 =======================
 
-`Physiome Journal Portal test site <http://sites.bioeng.auckland.ac.nz/mwu035/pjp/>`.
+`Physiome Journal Portal test site <http://sites.bioeng.auckland.ac.nz/mwu035/pjp/>`_.
 
 Indices and tables
 ==================

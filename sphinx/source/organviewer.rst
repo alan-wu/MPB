@@ -5,7 +5,7 @@ Organ Viewer
 
 Organ Viewer is used for viewing models that users have previously selected on the body viewer.
 If a matching anatomical model is found, the anatomical model will be displayed, otherwise the
-geometry data will be displayed instead similar to the one displayed on the body viewer. 
+geometry data similar to the one displayed on the body viewer will be displayed instead. 
 
 .. figure:: img/organ1.png
    :width: 100 %
@@ -23,13 +23,13 @@ geometry data will be displayed instead similar to the one displayed on the body
    
 .. _organgui:
 
-Organ Control Gui
+Organ Control GUI
 -----------------
 
 Individual visibility settings for different parts of a model can be toggled using this interface by clicking on the tickbox.
 In the case of the heart model, the visibility of different parts of a model such as terminal and nerves can be toggled.
 
-Similar to the gui controls on body viewer, basic settings shared between organs/parts can be changed, such as background colour and
+Similar to the GUI controls on body viewer, basic settings shared between organs/parts can be changed, such as background colour and
 animation speed.
 
 .. _organtimecontrol:
@@ -37,9 +37,9 @@ animation speed.
 Organ Time Control
 ------------------
 
-Fields such as geometry, electrical activity and etc. are often time varying and supported by the Organ Viewer. 
+Fields such as geometry, electrical activity and etc. are often time varying and visualisation of these data are supported by the Organ Viewer. 
 
-Visualising these time varying fields, a play/pause button and a time slider is added, which allow the users to visualise changes overtime.
+Play/pause button and a time slider allow users to navigate between different time steps and allow the users to visualise changes overtime.
 
 .. _organrenderer:
 
@@ -62,4 +62,4 @@ Users may click on an interest point (as shown below) when present which may tri
 Organ External Link
 -------------------
 
-Additional buttons may present, these buttons normally provides additional informations about the organs on display when pressed. 
+Additional buttons may present, these buttons provides additional informations about the organs on display when pressed. 

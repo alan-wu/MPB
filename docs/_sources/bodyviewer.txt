@@ -3,7 +3,7 @@
 Body Viewer
 ===========
 
-The main functionality for the Body Viewer is to view geometry data for each system/organ.
+The main function for the Body Viewer is to view geometry data for each system/organ.
 
 .. figure:: img/body1.png
    :width: 100 %
@@ -29,7 +29,7 @@ This determines the species to be viewed on the portal, only "Human" is supporte
 
 .. _bodygui:
 
-Body Control Gui
+Body Control GUI
 ----------------
 
 Individual visibility settings for each organ/part can be toggled using this interface.
@@ -39,23 +39,23 @@ Individual visibility settings for each organ/part can be toggled using this int
    :align: center
    :alt: Expanded view of the Body Viewer
 
-   Expanded Body Control Gui, individual visibility settings can be toggled by clicking on the tickbox next each organ/part name.
+   Expanded Body Control GUI, individual visibility settings can be toggled by clicking on the tickbox next each organ/part name.
    
 Beside changing visibility of different organs/parts, basic settings that are shared between different organs/parts can be set 
 using this controls such as background colour.
-The gui itself can be expanded/collapsed by pressing on the "Open Controls" and "Close Controls" buttons respectively.
+The GUI itself can be expanded/collapsed by pressing on the "Open Controls" and "Close Controls" buttons respectively.
 
 .. _systemtoggle:
 
 Body System Toggle
 ------------------
 
-Clicking on these buttons will toggle the visibility of all parts/organs of a system on/off. 
+Clicking on these buttons toggles the visibility of all parts/organs of a system on/off. 
 
 .. _bodyrenderer:
 
 Body Renderer
 -------------
 
-Renderer for the body, users can zoom in/out, pan and rotate the renditions. Name of the part/organ is displayed when a cursor hovers over it.
+Users can zoom in/out, pan and rotate the geometry data. Name of the part/organ is displayed when a cursor hovers over it.
 When a organ/part is clicked, a corresponding model will be opened on the :ref:`organviewer`. 

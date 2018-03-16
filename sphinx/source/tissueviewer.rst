@@ -4,7 +4,7 @@ Tissue Viewer
 =============
 
 Tissue Viewer is used for viewing tissue that users have previously selected on the organ viewer.
-At this time being, only heart tissue textures are available for viewing.
+Currently only heart tissue textures are available for viewing.
 
 .. figure:: img/tissue1.png
    :width: 100 %
@@ -22,7 +22,7 @@ At this time being, only heart tissue textures are available for viewing.
    
 .. _tissuegui:
 
-Tissue Control Gui
+Tissue Control GUI
 ------------------
 
 Controls for texture blocks selection, lower and upper bounds of the display volume can be found here.
@@ -43,11 +43,11 @@ Cell Type Buttons
 -----------------
 
 Each of these buttons represents a specific type of cells, when clicked 
-:ref:`cellviewer` and :ref:`modelsviewer` will load and display related informations.
+:ref:`cellviewer` and :ref:`modelsviewer` will load and display relevant informations.
 
 .. _tissueInformation:
 
 Additional Tissue Information 
 -----------------------------
 
-Clicking on this button will bring up a CellML page containing relevant to the Tissue on display. 
+Clicking on this button will bring up a CellML page containing relevant cell models to the Tissue on display. 
