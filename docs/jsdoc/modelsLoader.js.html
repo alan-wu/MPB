@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: modelsLoader.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: modelsLoader.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Provides utilities function for files IO, this is used primarily by
+ * {@link PJP.BodyViewer}.
+ * 
+ * @class
+ * @author Alan Wu
+ * @returns {PJP.ModelsLoader}
+ */
+PJP.ModelsLoader = function()  {
+	var _this = this;
+	var metaFilesReady = false;
+	var bodyDirectoryPrefix = "models/body";
+	var organsDirectoryPrefix = "models/organsViewerModels";
+	var metaURL = bodyDirectoryPrefix + "/" + "bodyMeta.json";
+	var systemMeta = new Array();
+	systemMeta['human'] = new Array();
+	systemMeta['pig'] = new Array();
+	systemMeta['rat'] = new Array();
+	systemMeta['mouse'] = new Array();
+	var systemColour = new Array();
+	var numberOfDownloadings = 0;
+	var systemMetaReadyCallbackFunctions = [];
+	systemColour["Cardiovascular"] = new THREE.Color("rgb(50%, 12%, 0%)");
+	systemColour["Digestive"] = new THREE.Color("mistyrose");
+	systemColour["Respiratory"] = new THREE.Color("palevioletred");
+	systemColour["Male Reproductive"] = new THREE.Color("salmon");
+	systemColour["Brain &amp; Central Nervous"] = new THREE.Color("peachpuff");
+	systemColour["Skin (integument)"] = new THREE.Color("rgb(90%, 70%, 50%)");
+	systemColour["Urinary"] = new THREE.Color("rgb(50%, 12%, 10%)");
+	systemColour["Musculo-skeletal"] = new THREE.Color("rgb(90%, 90%, 70%)");
+	
+	var partColour = new Array();
+	partColour["Muscle"] = new THREE.Color("rgb(50%, 12%, 10%)");
+	
+	this.setGeometryColour = function(geometry, systemName, partName) {
+		if(systemColour.hasOwnProperty(systemName))
+			geometry.morph.material.color = systemColour[systemName];
+		for (var key in partColour) {
+			if (partName.includes(key)) {
+				if(partColour.hasOwnProperty(key))
+					geometry.morph.material.color = partColour[key];
+			}
+		}
+	}
+	
+	/**
+	 * Provide meta for available data with the provided species name.
+	 * 
+	 * @param {string} speciesName
+	 * @returns {PJP.ModelsLoader~systemMeta}
+	 */
+	this.getSystemMeta = function(speciesName) {
+		return systemMeta[speciesName];
+	}
+	
+	/**
+	 * Provide prefix for all the data URLs.
+	 * 
+	 * @returns {string}
+	 */
+	this.getBodyDirectoryPrefix = function() {
+		return bodyDirectoryPrefix;
+	}
+	
+	/**
+	 * Provide prefix for all the model URLs.
+	 * 
+	 * @returns {string}
+	 */
+	this.getOrgansDirectoryPrefix = function() {
+		return organsDirectoryPrefix;
+	}
+	
+	/**
+	 * Call the provided function which will be triggered when the system meta is ready.
+	 */
+	this.addSystemMetaIsReadyCallback = function(callbackFunctions) {		
+		systemMetaReadyCallbackFunctions.push(callbackFunctions);
+	}
+	
+	//Load the json file containing informations about models availability
+	var loadSystemMetaURL = function(url) {
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function() {
+		    if (xmlhttp.readyState == 4 &amp;&amp; xmlhttp.status == 200) {
+		        var metadata = JSON.parse(xmlhttp.responseText);
+		        systemMeta['human'][metadata["System"]] = metadata["Part"];
+		        numberOfDownloadings = numberOfDownloadings - 1;
+		        if (numberOfDownloadings == 0) {
+		        	metaFilesReady = true;
+		        	for (i = 0; i &lt; systemMetaReadyCallbackFunctions.length; i++) {
+		        		systemMetaReadyCallbackFunctions[i].call();
+		        	}
+		        }
+		    }
+		}
+		var requestURL = url;
+		xmlhttp.open("GET", requestURL, true);
+		xmlhttp.send();
+	}
+
+	this.initialiseLoading = function() {
+		if (metaFilesReady == false) {
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.onreadystatechange = function() {
+			    if (xmlhttp.readyState == 4 &amp;&amp; xmlhttp.status == 200) {
+			        var metadata = JSON.parse(xmlhttp.responseText);
+			        var metaLocations = metadata["SystemMetaLocation"];
+			        numberOfDownloadings = metaLocations.length;
+			        for (var i = 0; i &lt; metaLocations.length; i++)
+			        	loadSystemMetaURL(metaLocations[i]);
+			    }
+			}
+			xmlhttp.open("GET", metaURL, true);
+			xmlhttp.send();
+		}
+	}
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ImageCombiner.html">ImageCombiner</a></li><li><a href="PJP.BodyViewer.html">BodyViewer</a></li><li><a href="PJP.CellPanel.html">CellPanel</a></li><li><a href="PJP.Main.html">Main</a></li><li><a href="PJP.ModelPanel.html">ModelPanel</a></li><li><a href="PJP.ModelsLoader.html">ModelsLoader</a></li><li><a href="PJP.OrgansViewer.html">OrgansViewer</a></li><li><a href="PJP.SVGController.html">SVGController</a></li><li><a href="PJP.TissueViewer.html">TissueViewer</a></li></ul><h3>Namespaces</h3><ul><li><a href="PJP.html">PJP</a></li></ul><h3>Global</h3><ul><li><a href="global.html#expandCollapse">expandCollapse</a></li><li><a href="global.html#findCSSRule">findCSSRule</a></li><li><a href="global.html#setToolTipText">setToolTipText</a></li><li><a href="global.html#showTooltip">showTooltip</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Mar 16 2018 10:25:41 GMT+1300 (NZDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
