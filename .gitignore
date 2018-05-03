@@ -3,3 +3,6 @@ models/*
 morphing/*
 nerves/*
 .project
+.settings
+.tern-project
+

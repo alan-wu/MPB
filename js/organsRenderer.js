@@ -1094,33 +1094,32 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
            	 * Uses dojo tree and checkbox for the UI and ImageCombiner for image composition.
            	 */
                function rootIsReady() {
-					return function(root) {
-						var height = document.getElementById("organsRootImage").height;
-						var width = document.getElementById("organsRootImage").width;
-			            imageCombiner = new ImageCombiner();
-						imageCombiner.setSize(width, height);
-						imageCombiner.addElement(document.getElementById("organsRootImage"));
-						var container = dom.byId("organsImgContainer");
-						model.getChildren(root, forEachChildrenCreateImageElements(container));
-						var bitmap = imageCombiner.getCombinedImage();
-						setTextureForScene(nerveMapScene, bitmap);
-					}
-				}
+                 return function(root) {
+                   var height = document.getElementById("organsRootImage").height;
+                   var width = document.getElementById("organsRootImage").width;
+                   imageCombiner = new ImageCombiner();
+                   imageCombiner.setSize(width, height);
+                   imageCombiner.addElement(document.getElementById("organsRootImage"));
+                   var container = dom.byId("organsImgContainer");
+                   model.getChildren(root, forEachChildrenCreateImageElements(container));
+                   var bitmap = imageCombiner.getCombinedImage();
+                   setTextureForScene(nerveMapScene, bitmap);
+                 }
+               }
 
                ready( function () {
-            	   tree = new Tree( { model: model,
-            		   id: "neuritemap",
-                       autoExpand:true,
-                       branchIcons:false,
-                       leafIcons: false,
-            		  } );
-            	   tree.domNode.style.height = "100%";
-            	   tree.domNode.style.fontSize = "70%";
-            	   model.getRoot(rootIsReady());
-            	   model.on("change", modelItemChanged);
-            	   tree.on("checkBoxClick", checkBoxClicked);
-            	   tree.placeAt( "CheckboxTree" );
-            	   tree.startup();
+                 tree = new Tree( { model: model,
+                   autoExpand:true,
+                   branchIcons:false,
+                   leafIcons: false,
+                 } );
+                 tree.domNode.style.height = "100%";
+                 tree.domNode.style.fontSize = "70%";
+                 model.getRoot(rootIsReady());
+                 model.on("change", modelItemChanged);
+                 tree.on("checkBoxClick", checkBoxClicked);
+                 tree.placeAt( "CheckboxTree" );
+                 tree.startup();
                });
     });
 }
