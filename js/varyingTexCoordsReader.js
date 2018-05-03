@@ -138,7 +138,7 @@ PJP.VaryingTexCoordsReader = function(sceneIn) {
 		var loader = new THREE.JSONLoader( true );
 	    numberOfInputs = urls.length;
 	    finishCallbackFunction = finishCallback;
-		loadExternalFiles(['shaders/varyingTexture.vs', 'shaders/varyingTexture.fs'], function (shaderText) {
+		Zinc.loadExternalFiles(['shaders/varyingTexture.vs', 'shaders/varyingTexture.fs'], function (shaderText) {
 		    for (var i = 0; i < numberOfInputs; i++)
 		    	loader.load( urls[i], myLoader(i, shaderText), progressCallback, errorCallback);
 		}, function (url) {

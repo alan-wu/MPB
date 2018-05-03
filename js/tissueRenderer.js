@@ -409,7 +409,7 @@ PJP.TissueViewer = function(PanelName)  {
 	
 	//initialising the loading of the volume renderer
 	var volumeRenderInit = function() {
-		loadExternalFiles(['shaders/tissueShaderFirstPass.vs', 'shaders/tissueShaderFirstPass.fs',
+		Zinc.loadExternalFiles(['shaders/tissueShaderFirstPass.vs', 'shaders/tissueShaderFirstPass.fs',
 		                   'shaders/tissueShaderSecondPass.vs', 'shaders/tissueShaderSecondPass.fs'], 
 		                   function (shaderText) {
 								volumeRenderStart(shaderText);

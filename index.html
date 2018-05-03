@@ -1,1 +1,74 @@
-with_apinatomy.html
+<!DOCTYPE html>
+<html lang="en" style="height:100%">
+	<head>
+		<title>Physiome Portal</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>			
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+
+		<link rel="stylesheet" title="Basic styles" href="styles/my_styles.css">
+		<link rel="stylesheet" href="styles/bootstrap.min.css">
+		<link rel="stylesheet" href="styles/w3.css">
+		<script src="js/three.min.js"></script>
+		<script src="js/OBJLoader.js"></script>
+		<script src="js/STLLoader.js"></script>
+		<script src="js/zinc.min.js"></script>
+		<script src="js/dat.gui.js"></script>
+		<script src="js/dat.gui.removeFolder.js"></script>
+		<link rel="stylesheet" type="text/css" href="styles/dat-gui-swec.css">
+    	<script src="js/html-imports.min.js"></script>
+    	<style type="text/css">
+			@import "js/dojo/dijit/themes/claro/claro.css";
+			@import "js/dojo/themes/claro/claro.css";
+		</style>
+    	<script type="text/javascript">
+			var dojoConfig = {
+				async: true,
+				parseOnLoad: true,
+				isDebug: false,
+				baseUrl: "js/dojo",
+				packages: [
+					{ name: "dojo",  location: "dojo" },
+					{ name: "dijit", location: "dijit" },
+					{ name: "cbtree",location: "cbtree" }
+				]
+			};
+		</script>
+		<script type="text/javascript" src="js/dojo/dojo/dojo.js"></script>
+	</head>
+
+	<body  style="height:100%;">
+		<script src="js/pjp.js"></script>
+		<script src="js/varyingTexCoordsReader.js"></script>
+		<script src="js/imageCombiner.js"></script>	
+		<script src="js/modelsLoader.js"></script>
+		<script src="js/bodyRenderer.js"></script>
+		<script src="js/organsRenderer.js"></script>
+		<script src="js/tissueRenderer.js"></script>
+		<script src="js/cell_panel.js"></script>
+		<script src="js/model_panel.js"></script>
+		<script src="js/svgController.js"></script>
+		<script src="js/with_apinatomy.js"></script>
+		<script>
+			var main = new PJP.Main();
+		</script>
+	</body>
+</html>
