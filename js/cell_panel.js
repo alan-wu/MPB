@@ -7,11 +7,13 @@
  * @author Alan Wu
  * @returns {PJP.CellPanel}
  */
-PJP.CellPanel = function(PanelName)  {
+PJP.CellPanel = function(DialogName)  {
 
 	//dat.gui container for cellGui
 	var cellGui = undefined;
 	var otherCellControls = undefined;
+	var dialogObject = undefined;
+	var localDialogName = DialogName;
 	
 	var _this = this;
 	
@@ -23,14 +25,14 @@ PJP.CellPanel = function(PanelName)  {
 	 * Display cell model image in the {@link PJP.CellPanel}.
 	 */
 	this.openCell = function() {
-		document.getElementById("imageContainer").style.visibility = "visible";
+		dialogObject.find("#imageContainer")[0].style.visibility = "visible";
 	}
 	
 	/**
 	 * Hide cell model image in the {@link PJP.CellPanel}.
 	 */
 	var hideCell = function() {
-		document.getElementById("imageContainer").style.visibility = "hidden";
+		dialogObject.find("#imageContainer")[0].style.visibility = "hidden";
 	}
 	
 	/**
@@ -38,13 +40,15 @@ PJP.CellPanel = function(PanelName)  {
 	 * @param {String} text - Cell panel title to be set.
 	 */
 	this.setCellPanelTitle = function(text) {
-		var titleDisplay = document.getElementById('CellTitle');
-		titleDisplay.innerHTML = text;
+	  console.log("Fix setCellPanelTitle");
+		//var titleDisplay = document.getElementById('CellTitle');
+		//titleDisplay.innerHTML = text;
 	}
 	
 	var resetCellTitle = function() {
-		var titleDisplay = document.getElementById('CellTitle');
-		titleDisplay.innerHTML = "<strong>Cell<span style='color:#FF4444'>";
+	  console.log("Fix resetCellTitle");
+		//var titleDisplay = document.getElementById('CellTitle');
+		//titleDisplay.innerHTML = "<strong>Cell<span style='color:#FF4444'>";
 	}
 	
 	/**
@@ -61,7 +65,7 @@ PJP.CellPanel = function(PanelName)  {
 			var greenValue = parseInt(value[1]);
 			var blueValue = parseInt(value[2]);
 			var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-			document.getElementById("cellDisplayPort").style.backgroundColor = backgroundColourString;
+			dialogObject[0].style.backgroundColor = backgroundColourString;
 		}
 	}
 	
@@ -78,34 +82,36 @@ PJP.CellPanel = function(PanelName)  {
 		var controller = cellGui.addColor(control, 'Background');
 		controller.onChange(cellBackGroundChanged());
 		otherCellControls = cellGui.addFolder('Others');
-		var customContainer = document.getElementById("cellGui").append(cellGui.domElement);
+		var customContainer = dialogObject.find("#cellGui")[0].append(cellGui.domElement);
 	}
 	
-	var loadHTMLComplete = function(link) {
-		return function(event) {
-			var localDOM = document.getElementById(PanelName);
-			var childNodes = null;
-			if (link.import.body !== undefined)
-				childNodes = link.import.body.childNodes;
-			else if (link.childNodes !== undefined)
-				childNodes = link.childNodes;
-			for (i = 0; i < childNodes.length; i++) {
-				localDOM.appendChild(childNodes[i]);
-			}
-			initialiseCellPanel();
-			document.head.removeChild(link);
-			UIIsReady = true;
-		}
-	}
+  var createNewDialog = function(link) {
+    dialogObject = PJP.createDialogContainer(localDialogName, link);
+    initialiseCellPanel();
+    UIIsReady = true;
+  }
+  
+  var loadHTMLComplete = function(link) {
+    return function(event) {
+      createNewDialog(link);
+    }
+  }
 	
-	var initialise = function() {
-		var link = document.createElement('link');
-		link.rel = 'import';
-		link.href = 'snippets/cellPanel.html';
-		link.onload = loadHTMLComplete(link);
-		link.onerror = loadHTMLComplete(link);
-		document.head.appendChild(link);	
-	}
+	
+	 var initialise = function() {
+     var link = document.getElementById("cellSnippet");
+      if (link == undefined) {
+        link = document.createElement('link');
+        link.id = "cellSnippet";
+        link.rel = 'import';
+        link.href = 'snippets/cellPanel.html';
+        link.onload = loadHTMLComplete(link);
+        link.onerror = loadHTMLComplete(link);
+        document.head.appendChild(link);  
+      } else {
+        createNewDialog(link);
+      }
+  }
 	
 	initialise();
 	

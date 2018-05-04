@@ -13,6 +13,28 @@ var tiptextElement = undefined;
 PJP.ITEM_LOADED = { FALSE: -1, DOWNLOADING: 0, TRUE: 1 };
 
 
+PJP.createDialogContainer = function (DialogNameIn, sourceElement) {
+  var e0 = $('<div></div>');
+  e0.attr('title', DialogNameIn);
+  var e1 = $('<div class="ui-widget-content" style="position:absolute;width:100%;height:100%;"></div>');
+  e0.append(e1);
+  e0.dialog({
+          width: 600,
+          height: 500});
+  var childNodes = null;
+  var parent = null;
+  if (sourceElement.import.body !== undefined)
+    parent = sourceElement.import.body.cloneNode(true);
+  else if (sourceElement.childNodes !== undefined)
+    parent = sourceElement.cloneNode(true);
+  childNodes = parent.childNodes;
+  for (i = 0; i < childNodes.length; i++) {
+    e1[0].appendChild(childNodes[i]);
+  }
+  
+  return e1;
+}
+
 /**
  * Create a {@link Zinc.Renderer} on the dom element with corresponding elementID.
  * @param {String} elementID - id of the target dom element.

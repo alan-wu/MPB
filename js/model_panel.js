@@ -9,7 +9,7 @@
  * @author Alan Wu
  * @returns {PJP.ModelPanel}
  */
-PJP.ModelPanel = function(PanelName)  {
+PJP.ModelPanel = function(DialogName)  {
 	var modelGui = undefined;
 	var otherModelControls = undefined;
 	var runModelURL = undefined;
@@ -19,6 +19,8 @@ PJP.ModelPanel = function(PanelName)  {
 	var modelControl = function() {
 		  this.Background = [ 255, 255, 255 ]; // RGB array
 	};
+	var dialogObject = undefined;
+	var localDialogName = DialogName;
 	
 	/**
 	 * Create and enable SVGController on the provided panelName, if no element with the id is found,
@@ -42,8 +44,8 @@ PJP.ModelPanel = function(PanelName)  {
 	this.openModel = function(svgName) {
 		if (svgController) {
 			svgController.loadSVG(svgName);
-			document.getElementById("modelsController").style.visibility = "visible";
-			document.getElementById("modelsContainer").style.visibility = "visible";
+			dialogObject.find("#modelsController")[0].style.visibility = "visible";
+			dialogObject.find("#modelsContainer")[0].style.visibility = "visible";
 			if (svgName == "Myocyte_v6_Grouped.svg") {
 				runModelURL = 'https://models.cellml.org/workspace/noble_1962/rawfile/c70f8962407db00673f1fdcac9f35a2593781c17/noble_1962.sedml';
 			} else {
@@ -66,7 +68,7 @@ PJP.ModelPanel = function(PanelName)  {
 			var blueValue = parseInt(value[2]);
 			
 			var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-			document.getElementById("modelDisplayPort").style.backgroundColor = backgroundColourString;
+			dialogObject[0].style.backgroundColor = backgroundColourString;
 		}
 	}
 	
@@ -92,16 +94,13 @@ PJP.ModelPanel = function(PanelName)  {
 	}
 	
 	var addUICallback = function() {
-		var callbackElement = document.getElementById("modelsControllerButton");
+		var callbackElement = dialogObject.find("#modelsControllerButton")[0];
 		callbackElement.onclick = function() { runModel() };
-		var modelsScreenButton = document.getElementById("modelsScreenButton");
-		modelsScreenButton.onclick = function() { expandCollapseModels(modelsScreenButton,
-			'modelDisplayPort') };
-		callbackElement = document.getElementById("svgZoomOut");
+		callbackElement = dialogObject.find("#svgZoomOut")[0];
 		callbackElement.onclick = function() { zoomOut(0.2); };
-		callbackElement = document.getElementById("svgZoomReset");
+		callbackElement = dialogObject.find("#svgZoomReset")[0];
 		callbackElement.onclick = function() { zoomReset(); };
-		callbackElement = document.getElementById("svgZoomIn");
+		callbackElement = dialogObject.find("#svgZoomIn")[0];
 		callbackElement.onclick = function() { zoomIn(0.2) };	
 			
 	}
@@ -114,42 +113,43 @@ PJP.ModelPanel = function(PanelName)  {
 		var controller = modelGui.addColor(control, 'Background');
 		controller.onChange(modelBackGroundChanged());
 		otherModelControls = modelGui.addFolder('Others');
-		var customContainer = document.getElementById("modelGui").append(modelGui.domElement);
+		var customContainer = dialogObject.find("#modelGui")[0].append(modelGui.domElement);
 		if (targetSVGPanelName !== undefined && svgController === undefined)
 			_this.enableSVGController(targetSVGPanelName);
 	}
 	
-	var loadHTMLComplete = function(link) {
-		return function(event) {
-			var localDOM = document.getElementById(PanelName);
-			var childNodes = null;
-			if (link.import.body !== undefined)
-				childNodes = link.import.body.childNodes;
-			else if (link.childNodes !== undefined)
-				childNodes = link.childNodes;
-			for (i = 0; i < childNodes.length; i++) {
-				localDOM.appendChild(childNodes[i]);
-			}
-			initialiseModelPanel();
-			addUICallback();
-			document.head.removeChild(link);
-			UIIsReady = true;
-		}
-	}
-	
-	/**
-	 * Initialise loading of the page, this is called when 
-	 * the {@link PJP.ModelPanel} is created.
-	 * @async
-	 */
-	var initialise = function() {
-		var link = document.createElement('link');
-		link.rel = 'import';
-		link.href = 'snippets/modelPanel.html';
-		link.onload = loadHTMLComplete(link);
-		link.onerror = loadHTMLComplete(link);
-		document.head.appendChild(link);	
-	}
+  var createNewDialog = function(link) {
+    dialogObject = PJP.createDialogContainer(localDialogName, link);
+    initialiseModelPanel();
+    addUICallback();
+    UIIsReady = true;
+  }
+  
+  var loadHTMLComplete = function(link) {
+    return function(event) {
+      createNewDialog(link);
+    }
+  }
+  
+  /**
+   * Initialise loading of the page, this is called when 
+   * the {@link PJP.ModelPanel} is created.
+   * @async
+   */
+   var initialise = function() {
+     var link = document.getElementById("modelSnippet");
+      if (link == undefined) {
+        link = document.createElement('link');
+        link.id = "modelSnippet";
+        link.rel = 'import';
+        link.href = 'snippets/modelPanel.html';
+        link.onload = loadHTMLComplete(link);
+        link.onerror = loadHTMLComplete(link);
+        document.head.appendChild(link);  
+      } else {
+        createNewDialog(link);
+      }
+  }
 	
 	initialise();
 

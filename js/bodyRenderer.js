@@ -8,7 +8,7 @@
  * @author Alan Wu
  * @returns {PJP.BodyViewer}
  */
-PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
+PJP.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 
 	var currentScene = undefined;
 	var currentSpecies = 'human';
@@ -27,7 +27,8 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 	var UIIsReady = false;
 	var organsViewer = undefined;
 	var modelsLoader = ModelsLoaderIn;
-
+	var dialogObject = undefined;
+	var localDialogName = DialogName;
 	
 	//Represents each physiological organ systems as folder in the dat.gui.
 	var systemGuiFolder = new Array();
@@ -165,7 +166,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 			for (var i = 0; i < intersects.length; i++) {
 				if (intersects[i] !== undefined && (intersects[ i ].object.name !== undefined)) {
 					if (!intersects[ i ].object.name.includes("Body")) {
-						document.getElementById("bodyDisplayArea").style.cursor = "pointer";
+						dialogObject.find("#bodyDisplayArea")[0].style.cursor = "pointer";
 						showBodyTooltip(intersects[ i ].object.name, window_x, window_y);
 						if (currentHoveredMaterial &&
 						  intersects[ i ].object.material != currentHoveredMaterial && currentHoveredMaterial != currentSelectedMaterial) {
@@ -189,11 +190,11 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 			}
 			currentHoveredMaterial = undefined;
 			if (bodyHovered) {
-				document.getElementById("bodyDisplayArea").style.cursor = "pointer";
+				dialogObject.find("#bodyDisplayArea")[0].style.cursor = "pointer";
 				showBodyTooltip("Body", window_x, window_y);
 			} else {
 				hideTooltip();
-				document.getElementById("bodyDisplayArea").style.cursor = "auto";
+				dialogObject.find("#bodyDisplayArea")[0].style.cursor = "auto";
 			}
 			
 		}
@@ -412,7 +413,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 		controller.onChange(bodyBackGroundChanged());
 		bodyGui.close();
 		addSystemFolders();
-		var customContainer = document.getElementById("bodyGui").append(bodyGui.domElement);
+		var customContainer = dialogObject.find("#bodyGui")[0].append(bodyGui.domElement);
 		var resetViewButton = { 'Reset View':function(){ bodyRenderer.resetView() }};
 		var scene = bodyRenderer.createScene("human");
 		bodyRenderer.setCurrentScene(scene);
@@ -446,31 +447,26 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 	}
 	
 	var addUICallback = function() {
-		var callbackContainer = document.getElementById("systemToggle");
+		var callbackContainer = dialogObject.find("#systemToggle")[0];
 		var inputs, index;
 		inputs = callbackContainer.getElementsByTagName('input');
 		for (var i = 0; i < inputs.length; ++i) {
 			inputs[i].onclick = systemButtonPressCallback(inputs[i]); 
 		}
-		var speciesSelected = document.getElementById("bodySpeciesSelect");
+		var speciesSelected = dialogObject.find("#bodySpeciesSelect")[0];
 		speciesSelected.onchange = function() { changeSpecies(speciesSelected) };
 	}
 	
+	 var createNewDialog = function(link) {
+	    dialogObject = PJP.createDialogContainer(localDialogName, link);
+	    addUICallback();
+	    initialiseBodyRenderer();
+	    UIIsReady = true;
+	  }
+	
 	var loadHTMLComplete = function(link) {
 		return function(event) {
-			var localDOM = document.getElementById(PanelName);
-			var childNodes = null;
-			if (link.import.body !== undefined)
-				childNodes = link.import.body.childNodes;
-			else if (link.childNodes !== undefined)
-				childNodes = link.childNodes;
-			for (i = 0; i < childNodes.length; i++) {
-				localDOM.appendChild(childNodes[i]);
-			}	
-			addUICallback();
-			initialiseBodyRenderer();
-			document.head.removeChild(link);
-			UIIsReady = true;
+		  createNewDialog(link);
 		}
 	}
 		
@@ -480,12 +476,18 @@ PJP.BodyViewer = function(ModelsLoaderIn, PanelName)  {
 	 * the {@link PJP.BodyViewer} is created.
 	 */
 	var initialise = function() {
-		var link = document.createElement('link');
-		link.rel = 'import';
-		link.href = 'snippets/bodyViewer.html';
-		link.onload = loadHTMLComplete(link);
-		link.onerror = loadHTMLComplete(link);
-		document.head.appendChild(link);
+	   var link = document.getElementById("bodySnippet");
+	    if (link == undefined) {
+	      link = document.createElement('link');
+	      link.id = "bodySnippet";
+	      link.rel = 'import';
+	      link.href = 'snippets/bodyViewer.html';
+	      link.onload = loadHTMLComplete(link);
+	      link.onerror = loadHTMLComplete(link);
+	      document.head.appendChild(link);  
+	    } else {
+	      createNewDialog(link);
+	    }
 	}
 	
 	var readModel = function(systemName, partName, startup) {

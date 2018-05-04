@@ -8,7 +8,7 @@
  * @author Alan Wu
  * @returns {PJP.OrgansViewer}
  */
-PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
+PJP.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	var currentSpecies = undefined;
 	var pickerScene = undefined;
 	var displayScene = undefined;
@@ -45,6 +45,10 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var timeSlider = undefined;
 	var texSlider = undefined;
 	var speedSlider = undefined;
+	var dialogObject = undefined;
+	var localDialogName = DialogName;
+	  
+	
 	// data used by dat.gui to control non-model specific controls. 
 	var organsControl = function() {
 		  this.Background = [ 255, 255, 255 ]; // RGB array
@@ -230,8 +234,9 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	}
 	
 	var setOrgansPanelTitle = function(name) {
-	 	var text_display = document.getElementById('OrganTitle');
-		text_display.innerHTML = "<strong>Organ: <span style='color:#FF4444'>" + name + "</span></strong>";
+	  console.log("Fix setOrgansPanelTitle");
+	 	//var text_display = document.getElementById('OrganTitle');
+		//text_display.innerHTML = "<strong>Organ: <span style='color:#FF4444'>" + name + "</span></strong>";
 	}
 
 	/** 
@@ -281,17 +286,17 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 					var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
 					setToolTipText("Node " + id);
 					currentHoverId = id;
-					document.getElementById("organsDisplayArea").style.cursor = "pointer";
+					dialogObject.find("#organsDisplayArea")[0].style.cursor = "pointer";
 					showTooltip(window_x, window_y);
 				} else if (displayScene.sceneName.includes("human/Cardiovascular/Arterial")) {
-					document.getElementById("organsDisplayArea").style.cursor = "pointer";
+					dialogObject.find("#organsDisplayArea")[0].style.cursor = "pointer";
 					setToolTipText("Click to show vascular model");
 					showTooltip(window_x, window_y);
 				}
 			}
 			else {
 				hideTooltip();
-				document.getElementById("organsDisplayArea").style.cursor = "auto";
+				dialogObject.find("#organsDisplayArea")[0].style.cursor = "auto";
 			}
 		}
 	};
@@ -364,64 +369,64 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	var updateLayout = function() {
 		if (fullScreen) {
 			if (comparedSceneIsOn) {
-				var element = document.getElementById("organsDisplayArea");
+				var element = dialogObject.find("#organsDisplayArea")[0];
 				element.style.width = "50%";
-				element = document.getElementById("organsSecondaryDisplayArea");
+				element = dialogObject.find("#organsSecondaryDisplayArea")[0];
 				element.className = "organsSecondSceneDisplay";
 				element.style.display = "block";
-				element = document.getElementById("timeSliderContainer");
+				element = dialogObject.find("#timeSliderContainer")[0];
 				element.style.width = "50%";
-				element = document.getElementById("organsTertieryDisplayArea");
+				element = dialogObject.find("#organsTertieryDisplayArea")[0];
 				element.style.display = "none";
 			} else if (nerveMapIsActive) {
-				var element = document.getElementById("organsDisplayArea");
+				var element = dialogObject.find("#organsDisplayArea")[0];
 				element.style.width = "33%";
-				element = document.getElementById("organsSecondaryDisplayArea");
+				element = dialogObject.find("#organsSecondaryDisplayArea")[0];
 				element.className = "organsSecondNerveDisplay";
 				element.style.display = "block";
-				element = document.getElementById("timeSliderContainer");
+				element = dialogObject.find("#timeSliderContainer")[0];
 				element.style.width = "33%";
-				element = document.getElementById("organsTertieryDisplayArea");
+				element = dialogObject.find("#organsTertieryDisplayArea")[0];
 				element.style.display = "block";
 			} else {
-				var element = document.getElementById("organsDisplayArea");
+				var element = dialogObject.find("#organsDisplayArea")[0];
 				element.style.width = "100%";
-				element = document.getElementById("timeSliderContainer");
+				element = dialogObject.find("#timeSliderContainer")[0];
 				element.style.width = "100%";
-				element = document.getElementById("organsSecondaryDisplayArea");
+				element = dialogObject.find("#organsSecondaryDisplayArea")[0];
 				element.style.display = "none";
-				element = document.getElementById("organsTertieryDisplayArea");
+				element = dialogObject.find("#organsTertieryDisplayArea")[0];
 				element.style.display = "none";
 			}
 		} else {
-			var element = document.getElementById("organsDisplayArea");
+			var element = dialogObject.find("#organsDisplayArea")[0];
 			element.style.width = "100%";
-			element = document.getElementById("timeSliderContainer");
+			element = dialogObject.find("#timeSliderContainer")[0];
 			element.style.width = "100%";
-			element = document.getElementById("organsSecondaryDisplayArea");
+			element = dialogObject.find("#organsSecondaryDisplayArea")[0];
 			element.style.display = "none";
-			element = document.getElementById("organsTertieryDisplayArea");
+			element = dialogObject.find("#organsTertieryDisplayArea")[0];
 			element.style.display = "none";
 		}
 		
 		if (nerveMapIsActive) {
-			element = document.getElementById("texSlider");
+			element = dialogObject.find("#texSlider")[0];
 			element.style.display = "block";
-			element = document.getElementById("organsImgContainer");
+			element = dialogObject.find("#organsImgContainer")[0];
 			element.style.display = "block";
-			element = document.getElementById("organsSecondaryDisplayRenderer");
+			element = dialogObject.find("#organsSecondaryDisplayRenderer")[0];
 			element.style.display = "none";
-			element = document.getElementById("CheckboxTree");
+			element = dialogObject.find("#CheckboxTree")[0];
 			element.style.display = "block";
 			
 		} else {
-			element = document.getElementById("texSlider");
+			element = dialogObject.find("#texSlider")[0];
 			element.style.display = "none";
-			element = document.getElementById("organsImgContainer");
+			element = dialogObject.find("#organsImgContainer")[0];
 			element.style.display = "none";
-			element = document.getElementById("organsSecondaryDisplayRenderer");
+			element = dialogObject.find("#organsSecondaryDisplayRenderer")[0];
 			element.style.display = "block";
-			element = document.getElementById("CheckboxTree");
+			element = dialogObject.find("#CheckboxTree")[0];
 			element.style.display = "none";
 				
 		}
@@ -476,7 +481,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	 * Load the appropriate svg diagram to the svg viewer on the organs panel.
 	 */
 	var setupOrgansNerveSVG = function() {
-			var svgObject = document.getElementById("organSVG");
+			var svgObject = dialogObject.find("#organSVG")[0];
 			if (nerveMap["svg"]["url"]) {
 				svgObject.setAttribute('data', nerveMap["svg"]["url"] );	
 			}
@@ -552,7 +557,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			var blueValue = parseInt(value[2]);
 			
 			var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-			document.getElementById("organsSecondaryDisplayArea").style.backgroundColor = backgroundColourString;
+			dialogObject.find("#organsSecondaryDisplayArea")[0].style.backgroundColor = backgroundColourString;
 			var colour = new THREE.Color(backgroundColourString);
 			var internalRenderer = organsRenderer.getThreeJSRenderer();
 			internalRenderer.setClearColor( colour, 1 );
@@ -586,7 +591,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 		var control = new organsControl();
 		var controller = organGui.addColor(control, 'Background');
 		controller.onChange(organsBackGroundChanged());
-		var customContainer = document.getElementById("organGui").append(organGui.domElement);
+		var customContainer = dialogObject.find("#organGui")[0].append(organGui.domElement);
 		var resetViewButton = { 'Reset View':function(){ organsRenderer.resetView() }};
 		var viewAllButton = { 'View All':function(){ organsRenderer.viewAll() }};
 		organGuiControls.Speed = 500.0;
@@ -648,7 +653,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 
 	function onImageMouseMove( event ) {
 		if (imgRightClickDown == true) {
-			targetElement = document.getElementById("organsImgContainer");
+			targetElement = dialogObject.find("#organsImgContainer")[0];
 			targetElement.scrollTop += event.movementY;
 			targetElement.scrollLeft -= event.movementX;
 		}
@@ -683,35 +688,30 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	 * Add UI callbacks after html page has been loaded.
 	 */
 	var addUICallback = function() {
-		var organLinkeButton = document.getElementById("organLinkButton");
+		var organLinkeButton = dialogObject.find("#organLinkButton")[0];
 		organLinkeButton.onclick = function() { openOrganModelLink() };
-		var organsScreenButton = document.getElementById("organsScreenButton");
-		organsScreenButton.onclick = function() { expandCollapseOrgans(organsScreenButton, 'organsDisplayPort') };
-		timeSlider = document.getElementById("organ_animation_slider");
+		//var organsScreenButton = dialogObject.find("#organsScreenButton")[0];
+		//organsScreenButton.onclick = function() { expandCollapseOrgans(organsScreenButton, 'organsDisplayPort') };
+		timeSlider = dialogObject.find("#organ_animation_slider")[0];
 		timeSlider.oninput= function() { timeSliderChanged() };
-		texSlider = document.getElementById("texSlider");
+		texSlider = dialogObject.find("#texSlider")[0];
 		texSlider.oninput= function() { texSliderChanged() };
-		var organsPlayToggle = document.getElementById("organsPlayToggle");
+		var organsPlayToggle = dialogObject.find("#organsPlayToggle")[0];
 		organsPlayToggle.onclick = function() { playPauseAnimation(organsPlayToggle) };
-		var element = document.getElementById("organsImgContainer");
+		var element = dialogObject.find("#organsImgContainer")[0];
 		enableImageMouseInteraction(element);
 	}
 	
+  var createNewDialog = function(link) {
+    dialogObject = PJP.createDialogContainer(localDialogName, link);
+    addUICallback();
+    initialiseOrgansVisualisation();
+    UIIsReady = true;
+  }
+	
 	var loadHTMLComplete = function(link) {
 		return function(event) {
-			var localDOM = document.getElementById(PanelName);
-			var childNodes = null;
-			if (link.import.body !== undefined)
-				childNodes = link.import.body.childNodes;
-			else if (link.childNodes !== undefined)
-				childNodes = link.childNodes;
-			for (i = 0; i < childNodes.length; i++) {
-				localDOM.appendChild(childNodes[i]);
-			}
-			addUICallback();
-			initialiseOrgansVisualisation();
-			document.head.removeChild(link);
-			UIIsReady = true;
+		  createNewDialog(link);
 		}
 	}
 	
@@ -721,14 +721,21 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 	 * 
 	 * @async 
 	 */
-	var initialise = function() {
-		var link = document.createElement('link');
-		link.rel = 'import';
-		link.href = 'snippets/organsViewer.html';
-		link.onload = loadHTMLComplete(link);
-		link.onerror = loadHTMLComplete(link);
-		document.head.appendChild(link);
-	}
+	 var initialise = function() {
+     var link = document.getElementById("organsSnippet");
+      if (link == undefined) {
+        link = document.createElement('link');
+        link.id = "organsSnippet";
+        link.rel = 'import';
+        link.href = 'snippets/organsViewer.html';
+        link.onload = loadHTMLComplete(link);
+        link.onerror = loadHTMLComplete(link);
+        document.head.appendChild(link);  
+      } else {
+        createNewDialog(link);
+      }
+  }
+	
 	
 	var getOrganDetails = function(speciesName, systemName, partName) {
 		if (speciesName && systemName && partName) {
@@ -862,7 +869,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 			
 		}
 				
-		var element = document.getElementById("texSlider");
+		var element = dialogObject.find("#texSlider")[0];
 		element.style.display = "none";
 	}
 	
@@ -907,7 +914,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
 					externalOrganLink = organsDetails.externalLink;
 					nerveMap = organsDetails.nerveMap;
 				}
-				var button = document.getElementById("organLinkButton");
+				var button = dialogObject.find("#organLinkButton")[0];
 				if (externalOrganLink) {
 					button.style.visibility = "visible";
 				} else {
@@ -1095,11 +1102,11 @@ PJP.OrgansViewer = function(ModelsLoaderIn, PanelName)  {
            	 */
                function rootIsReady() {
                  return function(root) {
-                   var height = document.getElementById("organsRootImage").height;
-                   var width = document.getElementById("organsRootImage").width;
+                   var height = dialogObject.find("#organsRootImage")[0].height;
+                   var width = dialogObject.find("#organsRootImage")[0].width;
                    imageCombiner = new ImageCombiner();
                    imageCombiner.setSize(width, height);
-                   imageCombiner.addElement(document.getElementById("organsRootImage"));
+                   imageCombiner.addElement(dialogObject.find("#organsRootImage")[0]);
                    var container = dom.byId("organsImgContainer");
                    model.getChildren(root, forEachChildrenCreateImageElements(container));
                    var bitmap = imageCombiner.getCombinedImage();

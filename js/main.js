@@ -55,14 +55,14 @@ PJP.Main = function()  {
    */
   var initialiseMain = function() {
     modelsLoader = new PJP.ModelsLoader();
-    bodyViewer = new PJP.BodyViewer(modelsLoader, "bodyDisplayPort");
-    organsViewer = new PJP.OrgansViewer(modelsLoader, "organsDisplayPort");
-    tissueViewer = new PJP.TissueViewer("tissueDisplayPort");
-    cellPanel = new PJP.CellPanel("cellDisplayPort");
-    modelPanel = new PJP.ModelPanel("modelDisplayPort");
-    modelPanel.enableSVGController('testsvg');
+    bodyViewer = new PJP.BodyViewer(modelsLoader, "Body");
     modelsLoader.addSystemMetaIsReadyCallback(systemMetaReadyCallback());
     modelsLoader.initialiseLoading();
+    organsViewer = new PJP.OrgansViewer(modelsLoader, "Organ");
+    tissueViewer = new PJP.TissueViewer("Tissue");
+    cellPanel = new PJP.CellPanel("Cell");
+    modelPanel = new PJP.ModelPanel("Model");
+    modelPanel.enableSVGController('testsvg');
     bodyViewer.setOrgansViewer(organsViewer);
     organsViewer.setTissueViewer(tissueViewer);
     organsViewer.setCellPanel(cellPanel);
@@ -93,12 +93,9 @@ PJP.Main = function()  {
   }
   
   var initialise = function() {
-    var link = document.createElement('link');
-    link.rel = 'import';
-    link.href = 'snippets/main.html';
-    link.onload = loadHTMLComplete(link);
-    link.onerror = loadHTMLComplete(link);
-    document.head.appendChild(link);  
+    initialiseMain();
+    addUICallback();
+    UIIsReady = true;
   }
 
   initialise();

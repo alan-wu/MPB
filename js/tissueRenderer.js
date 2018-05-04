@@ -8,7 +8,7 @@
  * @author Alan Wu
  * @returns {PJP.TissueViewer}
  */
-PJP.TissueViewer = function(PanelName)  {
+PJP.TissueViewer = function(DialogName)  {
 	//ZincScene for this renderer.
 	var textureScene;
 	var sceneFirstPass, renderer;
@@ -30,6 +30,8 @@ PJP.TissueViewer = function(PanelName)  {
 	var UIIsReady = false;
 	var cellPanel = undefined;
 	var modelPanel = undefined;
+  var dialogObject = undefined;
+  var localDialogName = DialogName;
 	var _this = this;
 	
 	this.setCellPanel = function(CellPanelIn) {
@@ -97,11 +99,11 @@ PJP.TissueViewer = function(PanelName)  {
 			if (intersects[0] !== undefined && intersects[0].object !== undefined &&
 					(intersects[0].object.geometry instanceof THREE.SphereGeometry)) {
 				showCellTooltip(1, window_x, window_y);
-				document.getElementById("tissueDisplayArea").style.cursor = "pointer";
+				dialogObject.find("#tissueDisplayArea")[0].style.cursor = "pointer";
 			}
 			else {
 				hideCellTooltip();
-				document.getElementById("tissueDisplayArea").style.cursor = "auto";
+				dialogObject.find("#tissueDisplayArea")[0].style.cursor = "auto";
 			}
 		}	
 	};
@@ -242,7 +244,7 @@ PJP.TissueViewer = function(PanelName)  {
 		
 		//create the renderer
 		var container = document.createElement( 'div' );
-		document.getElementById("tissueDisplayArea").appendChild( container );
+		dialogObject.find("#tissueDisplayArea")[0].appendChild( container );
 		container.style.height = "100%"
 		container.style.backgroundColor = "white";
 		tissueRenderer = new Zinc.Renderer(container, window);
@@ -374,7 +376,7 @@ PJP.TissueViewer = function(PanelName)  {
 		gui = new dat.GUI({autoPlace: false});
 		gui.domElement.id = 'gui';
 		gui.close();
-		var customContainer = document.getElementById("tissueGui").append(gui.domElement);
+		var customContainer = dialogObject.find("#tissueGui")[0].append(gui.domElement);
 		var controller = gui.addColor(guiControls, 'Background');
 		controller.onChange(volumeRenderBackGroundChanged());
 		var modelSelected = gui.add(guiControls, 'model', [ 'collagen', 'crop', 'collagen_large', 'crop_large'] );
@@ -399,11 +401,11 @@ PJP.TissueViewer = function(PanelName)  {
 	}
 	
 	var addUICallback = function() {
-		var callbackElement = document.getElementById("cellButton1");
+		var callbackElement = dialogObject.find("#cellButton1")[0];
 		callbackElement.onclick = function() { openCellModelUI('Cardiac myocyte'); };
-		callbackElement = document.getElementById("cellButton2");
+		callbackElement = dialogObject.find("#cellButton2")[0];
 		callbackElement.onclick = function() { openCellModelUI('Cardiac fibroblast'); };
-		callbackElement = document.getElementById("cellButton3");
+		callbackElement = dialogObject.find("#cellButton3")[0];
 		callbackElement.onclick = function() { openConstitutiveLawsLink(); };
 	}
 	
@@ -417,53 +419,54 @@ PJP.TissueViewer = function(PanelName)  {
 							alert('Failed to download "' + url + '"');});
 	}
 	
-	var loadHTMLComplete = function(link) {
-		return function(event) {
-			var localDOM = document.getElementById(PanelName);
-			var childNodes = null;
-			if (link.import.body !== undefined)
-				childNodes = link.import.body.childNodes;
-			else if (link.childNodes !== undefined)
-				childNodes = link.childNodes;
-			for (i = 0; i < childNodes.length; i++) {
-				localDOM.appendChild(childNodes[i]);
-			}
-			addUICallback();
-			volumeRenderInit();
-			document.head.removeChild(link);
-			UIIsReady = true;
-		}
-	}
-	
-	
-	/**
-	 * Initialise loading of the page, this is called when 
-	 * the {@link PJP.TissueViewer} is created.
-	 * @async
-	 */
-	var initialise = function() {
-		var link = document.createElement('link');
-		link.rel = 'import';
-		link.href = 'snippets/tissueViewer.html';
-		link.onload = loadHTMLComplete(link);
-		link.onerror = loadHTMLComplete(link);
-		document.head.appendChild(link);	
-	}
+  var createNewDialog = function(link) {
+    dialogObject = PJP.createDialogContainer(localDialogName, link);
+    addUICallback();
+    volumeRenderInit();
+    UIIsReady = true;
+  }
+  
+  var loadHTMLComplete = function(link) {
+    return function(event) {
+      createNewDialog(link);
+    }
+  }
+  
+  /**
+   * Initialise loading of the page, this is called when 
+   * the {@link PJP.TissueViewer} is created.
+   * @async
+   */
+  var initialise = function() {
+    var link = document.getElementById("#tissueSnippet");
+    if (link == undefined) {
+      link = document.createElement('link');
+      link.id = "tissueSnippet";
+      link.rel = 'import';
+      link.href = 'snippets/tissueViewer.html';
+      link.onload = loadHTMLComplete(link);
+      link.onerror = loadHTMLComplete(link);
+      document.head.appendChild(link);  
+    } else {
+      createNewDialog(link);
+    }
+  }
 	
 	/**
 	 * Set the title string for {@link PJP.TissueViewer}.
 	 * @param {String} text - Tissue viewer title to be set.
 	 */
 	this.setTissueTitleString = function(text) {
-	 	var text_display = document.getElementById('TissueTitle');
-	 	text_display.innerHTML = text;
+	  console.log("Fix setOrgansPanelTitle");
+	 	//var text_display = document.getElementById('TissueTitle');
+	 	//text_display.innerHTML = text;
 	}
  
 	this.showButtons = function(flag) {
 		if (flag)
-			document.getElementById("cellButtonContainer").style.visibility = "visible";
+			dialogObject.find("#cellButtonContainer")[0].style.visibility = "visible";
 		else
-			document.getElementById("cellButtonContainer").style.visibility = "hiddenlink ";
+			dialogObject.find("#cellButtonContainer")[0].style.visibility = "hiddenlink ";
 	}
 	
 	/**
