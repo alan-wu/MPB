@@ -127,6 +127,7 @@ PJP.ModelPanel = function(DialogName)  {
   
   var loadHTMLComplete = function(link) {
     return function(event) {
+      link.isReady = true;
       createNewDialog(link);
     }
   }
@@ -138,15 +139,17 @@ PJP.ModelPanel = function(DialogName)  {
    */
    var initialise = function() {
      var link = document.getElementById("modelSnippet");
-      if (link == undefined) {
+     if (link == undefined) {
         link = document.createElement('link');
         link.id = "modelSnippet";
         link.rel = 'import';
         link.href = 'snippets/modelPanel.html';
         link.onload = loadHTMLComplete(link);
         link.onerror = loadHTMLComplete(link);
-        document.head.appendChild(link);  
-      } else {
+        document.head.appendChild(link);
+     } else if (link.isReady !== true) {
+       setTimeout(function(){initialise()}, 500);
+     } else {
         createNewDialog(link);
       }
   }

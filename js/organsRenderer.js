@@ -711,6 +711,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	
 	var loadHTMLComplete = function(link) {
 		return function(event) {
+		  link.isReady = true;
 		  createNewDialog(link);
 		}
 	}
@@ -730,7 +731,9 @@ PJP.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
         link.href = 'snippets/organsViewer.html';
         link.onload = loadHTMLComplete(link);
         link.onerror = loadHTMLComplete(link);
-        document.head.appendChild(link);  
+        document.head.appendChild(link);
+      } else if (link.isReady !== true) {
+        setTimeout(function(){initialise()}, 500);
       } else {
         createNewDialog(link);
       }

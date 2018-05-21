@@ -466,6 +466,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 	
 	var loadHTMLComplete = function(link) {
 		return function(event) {
+		  link.isReady = true;
 		  createNewDialog(link);
 		}
 	}
@@ -477,6 +478,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 	 */
 	var initialise = function() {
 	   var link = document.getElementById("bodySnippet");
+
 	    if (link == undefined) {
 	      link = document.createElement('link');
 	      link.id = "bodySnippet";
@@ -484,7 +486,9 @@ PJP.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 	      link.href = 'snippets/bodyViewer.html';
 	      link.onload = loadHTMLComplete(link);
 	      link.onerror = loadHTMLComplete(link);
-	      document.head.appendChild(link);  
+	      document.head.appendChild(link);
+	    } else if (link.isReady !== true) {
+	      setTimeout(function(){initialise()}, 500);
 	    } else {
 	      createNewDialog(link);
 	    }

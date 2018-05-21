@@ -23,7 +23,7 @@ PJP.createDialogContainer = function (DialogNameIn, sourceElement) {
           height: 500});
   var childNodes = null;
   var parent = null;
-  if (sourceElement.import.body !== undefined)
+  if (sourceElement.import !== undefined && sourceElement.import.body !== undefined)
     parent = sourceElement.import.body.cloneNode(true);
   else if (sourceElement.childNodes !== undefined)
     parent = sourceElement.cloneNode(true);
@@ -31,7 +31,7 @@ PJP.createDialogContainer = function (DialogNameIn, sourceElement) {
   for (i = 0; i < childNodes.length; i++) {
     e1[0].appendChild(childNodes[i]);
   }
-  
+
   return e1;
 }
 
