@@ -1,3 +1,7 @@
+var dat = require("./dat.gui.js");
+require("./styles/dat-gui-swec.css");
+require("./styles/my_styles.css");
+
 /**
  * Provide a panel for viewing system models. Currently, this panel displays
  * bond graph of different system model in the form of interactive SVG diagram. Interactions with
@@ -9,7 +13,7 @@
  * @author Alan Wu
  * @returns {PJP.ModelPanel}
  */
-PJP.ModelPanel = function(DialogName)  {
+exports.ModelPanel = function(DialogName)  {
 	var modelGui = undefined;
 	var otherModelControls = undefined;
 	var runModelURL = undefined;
@@ -32,7 +36,7 @@ PJP.ModelPanel = function(DialogName)  {
 		if (svgController === undefined) {
 			targetSVGPanelName = svgPanelName;
 			if (document.getElementById(targetSVGPanelName) != null)
-				svgController = new PJP.SVGController(targetSVGPanelName);
+				svgController = new (require('./svgController').SVGController)(targetSVGPanelName);
 		}
 	}
 	
@@ -102,7 +106,6 @@ PJP.ModelPanel = function(DialogName)  {
 		callbackElement.onclick = function() { zoomReset(); };
 		callbackElement = dialogObject.find("#svgZoomIn")[0];
 		callbackElement.onclick = function() { zoomIn(0.2) };	
-			
 	}
 	
 	var initialiseModelPanel = function() {
@@ -118,42 +121,21 @@ PJP.ModelPanel = function(DialogName)  {
 			_this.enableSVGController(targetSVGPanelName);
 	}
 	
-  var createNewDialog = function(link) {
-    dialogObject = PJP.createDialogContainer(localDialogName, link);
+  var createNewDialog = function(data) {
+    dialogObject = require("./utility").createDialogContainer(localDialogName, data);
     initialiseModelPanel();
     addUICallback();
     UIIsReady = true;
   }
-  
-  var loadHTMLComplete = function(link) {
-    return function(event) {
-      link.isReady = true;
-      createNewDialog(link);
-    }
-  }
-  
+    
   /**
    * Initialise loading of the page, this is called when 
    * the {@link PJP.ModelPanel} is created.
    * @async
    */
-   var initialise = function() {
-     var link = document.getElementById("modelSnippet");
-     if (link == undefined) {
-        link = document.createElement('link');
-        link.id = "modelSnippet";
-        link.rel = 'import';
-        link.href = 'snippets/modelPanel.html';
-        link.onload = loadHTMLComplete(link);
-        link.onerror = loadHTMLComplete(link);
-        document.head.appendChild(link);
-     } else if (link.isReady !== true) {
-       setTimeout(function(){initialise()}, 500);
-     } else {
-        createNewDialog(link);
-      }
+  var initialise = function() {
+    createNewDialog(require("./snippets/modelPanel.html"));
   }
 	
 	initialise();
-
 }

@@ -7,7 +7,7 @@
  * @author Alan Wu
  * @returns {PJP.SVGController}
  */
-PJP.SVGController = function(SVGPanelName)  {
+exports.SVGController = function(SVGPanelName)  {
 	var svgObject = document.getElementById(SVGPanelName);
 	//used for tracking right click
 	var svgRightClickDown = false;

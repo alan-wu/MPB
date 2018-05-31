@@ -1,3 +1,6 @@
+var dat = require("./dat.gui.js");
+require("./styles/dat-gui-swec.css");
+
 /**
  * Used for viewing cell model. This currently contains an image.
  * 
@@ -7,7 +10,7 @@
  * @author Alan Wu
  * @returns {PJP.CellPanel}
  */
-PJP.CellPanel = function(DialogName)  {
+exports.CellPanel = function(DialogName)  {
 
 	//dat.gui container for cellGui
 	var cellGui = undefined;
@@ -85,35 +88,15 @@ PJP.CellPanel = function(DialogName)  {
 		var customContainer = dialogObject.find("#cellGui")[0].append(cellGui.domElement);
 	}
 	
-  var createNewDialog = function(link) {
-    dialogObject = PJP.createDialogContainer(localDialogName, link);
+  var createNewDialog = function(data) {
+    dialogObject = require("./utility").createDialogContainer(localDialogName, data);
     initialiseCellPanel();
     UIIsReady = true;
+    delete link;
   }
-  
-  var loadHTMLComplete = function(link) {
-    return function(event) {
-      link.isReady = true;
-      createNewDialog(link);
-    }
-  }
-	
 	
 	 var initialise = function() {
-     var link = document.getElementById("cellSnippet");
-      if (link == undefined) {
-        link = document.createElement('link');
-        link.id = "cellSnippet";
-        link.rel = 'import';
-        link.href = 'snippets/cellPanel.html';
-        link.onload = loadHTMLComplete(link);
-        link.onerror = loadHTMLComplete(link);
-        document.head.appendChild(link);
-      } else if (link.isReady !== true) {
-        setTimeout(function(){initialise()}, 500);
-      } else {
-        createNewDialog(link);
-      }
+	   createNewDialog(require("./snippets/cellPanel.html"));
   }
 	
 	initialise();

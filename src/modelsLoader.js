@@ -6,7 +6,7 @@
  * @author Alan Wu
  * @returns {PJP.ModelsLoader}
  */
-PJP.ModelsLoader = function()  {
+exports.ModelsLoader = function()  {
 	var _this = this;
 	var metaFilesReady = false;
 	var bodyDirectoryPrefix = "models/body";

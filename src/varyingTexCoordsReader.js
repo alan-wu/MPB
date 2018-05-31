@@ -1,5 +1,5 @@
 
-PJP.VaryingTexCoordsReader = function(sceneIn) {
+exports.VaryingTexCoordsReader = function(sceneIn) {
 	
 	var _this = this;
 	var finishCallbackFunction = undefined;

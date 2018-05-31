@@ -3243,7 +3243,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _dom2.default.addClass(li, 'folder');
 	    return gui;
 	  },
-	
+	  
+	  removeFolder: function removeFolder(name) {
+	    var folder = this.__folders[name];
+	    if (!folder) {
+	      return;
+	    }
+	    folder.close();
+	    this.__ul.removeChild(folder.domElement.parentNode);
+	    delete this.__folders[name];
+	    this.onResize();
+	  },
+	  
 	  open: function open() {
 	    this.closed = false;
 	  },

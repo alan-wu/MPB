@@ -1,3 +1,9 @@
+var dat = require("./dat.gui.js");
+require("./styles/dat-gui-swec.css");
+require("./styles/my_styles.css");
+var THREE = require("three");
+var ITEM_LOADED = require("./utility").ITEM_LOADED;
+
 /**
  * Provides rendering of the 3D-scaffold data in the dom of the provided id with models
  * defined in the modelsLoader.
@@ -8,11 +14,12 @@
  * @author Alan Wu
  * @returns {PJP.BodyViewer}
  */
-PJP.BodyViewer = function(ModelsLoaderIn, DialogName)  {
+exports.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 
 	var currentScene = undefined;
 	var currentSpecies = 'human';
 	var bodyScenes = new Array();
+	var toolTip = undefined;
 	bodyScenes['human'] = undefined;
 	bodyScenes['pig'] = undefined;
 	bodyScenes['mouse'] = undefined;
@@ -99,31 +106,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 	this.setOrgansViewer = function(OrgansViewerIn) {
 		organsViewer = OrgansViewerIn;
 	}
-	
-	/**
-	 * Display the provided name with a tool tip.
-	 * 
-	 * @param {String} name - String to display
-	 * @param {Number} x - windows x coordinates
-	 * @param {Number} y - windows y coordinates
-	 */
-	var showBodyTooltip = function(name, x, y) {
-		setToolTipText(name);
-		tooltipcontainerElement.style.left = x +"px";
-		tooltipcontainerElement.style.top = (y - 20) + "px";
-		tipElement.style.visibility = "visible";
-		tipElement.style.opacity = 1;
-		tiptextElement.style.visibility = "visible";
-		tiptextElement.style.opacity = 1;
-	}
-	
-	var hideBodyTooltip = function() {
-		tipElement.style.visibility = "hidden";
-		tipElement.style.opacity = 0;
-		tiptextElement.style.visibility = "hidden";
-		tiptextElement.style.opacity = 0;
-	}
-	
+
 	/**
 	 * This callback is triggered when a body part is clicked.
 	 * @callback
@@ -167,7 +150,8 @@ PJP.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 				if (intersects[i] !== undefined && (intersects[ i ].object.name !== undefined)) {
 					if (!intersects[ i ].object.name.includes("Body")) {
 						dialogObject.find("#bodyDisplayArea")[0].style.cursor = "pointer";
-						showBodyTooltip(intersects[ i ].object.name, window_x, window_y);
+				    toolTip.setText(intersects[ i ].object.name);
+				    toolTip.show(window_x, window_y);
 						if (currentHoveredMaterial &&
 						  intersects[ i ].object.material != currentHoveredMaterial && currentHoveredMaterial != currentSelectedMaterial) {
 							currentHoveredMaterial.emissive.setHex(0x000000);
@@ -191,9 +175,10 @@ PJP.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 			currentHoveredMaterial = undefined;
 			if (bodyHovered) {
 				dialogObject.find("#bodyDisplayArea")[0].style.cursor = "pointer";
-				showBodyTooltip("Body", window_x, window_y);
+        toolTip.setText("Body");
+        toolTip.show(window_x, window_y);
 			} else {
-				hideTooltip();
+			  toolTip.hide();
 				dialogObject.find("#bodyDisplayArea")[0].style.cursor = "auto";
 			}
 			
@@ -205,7 +190,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 			var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
 			if (systemMeta[systemName].hasOwnProperty(name) && systemMeta[systemName][name].geometry) {
 				currentScene.removeZincGeometry(systemMeta[systemName][name].geometry);
-				systemMeta[systemName][name]["loaded"] = PJP.ITEM_LOADED.FALSE;
+				systemMeta[systemName][name]["loaded"] = ITEM_LOADED.FALSE;
 				systemMeta[systemName][name].geometry = undefined;
 			}
 			
@@ -352,10 +337,10 @@ PJP.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 	var _addBodyPartCallback = function(systemName, partName, item, scaling, useDefautColour, startup) {
 		return function(geometry) {
 			//_transformBodyPart(key, geometry);
-			item["loaded"] = PJP.ITEM_LOADED.TRUE;
+			item["loaded"] = ITEM_LOADED.TRUE;
 			item.geometry = geometry;
 			if (startup)
-				_addSystemPartGuiControl(systemName, partName, item, geometry, (item["loaded"] == PJP.ITEM_LOADED.TRUE));
+				_addSystemPartGuiControl(systemName, partName, item, geometry, (item["loaded"] == ITEM_LOADED.TRUE));
 			if (scaling == true) {
 				geometry.morph.scale.x = 1.00;
 				geometry.morph.scale.y = 1.00;
@@ -405,7 +390,8 @@ PJP.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 	 * 
 	 */
 	var initialiseBodyRenderer = function() {
-		bodyRenderer = PJP.setupRenderer("bodyDisplayArea");
+	  toolTip = new (require("./tooltip").ToolTip)(dialogObject);
+		bodyRenderer = require("./utility").setupRenderer("bodyDisplayArea");
 		bodyGui = new dat.GUI({autoPlace: false});
 		bodyGui.domElement.id = 'gui';
 		var control = new bodyControl();
@@ -457,50 +443,28 @@ PJP.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 		speciesSelected.onchange = function() { changeSpecies(speciesSelected) };
 	}
 	
-	 var createNewDialog = function(link) {
-	    dialogObject = PJP.createDialogContainer(localDialogName, link);
-	    addUICallback();
-	    initialiseBodyRenderer();
-	    UIIsReady = true;
-	  }
-	
-	var loadHTMLComplete = function(link) {
-		return function(event) {
-		  link.isReady = true;
-		  createNewDialog(link);
-		}
-	}
-		
+	 var createNewDialog = function(data) {
+	   dialogObject = require("./utility").createDialogContainer(localDialogName, data);
+	   addUICallback();
+	   initialiseBodyRenderer();
+	   UIIsReady = true;
+	 }
 	/**
 	 * Initialise the {@link PJP.BodyViewer}, it will load snippets/bodyViewer.html 
 	 * which contains the general layout of this viewer, this is called when 
 	 * the {@link PJP.BodyViewer} is created.
 	 */
 	var initialise = function() {
-	   var link = document.getElementById("bodySnippet");
-
-	    if (link == undefined) {
-	      link = document.createElement('link');
-	      link.id = "bodySnippet";
-	      link.rel = 'import';
-	      link.href = 'snippets/bodyViewer.html';
-	      link.onload = loadHTMLComplete(link);
-	      link.onerror = loadHTMLComplete(link);
-	      document.head.appendChild(link);
-	    } else if (link.isReady !== true) {
-	      setTimeout(function(){initialise()}, 500);
-	    } else {
-	      createNewDialog(link);
-	    }
+    createNewDialog(require("./snippets/bodyViewer.html"));
 	}
 	
 	var readModel = function(systemName, partName, startup) {
 		var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
 		item = systemMeta[systemName][partName];
-		if (item["loaded"] ==  PJP.ITEM_LOADED.FALSE) {
+		if (item["loaded"] ==  ITEM_LOADED.FALSE) {
 			var downloadPath = item["BodyURL"];
 			var scaling = false;
-			item["loaded"] =  PJP.ITEM_LOADED.DOWNLOADING;
+			item["loaded"] =  ITEM_LOADED.DOWNLOADING;
 			if (item["FileFormat"] == "JSON") {
 				if (systemName == "Musculo-skeletal" || systemName == "Skin (integument)")
 					scaling = true;
@@ -517,7 +481,7 @@ PJP.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 		for (var partName in partMap) {
 			if (partMap.hasOwnProperty(partName)) {
 				var item = partMap[partName]; toggleSystem
-				item["loaded"] =  PJP.ITEM_LOADED.FALSE;
+				item["loaded"] = ITEM_LOADED.FALSE;
 				if (item["loadAtStartup"] == true) {
 					readModel(systemName, partName, true);
 				} else {

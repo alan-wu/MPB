@@ -86,7 +86,7 @@ input:checked + .switchSlider:before {
 }
 
 #tooltipcontainer {
-	position: absolute;
+	position: fixed;
 	background-color: #fff;
 	pointer-events: none;
 	cursor: pointer;

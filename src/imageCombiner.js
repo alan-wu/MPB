@@ -6,7 +6,7 @@
  * @author Alan Wu
  * @returns {ImageCombiner}
  */
-ImageCombiner = function()  {
+exports.ImageCombiner = function()  {
 	var canvas = undefined;
 	var ctx = undefined;
 	var _this = this;

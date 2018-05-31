@@ -1,3 +1,8 @@
+var dat = require("./dat.gui.js");
+require("./styles/dat-gui-swec.css");
+require("./styles/my_styles.css");
+var THREE = require('three');
+
 /**
  * Viewer of 3D-organs models. Users can toggle on/off different views. Data is displayed instead
  * if models are not available.
@@ -8,7 +13,7 @@
  * @author Alan Wu
  * @returns {PJP.OrgansViewer}
  */
-PJP.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
+exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	var currentSpecies = undefined;
 	var pickerScene = undefined;
 	var displayScene = undefined;
@@ -47,6 +52,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	var speedSlider = undefined;
 	var dialogObject = undefined;
 	var localDialogName = DialogName;
+	var toolTip = undefined;
 	  
 	
 	// data used by dat.gui to control non-model specific controls. 
@@ -250,9 +256,8 @@ PJP.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 			if (intersects[0] !== undefined) {
 				if (displayScene.sceneName == "human/Cardiovascular/Heart") {
 					var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
-					setToolTipText("Node " + id);
-					currentHoverId = id;
-					showTooltip(window_x, window_y);
+					toolTip.setText("Node " + id);
+					toolTip.show(window_x, window_y);
 					var tissueTitle = "<strong>Tissue: <span style='color:#FF4444'>" + id + "</span></strong>";
 					if (tissueViewer) {
 						tissueViewer.setTissueTitleString(tissueTitle);
@@ -260,8 +265,8 @@ PJP.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 						tissueViewer.showCollagenVisible(true);
 					}
 				} else if (displayScene.sceneName.includes("human/Cardiovascular/Arterial")) {
-					setToolTipText("Click to show vascular model");
-					showTooltip(window_x, window_y);
+				  toolTip.setText("Click to show vascular model");
+				  toolTip.show(window_x, window_y);
 					if (tissueViewer)
 						tissueViewer.resetTissuePanel();
 					if (cellPanel)
@@ -284,18 +289,17 @@ PJP.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 			if (intersects[0] !== undefined) {
 				if (displayScene.sceneName == "human/Cardiovascular/Heart") {
 					var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
-					setToolTipText("Node " + id);
-					currentHoverId = id;
 					dialogObject.find("#organsDisplayArea")[0].style.cursor = "pointer";
-					showTooltip(window_x, window_y);
+	        toolTip.setText("Node " + id);
+	        toolTip.show(window_x, window_y);
 				} else if (displayScene.sceneName.includes("human/Cardiovascular/Arterial")) {
 					dialogObject.find("#organsDisplayArea")[0].style.cursor = "pointer";
-					setToolTipText("Click to show vascular model");
-					showTooltip(window_x, window_y);
+					toolTip.setText("Click to show vascular model");
+					toolTip.show(window_x, window_y);
 				}
 			}
 			else {
-				hideTooltip();
+			  toolTip.hide();
 				dialogObject.find("#organsDisplayArea")[0].style.cursor = "auto";
 			}
 		}
@@ -582,7 +586,8 @@ PJP.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	 * Initialise organs panel, setup primary renderer and dat.gui UI.
 	 */ 
 	var initialiseOrgansVisualisation = function() {
-		organsRenderer = PJP.setupRenderer("organsDisplayArea");
+	  toolTip = new (require("./tooltip").ToolTip)(dialogObject);
+		organsRenderer = require("./utility").setupRenderer("organsDisplayArea");
 		organsRenderer.addPreRenderCallbackFunction(updateTimeSliderCallback());
 		defaultScene = organsRenderer.getCurrentScene();
 		organGui = new dat.GUI({autoPlace: false});
@@ -604,7 +609,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	}
 
 	var imgZoom = function() {
-		var cssRule = findCSSRule("Basic styles", ".organsImg");
+		var cssRule = (require('./utility').findCSSRule)(".organsImg");
 		var zoom = currentImgZoom * 100 + "%";
 		cssRule.style["max-height"] = zoom; 
 		cssRule.style["max-width"] = zoom;
@@ -702,19 +707,12 @@ PJP.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 		enableImageMouseInteraction(element);
 	}
 	
-  var createNewDialog = function(link) {
-    dialogObject = PJP.createDialogContainer(localDialogName, link);
+  var createNewDialog = function(data) {
+    dialogObject = require("./utility").createDialogContainer(localDialogName, data);
     addUICallback();
     initialiseOrgansVisualisation();
     UIIsReady = true;
   }
-	
-	var loadHTMLComplete = function(link) {
-		return function(event) {
-		  link.isReady = true;
-		  createNewDialog(link);
-		}
-	}
 	
 	/**
 	 * initialise loading of the html layout for the organs panel, 
@@ -723,20 +721,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	 * @async 
 	 */
 	 var initialise = function() {
-     var link = document.getElementById("organsSnippet");
-      if (link == undefined) {
-        link = document.createElement('link');
-        link.id = "organsSnippet";
-        link.rel = 'import';
-        link.href = 'snippets/organsViewer.html';
-        link.onload = loadHTMLComplete(link);
-        link.onerror = loadHTMLComplete(link);
-        document.head.appendChild(link);
-      } else if (link.isReady !== true) {
-        setTimeout(function(){initialise()}, 500);
-      } else {
-        createNewDialog(link);
-      }
+      createNewDialog(require("./snippets/organsViewer.html"));
   }
 	
 	
@@ -1026,6 +1011,7 @@ PJP.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	
 	initialise();
 	
+	if (0) {
     require([
              "dojo/ready",
              "dojo/dom",
@@ -1132,4 +1118,5 @@ PJP.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
                  tree.startup();
                });
     });
+	}
 }
