@@ -2,7 +2,7 @@
 //require("./styles/bootstrap.min.css");
 require("./styles/w3.css");
 require("./styles/jquery-ui.min.css");
-require('bootstrap/dist/css/bootstrap.min.css');
+require('./styles/bootstrap.min.css');
 
 exports.BodyViewer = require("./bodyRenderer").BodyViewer;
 exports.CellPanel = require("./cell_panel").CellPanel;
