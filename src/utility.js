@@ -41,6 +41,22 @@ exports.setupRenderer = function (elementID) {
 }
 
 /**
+ * Create a {@link Zinc.Renderer} on the dom element with corresponding elementID.
+ * @param {String} elementID - id of the target dom element.
+ * @returns {Zinc.Renderer}
+ */
+exports.createRenderer = function () {
+  var localContainer = document.createElement( 'div' );
+  localContainer.style.height = "100%"
+  var localRenderer = new Zinc.Renderer(localContainer, window);
+  Zinc.defaultMaterialColor = 0xFFFF9C;
+  localRenderer.initialiseVisualisation();
+  localRenderer.playAnimation = false;
+  
+  return {"renderer":localRenderer, "container":localContainer};
+}
+
+/**
  * Find the {@link CSSStyleRule} with the provided css sheet title and selector name.
  * @param {String} sheetTitle - Style sheet with the same title.
  * @param {String} selectorText - selector string to match.

@@ -10,6 +10,9 @@ exports.ModelsLoader = require("./modelsLoader").ModelsLoader;
 exports.ModelPanel = require("./model_panel").ModelPanel;
 exports.OrgansViewer = require("./organsRenderer").OrgansViewer;
 exports.TissueViewer = require("./tissueRenderer").TissueViewer;
+exports.TissueViewer = require("./tissueRenderer").TissueViewer;
+exports.BaseDialog = require("./ui/BaseDialog").BaseDialog;
+exports.OrgansViewerDialog = require("./ui/OrgansViewerDialog").OrgansViewerDialog;
 //exports.CellPanelDialog = require("./ui/CellPanelDialog").CellPanelDialog;
 exports.VERSION = '0.2.0';
 

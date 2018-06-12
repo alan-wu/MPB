@@ -11,7 +11,7 @@ exports.ModelsLoader = function()  {
 	var metaFilesReady = false;
 	var bodyDirectoryPrefix = "models/body";
 	var organsDirectoryPrefix = "models/organsViewerModels";
-	var metaURL = bodyDirectoryPrefix + "/" + "bodyMeta.json";
+	this.systemMetaURL = bodyDirectoryPrefix + "/" + "bodyMeta.json";
 	var systemMeta = new Array();
 	systemMeta['human'] = new Array();
 	systemMeta['pig'] = new Array();
@@ -111,7 +111,7 @@ exports.ModelsLoader = function()  {
 			        	loadSystemMetaURL(metaLocations[i]);
 			    }
 			}
-			xmlhttp.open("GET", metaURL, true);
+			xmlhttp.open("GET", _this.systemMetaURL, true);
 			xmlhttp.send();
 		}
 	}

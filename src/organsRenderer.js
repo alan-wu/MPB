@@ -1,7 +1,21 @@
-var dat = require("./dat.gui.js");
-require("./styles/dat-gui-swec.css");
-require("./styles/my_styles.css");
 var THREE = require('three');
+
+//Current model's associate data, data fields, external link, nerve map informations,
+//these are proived in the organsFileMap array.
+var OrgansSceneData = function() {
+  this.currentName = "";
+  this.currentSystem = "";
+  this.currentPart = "";
+  this.currentSpecies  = "";
+  //Current model's associate data, data fields, external link, nerve map informations,
+  //these are proived in the organsFileMap array.
+  this.associateData = undefined;
+  this.dataFields = undefined;
+  this.externalOrganLink = undefined;
+  this.nerveMap = undefined;
+  this.nerveMapIsActive = false;
+}
+
 
 /**
  * Viewer of 3D-organs models. Users can toggle on/off different views. Data is displayed instead
@@ -13,75 +27,47 @@ var THREE = require('three');
  * @author Alan Wu
  * @returns {PJP.OrgansViewer}
  */
-exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
-	var currentSpecies = undefined;
+exports.OrgansViewer = function(ModelsLoaderIn)  {
 	var pickerScene = undefined;
 	var displayScene = undefined;
 	var defaultScene = undefined;
 	var secondaryScene = undefined;
 	var tertiaryScene = undefined;
 	var nerveMapScene = undefined;
-	var windowWidth, windowHeight;
-	var organGui;
+	var displayArea = undefined;
 	var currentImgZoom = 1.0;
-	var organGuiControls = new function() {
-		this.Speed = 500;
-	};
+	var rendererContainer = undefined;
 	var imgRightClickDown = false;
 	var comparedSceneIsOn = false;
 	var additionalSpecies = undefined;
-	var currentName = "";
-	var currentSystem = "";
-	var currentPart = "";
-	var currentSpecies  = "";
-	//Current model's associate data, data fields, external link, nerve map informations,
-	//these are proived in the organsFileMap array.
-	var associateData = undefined;
-	var dataFields = undefined;
-	var externalOrganLink = undefined;
-	var nerveMap = undefined;
-	var nerveMapIsActive = false;
+	var sceneData = new OrgansSceneData();
 	var timeoutID = 0;
-	var fullScreen = false;
-	var organPartsGui;
-	// data used by dat.gui to control model specific controls. 
-	var organPartGuiControls = function() {
-	};
-	var timeSlider = undefined;
-	var texSlider = undefined;
-	var speedSlider = undefined;
-	var dialogObject = undefined;
-	var localDialogName = DialogName;
 	var toolTip = undefined;
-	  
-	
-	// data used by dat.gui to control non-model specific controls. 
-	var organsControl = function() {
-		  this.Background = [ 255, 255, 255 ]; // RGB array
-	};
+	/**new**/
+	var timeChangedCallbacks = new Array();
+	var sceneChangedCallbacks = new Array();
+	var organPartAddedCallbacks = new Array();
 	/**
 	 * {ImageCombiner}.
 	 */
 	var imageCombiner = undefined;
-	
-	var UIIsReady = false;
 	var tissueViewer = undefined;
 	var cellPanel = undefined;
 	var modelPanel = undefined;
 	var modelsLoader = ModelsLoaderIn;
 	var _this = this;
-	
+
 	//ZincRenderer for the primary display of model.
 	var organsRenderer = null;
 	//Secondary renderer, used for comparing species models.
 	var secondaryRenderer = null;
 	
 	//Array for storing different species models urls.
-	var organsFileMap = new Array();
+	var organsFileMap = {};
 	
 	//Array for storing rat's models urls and its associated data.
-	var ratOrgansFileMap = new Array();
-	ratOrgansFileMap["Cardiovascular"] = new Array();
+	var ratOrgansFileMap = {};
+	ratOrgansFileMap["Cardiovascular"] = {};
 	ratOrgansFileMap["Cardiovascular"]["Kidneys-Arteries"] = {
 			view: "rat/cardiovascular/arteries/rat_kidneys_view.json",
 			meta: "rat/cardiovascular/arteries/rat_kidneys_1.json",
@@ -90,10 +76,10 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	};
 	
 	//Array for storing human's models urls and its associated data.
-	var humanOrgansFileMap = new Array();
-	humanOrgansFileMap["Cardiovascular"] = new Array();
-	humanOrgansFileMap["Digestive"] = new Array();
-	humanOrgansFileMap["Respiratory"] = new Array();
+	var humanOrgansFileMap = {};
+	humanOrgansFileMap["Cardiovascular"] = {};
+	humanOrgansFileMap["Digestive"] = {};
+	humanOrgansFileMap["Respiratory"] = {};
 	humanOrgansFileMap["Cardiovascular"]["Heart"] = {
 			view: "cardiovascular/heart/heart_view.json",
 			meta: "cardiovascular/heart/animated_nerve_1.json",
@@ -137,7 +123,7 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 			meta: "digestive/stomach_1.json",
 			picker: undefined,
 			associateData: undefined,
-			nerveMap: new Array()};
+			nerveMap: {}};
 	humanOrgansFileMap["Digestive"]["Stomach"].nerveMap["threed"] = {meta: "digestive/stomach/nerve_map/3d/stomach_nerve_3d_1.json", 
 			view: "digestive/stomach/nerve_map/3d/stomach_nerve_3d_view.json"};
 	humanOrgansFileMap["Digestive"]["Stomach"].nerveMap["twod"] = {meta: "digestive/stomach/nerve_map/2d/stomach_nerve_2d_1.json",
@@ -149,6 +135,8 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 			meta: "respiratory/lungs_1.json",
 			picker: undefined,
 			associateData: undefined};
+  humanOrgansFileMap["Cardiovascular"]["ScaffoldHeart"] = {
+      meta: "cardiovascular/scaffold_heart/heart_scaffold_metadata.json"};
 	
 	organsFileMap['human'] = humanOrgansFileMap;
 	organsFileMap['rat'] = ratOrgansFileMap;
@@ -165,85 +153,87 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	this.setModelPanel = function(ModelPanelIn) {
 		modelPanel = ModelPanelIn;
 	}
-	
-	var getPos = function(el) {
-	    for (var lx=0, ly=0;
-			el != null;
-			lx += el.offsetLeft, ly += el.offsetTop, el = el.offsetParent);
-		return {x: lx,y: ly};
-	}
-	
+
 	/**
-	 * Used to update internal timeer in scene when time slider has changed.
+	 * Used to update internal timer in scene when time slider has changed.
 	 */
-	var timeSliderChanged = function() {
-		if (!nerveMapIsActive) {
+	this.updateTime = function(value) {
+		if (!sceneData.nerveMapIsActive) {
 			if (pickerScene)
-				pickerScene.setMorphsTime(timeSlider.value * 30);
+				pickerScene.setMorphsTime(value * 30);
 			if (displayScene)
-				displayScene.setMorphsTime(timeSlider.value * 30);
+				displayScene.setMorphsTime(value * 30);
 		} else if (nerveMapScene) {
-				nerveMapScene.setMorphsTime(timeSlider.value * 30);
-				if (nerveMap && nerveMap.additionalReader)
-					nerveMap.additionalReader.setTime(timeSlider.value / 100.0);
+				nerveMapScene.setMorphsTime(value * 30);
+				if (sceneData.nerveMap && sceneData.nerveMap.additionalReader)
+					sceneData.nerveMap.additionalReader.setTime(value / 100.0);
 		}
 	}
 	
 	/**
 	 * Update the time slider and other renderers/scenes when time has changed.
 	 */
-	var updateTimeSlider = function() {
+	var preRenderTimeUpdate = function() {
 		var currentTime = organsRenderer.getCurrentTime();
-		var sliderValue = currentTime / 30.0;
-		timeSlider.value = sliderValue;
-		if (!nerveMapIsActive && pickerScene)
+    for (var i = 0; i < timeChangedCallbacks.length;i++) {
+      timeChangedCallbacks[i](currentTime);
+    }
+		if (!sceneData.nerveMapIsActive && pickerScene)
 			pickerScene.setMorphsTime(currentTime);
-		if (nerveMap && nerveMap.additionalReader)
-			nerveMap.additionalReader.setTime(currentTime / 3000.0);
+		if (sceneData.nerveMap && sceneData.nerveMap.additionalReader)
+			sceneData.nerveMap.additionalReader.setTime(currentTime / 3000.0);
 	}
 	
-	var updateTimeSliderCallback = function() {
+	var preRenderTimeUpdateCallback = function() {
 		return function() {
-			updateTimeSlider();
+		  preRenderTimeUpdate();
 		}
 	}
 	
-	var playPauseAnimation = function(element) {
-		if (element.className == "play") {
-			element.className = "pause";
-			organsRenderer.playAnimation = true;
-		} else {
-			element.className = "play";
-			organsRenderer.playAnimation = false;	
-		}
+	 /**
+   * Add a callback which will be called when time has changed
+   */
+	this.addTimeChangedCallback = function(callback) {
+	  if (typeof(callback === "function"))
+	    timeChangedCallbacks.push(callback);
+	}
+
+	 /**
+	  * Start the animation and let the renderer to processs with
+	  * time progression
+	  */
+	this.playAnimation = function(flag) {
+	  organsRenderer.playAnimation = flag;
 	}
 	
-	/**
-	 * Speed slider has moved, adjust the play speed of the renderer.
-	 * @callback
-	 */
-	var speedSliderChanged = function() {
-		return function(value) {
-			organsRenderer.setPlayRate(value);
-		}
+  /**
+   * Set the speed of playback
+   */
+	this.setPlayRate = function(value) {
+	  organsRenderer.setPlayRate(value);
 	}
 	
-	var updateSpeedSlider = function() {
-		var playRate = organsRenderer.getPlayRate();
-		organGuiControls.Speed = playRate;
-		speedSlider.updateDisplay();	
+  /**
+   * Get the speed of playback
+   */
+	this.getPlayRate = function(value) {
+	  return organsRenderer.getPlayRate();
 	}
 	
-	var texSliderChanged = function() {
-		if (nerveMap && nerveMap.additionalReader)
-			nerveMap.additionalReader.setSliderPos(texSlider.value);
+	this.setTexturePos = function(value) {
+		if (sceneData.nerveMap && sceneData.nerveMap.additionalReader)
+			sceneData.nerveMap.additionalReader.setSliderPos(value);
 	}
 	
-	var setOrgansPanelTitle = function(name) {
-	  console.log("Fix setOrgansPanelTitle");
-	 	//var text_display = document.getElementById('OrganTitle');
-		//text_display.innerHTML = "<strong>Organ: <span style='color:#FF4444'>" + name + "</span></strong>";
+	this.addSceneChangedCallback = function(callback) {
+	  if (typeof(callback === "function"))
+	    sceneChangedCallbacks.push(callback);
 	}
+	
+	this.addOrganPartAddedCallback = function(callback) {
+    if (typeof(callback === "function"))
+      organPartAddedCallbacks.push(callback);
+  }
 
 	/** 
 	 * Callback function when a pickable object has been picked. It will then call functions in tissueViewer
@@ -256,8 +246,10 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 			if (intersects[0] !== undefined) {
 				if (displayScene.sceneName == "human/Cardiovascular/Heart") {
 					var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
-					toolTip.setText("Node " + id);
-					toolTip.show(window_x, window_y);
+					if (toolTip !== undefined) {
+  					toolTip.setText("Node " + id);
+  					toolTip.show(window_x, window_y);
+					}
 					var tissueTitle = "<strong>Tissue: <span style='color:#FF4444'>" + id + "</span></strong>";
 					if (tissueViewer) {
 						tissueViewer.setTissueTitleString(tissueTitle);
@@ -265,8 +257,10 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 						tissueViewer.showCollagenVisible(true);
 					}
 				} else if (displayScene.sceneName.includes("human/Cardiovascular/Arterial")) {
-				  toolTip.setText("Click to show vascular model");
-				  toolTip.show(window_x, window_y);
+				  if (toolTip !== undefined) {
+				    toolTip.setText("Click to show vascular model");
+				    toolTip.show(window_x, window_y);
+				  }
 					if (tissueViewer)
 						tissueViewer.resetTissuePanel();
 					if (cellPanel)
@@ -289,18 +283,24 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 			if (intersects[0] !== undefined) {
 				if (displayScene.sceneName == "human/Cardiovascular/Heart") {
 					var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
-					dialogObject.find("#organsDisplayArea")[0].style.cursor = "pointer";
-	        toolTip.setText("Node " + id);
-	        toolTip.show(window_x, window_y);
+					displayArea.style.cursor = "pointer";
+					if (toolTip !== undefined) {
+  	        toolTip.setText("Node " + id);
+  	        toolTip.show(window_x, window_y);
+					}
 				} else if (displayScene.sceneName.includes("human/Cardiovascular/Arterial")) {
-					dialogObject.find("#organsDisplayArea")[0].style.cursor = "pointer";
-					toolTip.setText("Click to show vascular model");
-					toolTip.show(window_x, window_y);
+				  displayArea.style.cursor = "pointer";
+				  if (toolTip !== undefined) {
+  					toolTip.setText("Click to show vascular model");
+  					toolTip.show(window_x, window_y);
+				  }
 				}
 			}
 			else {
-			  toolTip.hide();
-				dialogObject.find("#organsDisplayArea")[0].style.cursor = "auto";
+			  if (toolTip !== undefined) {
+			    toolTip.hide();
+			  }
+			  displayArea.style.cursor = "auto";
 			}
 		}
 	};
@@ -325,7 +325,27 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 		}
 	}
 	
-	var changeOrganPartsVisibilityCallback = function(name) {
+	this.updateDataGeometryVisibility = function(value) {
+    if ((displayScene.findGeometriesWithGroupName("Data Geometry").length > 0) ||
+        (displayScene.findGlyphsetsWithGroupName("Data Geometry").length > 0)) {
+      changeOrganPartsVisibility("Data Geometry", value);
+    } else {
+      for ( var i = 0; i < sceneData.associateData.length; i ++ ) {
+        var systemMeta = modelsLoader.getSystemMeta(sceneData.currentSpecies);
+        var metaItem = systemMeta[sceneData.associateData[i].SystemName][sceneData.associateData[i].PartName];
+        var downloadPath = metaItem["BodyURL"];
+        var color = new THREE.Color("#0099ff");
+        if (metaItem["FileFormat"] == "JSON")
+          displayScene.loadMetadataURL(downloadPath, _addDataGeometryCallback("Data Geometry", color));
+        else if (metaItem["FileFormat"] == "STL")
+          displayScene.loadSTL(downloadPath, "Data Geometry", _addDataGeometryCallback("Data Geometry", color));
+        else if (metaItem["FileFormat"] == "OBJ") 
+          displayScene.loadOBJ(downloadPath, "Data Geometry", _addDataGeometryCallback("Data Geometry", color));
+      }
+    }
+	}
+	
+	this.changeOrganPartsVisibilityCallback = function(name) {
 		return function(value) {
 			changeOrganPartsVisibility(name, value);
 		}
@@ -336,103 +356,6 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 			geometry.groupName = GroupName;
 			if (color && geometry.morph)
 				geometry.morph.material.color = color;
-		}
-	}
-	
-	/**
-	 * Callback function when a data geometry has been toggled on/off the scene.
-	 */
-	var changeDataGeometryVisibility = function() {
-		return function(value) {
-			if ((displayScene.findGeometriesWithGroupName("Data Geometry").length > 0) ||
-					(displayScene.findGlyphsetsWithGroupName("Data Geometry").length > 0)) {
-				changeOrganPartsVisibility("Data Geometry", value);
-			} else {
-				for ( var i = 0; i < associateData.length; i ++ ) {
-					var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
-					var metaItem = systemMeta[associateData[i].SystemName][associateData[i].PartName];
-					var downloadPath = metaItem["BodyURL"];
-					var color = new THREE.Color("#0099ff");
-					if (metaItem["FileFormat"] == "JSON")
-						displayScene.loadMetadataURL(downloadPath, _addDataGeometryCallback("Data Geometry", color));
-					else if (metaItem["FileFormat"] == "STL")
-						displayScene.loadSTL(downloadPath, "Data Geometry", _addDataGeometryCallback("Data Geometry", color));
-					else if (metaItem["FileFormat"] == "OBJ") 
-						displayScene.loadOBJ(downloadPath, "Data Geometry", _addDataGeometryCallback("Data Geometry", color));
-				}
-			}
-		}
-	}
-	
-	/** 
-	 * Update layout of the organs panel, there are three different layouts at this moment.
-	 * 1. Normal display - Fullscreen/split screen with a single display.
-	 * 2. Nerve map display - Three panels when it is on fullscreen display.
-	 * 3. Species comparison display - Two panels when it is on fullscreen display.
-	 */
-	var updateLayout = function() {
-		if (fullScreen) {
-			if (comparedSceneIsOn) {
-				var element = dialogObject.find("#organsDisplayArea")[0];
-				element.style.width = "50%";
-				element = dialogObject.find("#organsSecondaryDisplayArea")[0];
-				element.className = "organsSecondSceneDisplay";
-				element.style.display = "block";
-				element = dialogObject.find("#timeSliderContainer")[0];
-				element.style.width = "50%";
-				element = dialogObject.find("#organsTertieryDisplayArea")[0];
-				element.style.display = "none";
-			} else if (nerveMapIsActive) {
-				var element = dialogObject.find("#organsDisplayArea")[0];
-				element.style.width = "33%";
-				element = dialogObject.find("#organsSecondaryDisplayArea")[0];
-				element.className = "organsSecondNerveDisplay";
-				element.style.display = "block";
-				element = dialogObject.find("#timeSliderContainer")[0];
-				element.style.width = "33%";
-				element = dialogObject.find("#organsTertieryDisplayArea")[0];
-				element.style.display = "block";
-			} else {
-				var element = dialogObject.find("#organsDisplayArea")[0];
-				element.style.width = "100%";
-				element = dialogObject.find("#timeSliderContainer")[0];
-				element.style.width = "100%";
-				element = dialogObject.find("#organsSecondaryDisplayArea")[0];
-				element.style.display = "none";
-				element = dialogObject.find("#organsTertieryDisplayArea")[0];
-				element.style.display = "none";
-			}
-		} else {
-			var element = dialogObject.find("#organsDisplayArea")[0];
-			element.style.width = "100%";
-			element = dialogObject.find("#timeSliderContainer")[0];
-			element.style.width = "100%";
-			element = dialogObject.find("#organsSecondaryDisplayArea")[0];
-			element.style.display = "none";
-			element = dialogObject.find("#organsTertieryDisplayArea")[0];
-			element.style.display = "none";
-		}
-		
-		if (nerveMapIsActive) {
-			element = dialogObject.find("#texSlider")[0];
-			element.style.display = "block";
-			element = dialogObject.find("#organsImgContainer")[0];
-			element.style.display = "block";
-			element = dialogObject.find("#organsSecondaryDisplayRenderer")[0];
-			element.style.display = "none";
-			element = dialogObject.find("#CheckboxTree")[0];
-			element.style.display = "block";
-			
-		} else {
-			element = dialogObject.find("#texSlider")[0];
-			element.style.display = "none";
-			element = dialogObject.find("#organsImgContainer")[0];
-			element.style.display = "none";
-			element = dialogObject.find("#organsSecondaryDisplayRenderer")[0];
-			element.style.display = "block";
-			element = dialogObject.find("#CheckboxTree")[0];
-			element.style.display = "none";
-				
 		}
 	}
 	
@@ -456,14 +379,14 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	 * toggled on.
 	 */
 	var setupNerveMapPrimaryRenderer = function() {
-		var sceneName = currentName + "_nervemap";
+		var sceneName = sceneData.currentName + "_nervemap";
 		nerveMapScene = organsRenderer.getSceneByName(sceneName);
 		if (nerveMapScene == undefined) {
-			var downloadPath = modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.threed.meta;
+			var downloadPath = modelsLoader.getOrgansDirectoryPrefix() + "/" + sceneData.nerveMap.threed.meta;
 			nerveMapScene = organsRenderer.createScene(sceneName);
 			nerveMapScene.loadMetadataURL(downloadPath, _addNerveMapGeometryCallback("threed"));
-			if (nerveMap.threed.view !== undefined)
-				nerveMapScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + nerveMap.threed.view);
+			if (sceneData.nerveMap.threed.view !== undefined)
+				nerveMapScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + sceneData.nerveMap.threed.view);
 			else {
 				nerveMapScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
 			}
@@ -472,11 +395,11 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 			var zincCameraControl = nerveMapScene.getZincCameraControls();
 			zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
 			zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
-			nerveMap.additionalReader = new PJP.VaryingTexCoordsReader(nerveMapScene);
+			sceneData.nerveMap.additionalReader = new PJP.VaryingTexCoordsReader(nerveMapScene);
 			var urlsArray = [ modelsLoader.getOrgansDirectoryPrefix() + "/digestive/stomach/nerve_map/3d/xi1_time_0.json",
 			                  modelsLoader.getOrgansDirectoryPrefix() + "/digestive/stomach/nerve_map/3d/xi1_time_1.json",
 			                  modelsLoader.getOrgansDirectoryPrefix() + "/digestive/stomach/nerve_map/3d/xi0_time_0.json"];
-			nerveMap.additionalReader.loadURLsIntoBufferGeometry(urlsArray);
+			sceneData.nerveMap.additionalReader.loadURLsIntoBufferGeometry(urlsArray);
 		}
 		organsRenderer.setCurrentScene(nerveMapScene);	
 	}
@@ -486,8 +409,8 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	 */
 	var setupOrgansNerveSVG = function() {
 			var svgObject = dialogObject.find("#organSVG")[0];
-			if (nerveMap["svg"]["url"]) {
-				svgObject.setAttribute('data', nerveMap["svg"]["url"] );	
+			if (sceneData.nerveMap["svg"]["url"]) {
+				svgObject.setAttribute('data', sceneData.nerveMap["svg"]["url"] );	
 			}
 	}
 
@@ -497,10 +420,10 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	var setupSecondaryRenderer = function(species) {
 		if (secondaryRenderer == null)
 			secondaryRenderer = PJP.setupRenderer("organsSecondaryDisplayRenderer");
-		var sceneName = currentSpecies + "/" + currentName;
+		var sceneName = sceneData.currentSpecies + "/" + sceneData.currentName;
 		secondaryScene = secondaryRenderer.getSceneByName(sceneName);
 		if (secondaryScene == undefined) {
-			var details = organsFileMap[species][currentSystem][currentPart];
+			var details = organsFileMap[species][sceneData.currentSystem][sceneData.currentPart];
 			secondaryScene = secondaryRenderer.createScene(sceneName);
 			secondaryScene.loadMetadataURL(modelsLoader.getOrgansDirectoryPrefix()  + "/" +details.meta);
 			if (details.view !== undefined)
@@ -531,8 +454,8 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 		if (targetScene) {
 			var texture = new THREE.Texture(bitmap);
 			targetScene.forEachGeometry(setTextureForGeometryCallback(texture));
-			if (nerveMap)
-				nerveMap.additionalReader.setTexture(texture);
+			if (sceneData.nerveMap)
+				sceneData.nerveMap.additionalReader.setTexture(texture);
 		}
 	}
 
@@ -544,9 +467,9 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	/**
 	 * Nerve map has been toggled on/off, change organs renderer layput.
 	 */
-	var changeNerveMapVisibility = function() {
-		nerveMapIsActive = !nerveMapIsActive;
-		if (nerveMapIsActive)
+	this.changeNerveMapVisibility = function() {
+		sceneData.nerveMapIsActive = !sceneData.nerveMapIsActive;
+		if (sceneData.nerveMapIsActive)
 			setupNerveMapPrimaryRenderer();
 		else {
 			organsRenderer.setCurrentScene(displayScene);
@@ -554,58 +477,37 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 		activateAdditionalNerveMapRenderer();
 	}
 	
-	var organsBackGroundChanged = function() {
-		return function(value) {
-			var redValue = parseInt(value[0]);
-			var greenValue = parseInt(value[1]);
-			var blueValue = parseInt(value[2]);
-			
-			var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-			dialogObject.find("#organsSecondaryDisplayArea")[0].style.backgroundColor = backgroundColourString;
-			var colour = new THREE.Color(backgroundColourString);
-			var internalRenderer = organsRenderer.getThreeJSRenderer();
-			internalRenderer.setClearColor( colour, 1 );
-			if (secondaryRenderer) {
-				internalRenderer = secondaryRenderer.getThreeJSRenderer();
-				internalRenderer.setClearColor( colour, 1 );
-			}
-		}
+	this.changeBackgroundColour = function(backgroundColourString) {
+	  var colour = new THREE.Color(backgroundColourString);
+    if (organsRenderer) {
+      var internalRenderer = organsRenderer.getThreeJSRenderer();
+      internalRenderer.setClearColor( colour, 1 );
+    }
+    if (secondaryRenderer) {
+      var internalRenderer = secondaryRenderer.getThreeJSRenderer();
+      internalRenderer.setClearColor( colour, 1 );
+    }
 	}
 	
-	var expandCollapseOrgans = function(source, portName) {
-		if (source.value == "Expand") {
-			fullScreen = true;
-		} else {
-			fullScreen = false;
-		}
-		expandCollapse(source, portName);
-		activateAdditionalNerveMapRenderer();
-	}
+
+
 	
 	/**
-	 * Initialise organs panel, setup primary renderer and dat.gui UI.
+	 * Initialise the drawing area.
 	 */ 
-	var initialiseOrgansVisualisation = function() {
-	  toolTip = new (require("./tooltip").ToolTip)(dialogObject);
-		organsRenderer = require("./utility").setupRenderer("organsDisplayArea");
-		organsRenderer.addPreRenderCallbackFunction(updateTimeSliderCallback());
-		defaultScene = organsRenderer.getCurrentScene();
-		organGui = new dat.GUI({autoPlace: false});
-		organGui.domElement.id = 'gui';
-		organGui.close();
-		var control = new organsControl();
-		var controller = organGui.addColor(control, 'Background');
-		controller.onChange(organsBackGroundChanged());
-		var customContainer = dialogObject.find("#organGui")[0].append(organGui.domElement);
-		var resetViewButton = { 'Reset View':function(){ organsRenderer.resetView() }};
-		var viewAllButton = { 'View All':function(){ organsRenderer.viewAll() }};
-		organGuiControls.Speed = 500.0;
-		speedSlider = organGui.add(organGuiControls, 'Speed', 0, 5000).step(50).onChange(speedSliderChanged());
-		organGui.add(resetViewButton, 'Reset View');
-		organGui.add(viewAllButton, 'View All');
-		organPartsGui = organGui.addFolder('Visibility Control');
-		organPartsGui.open();
-		organsRenderer.animate();
+	this.initialiseRenderer = function(displayAreaIn) {
+	  if (organsRenderer === undefined || rendererContainer === undefined) {
+	    var returnedValue = (require("./utility").createRenderer)();
+	    organsRenderer = returnedValue["renderer"];
+	    rendererContainer = returnedValue["container"];
+	  }
+	  if (displayAreaIn) {
+	    displayArea = displayAreaIn;
+	    displayArea.appendChild( rendererContainer );
+	    organsRenderer.animate();
+	    if (toolTip === undefined)
+	      toolTip = new (require("./tooltip").ToolTip)(displayArea);
+	  } 
 	}
 
 	var imgZoom = function() {
@@ -679,40 +581,246 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	
 	
 	var enableImageMouseInteraction = function(targetElement) {
-		if (targetElement.addEventListener) {
-			targetElement.addEventListener( 'mousedown', onImageMouseDown, false );
-			targetElement.addEventListener( 'mousemove', onImageMouseMove, false );
-			targetElement.addEventListener( 'mouseup', onImageMouseUp, false );
-			targetElement.addEventListener( 'mouseleave', onImageMouseLeave, false );
-			targetElement.oncontextmenu = function() { return false;};
-			targetElement.addEventListener( 'wheel', function ( event ) { onImageScrollEvent(event); }, false);
-	    }
+  if (targetElement.addEventListener) {
+  	targetElement.addEventListener( 'mousedown', onImageMouseDown, false );
+  	targetElement.addEventListener( 'mousemove', onImageMouseMove, false );
+  	targetElement.addEventListener( 'mouseup', onImageMouseUp, false );
+  	targetElement.addEventListener( 'mouseleave', onImageMouseLeave, false );
+  	targetElement.oncontextmenu = function() { return false;};
+  	targetElement.addEventListener( 'wheel', function ( event ) { onImageScrollEvent(event); }, false);
+    }
 	}
+	
+  var getOrganDetails = function(speciesName, systemName, partName) {
+    if (speciesName && systemName && partName) {
+      if (organsFileMap.hasOwnProperty(speciesName) &&
+        organsFileMap[speciesName].hasOwnProperty(systemName) &&
+        organsFileMap[speciesName][systemName].hasOwnProperty(partName))
+        return organsFileMap[speciesName][systemName][partName];
+    }
+    return undefined;
+  }
+	  
+	  /**
+	   * New organs geometry has been added to the scene, add UIs and make sure
+	   * the viewport is correct.
+	   */
+	  var _addOrganPartCallback = function(systemName, partName, useDefautColour) {
+	    return function(geometry) {
+	      if (geometry.groupName) {
+	        for (var i = 0; i < organPartAddedCallbacks.length;i++) {
+	          organPartAddedCallbacks[i](geometry.groupName);
+	        }
+	        if (useDefautColour)
+	          modelsLoader.setGeometryColour(geometry, systemName, partName);
+	        var organDetails = getOrganDetails(sceneData.currentSpecies, systemName, partName);
+	        if (organDetails === undefined || organDetails.view == undefined)
+	        {
+	          displayScene.viewAll();
+	          var zincCameraControl = displayScene.getZincCameraControls();
+	          var viewport = zincCameraControl.getCurrentViewport();
+	          zincCameraControl.setDefaultCameraSettings(viewport);
+	          displayScene.resetView();
+	        }
+	      }
+	    }
+	  }
+	  
+	  /** 
+	   * Toggle data field displays. Data fields displays flow/pressure and other activities of the
+	   * organs.
+	   */
+	  this.updateFieldvisibility = function(dataFields, value) {
+      for ( var i = 0; i < dataFields.length; i ++ ) {
+        if (value != i) {
+          var geometryName = dataFields[i].PartName;
+          changeOrganPartsVisibility(geometryName, false);
+        }
+      }
+      if (value > -1) {
+        var partName = dataFields[value].PartName;
+        if ((displayScene.findGeometriesWithGroupName(partName).length > 0) ||
+          (displayScene.findGlyphsetsWithGroupName(partName).length > 0)) {
+          changeOrganPartsVisibility(partName, true);
+        } else {
+          var partDetails = getOrganDetails(dataFields[value].SystemName, partName);
+          if (partDetails != undefined) {
+            displayScene.loadMetadataURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + partDetails.meta);
+          }
+        }
+	    }
+	  }
+	  
+	  /**
+	   * Return an array containing name(s) of species that also contains the currently displayed organs.
+	   * @returns {Array} containing species name 
+	   */
+	  this.getAvailableSpecies = function(currentSpecies, currentSystem, currentPart) {
+	    var availableSpecies = new Array();
+	    availableSpecies.push("none");
+	    var keysArray = Object.keys(organsFileMap);
+	    for (index in keysArray) {
+	      var species = keysArray[index];
+	      if (species != currentSpecies) {
+	        if (organsFileMap[species].hasOwnProperty(currentSystem) &&
+	            organsFileMap[species][currentSystem].hasOwnProperty(currentPart)) {
+	          availableSpecies.push(species);
+	        }
+	      }
+	    }
+	    return availableSpecies;
+	  }
+	  
+	  this.changeComparedSpecies = function(species) {
+	    if (species == "none") {
+	      comparedSceneIsOn = false;
+	      updateLayout();
+	    } else{
+	      sceneData.nerveMapIsActive = false;
+	      comparedSceneIsOn = true;
+	      updateLayout();
+	      setupSecondaryRenderer(species);
+	    }
+	  }
+
+	  /**
+	   * Load organ(s) with the provided species, system and part. This will update
+	   * the UIs, load in the models.
+	   * If models are not available, it will attempt to display the data instead (same
+	   * geometry as shown on the {@link PJP.BodyViewer}
+	   * 
+	   * @param {String} speciesName
+	   * @param {String} systemName
+	   * @param {String} systemName  
+	   * @async
+	   */
+	  this.loadOrgans = function(speciesName, systemName, partName) {
+	    //Do the work now if UI is ready otherwise try again later with a timeout setup.
+	    if (organsRenderer) {
+	      if (speciesName && systemName && partName) {
+	        resetZoom();
+	        sceneData.currentSpecies = speciesName;
+	        sceneData.currentSystem = systemName;
+	        sceneData.currentPart = partName;
+	        sceneData.nerveMapIsActive = false;
+	        comparedSceneIsOn = false;
+	        // This is used as title
+	        var name = speciesName + "/" + systemName + "/" + partName;
+	        //Get informations from the array
+	        var organsDetails = getOrganDetails(sceneData.currentSpecies, systemName, partName);
+	        sceneData.associateData = undefined;
+	        sceneData.dataFields = undefined;
+	        sceneData.externalOrganLink = undefined;
+	        sceneData.nerveMap = undefined;
+	        if (organsDetails !== undefined){
+	          if (organsDetails.sceneName !== undefined)
+	            name = speciesName + "/" + organsDetails.sceneName;
+	          sceneData.associateData = organsDetails.associateData;
+	          if (organsDetails.fields)
+	            sceneData.dataFields = organsDetails.fields;
+	          sceneData.externalOrganLink = organsDetails.externalLink;
+	          sceneData.nerveMap = organsDetails.nerveMap;
+	        }
+	        sceneData.currentName = name;
+
+	        var organScene = organsRenderer.getSceneByName(name);
+	        // Check if organ scene exist,
+	        // Exist: Set it as current scene and update the gui.
+	        // Not: Create a new scene
+	        if (organScene == undefined) {
+	          organScene = organsRenderer.createScene(name);
+	          displayScene = organScene;
+	          var directionalLight = organScene.directionalLight;
+	          directionalLight.intensity = 1.4;
+	          // Models with the same name exists, read in the models.
+	          if (organsDetails != undefined) {
+	            //Use organs specific viewports if it exists, otherwise use the default viewport.
+	            if (organsDetails.view !== undefined)
+	              organScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.view);
+	            else {
+	              organScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
+	            }
+	            organScene.loadMetadataURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.meta, 
+	              _addOrganPartCallback(systemName, partName, false));
+	            var zincCameraControl = organScene.getZincCameraControls();
+	            zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
+	            zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
+	            //Create a picker scene if it exists.
+	            if (organsDetails.picker != undefined) {
+	              var pickerSceneName = name + "_picker_scene";
+	              pickerScene = organsRenderer.createScene(pickerSceneName);
+	              pickerScene.loadMetadataURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.picker);
+	              zincCameraControl.enableRaycaster(pickerScene, _pickingCallback(), _hoverCallback());
+	            } else {
+	              zincCameraControl.enableRaycaster(organScene, _pickingCallback(), _hoverCallback());
+	            }
+	          } else {
+	            organScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
+	            var systemMeta = modelsLoader.getSystemMeta(sceneData.currentSpecies);
+	            var metaItem = systemMeta[systemName][partName];
+	            var downloadPath = metaItem["BodyURL"];
+	            if (metaItem["FileFormat"] == "JSON") {
+	              organScewith_body.htmlne.loadMetadataURL(downloadPath, _addOrganPartCallback(systemName, partName, false));
+	            }
+	            else if (metaItem["FileFormat"] == "STL")
+	              organScene.loadSTL(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
+	            else if (metaItem["FileFormat"] == "OBJ") 
+	              organScene.loadOBJ(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
+	            organsRenderer.setCurrentScene(organScene);
+	            var zincCameraControl = organScene.getZincCameraControls();
+	            zincCameraControl.enableRaycaster(organScene, _pickingCallback(), _hoverCallback());
+	            zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
+	            zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
+	          }
+	          var directionalLight = organScene.directionalLight;
+	          directionalLight.intensity = 1.4;
+	          organsRenderer.setCurrentScene(organScene);
+	        } else if (displayScene != organScene){
+	          organsRenderer.setCurrentScene(organScene);
+	          displayScene = organScene;
+	          var pickerSceneName = name + "_picker_scene";
+	          pickerScene = organsRenderer.getSceneByName(pickerSceneName);
+	          displayScene.forEachGeometry(_addOrganPartCallback());
+	          displayScene.forEachGlyphset(_addOrganPartCallback());
+	        }
+	        
+	        preRenderTimeUpdate();
+	        for (var i = 0; i < sceneChangedCallbacks.length;i++) {
+	          sceneChangedCallbacks[i](sceneData);
+	        }
+	      }
+	    } else {
+	      if (timeoutID == 0)
+	        timeoutID = setTimeout(loadOrgansTimeoutCallback(speciesName, systemName, partName), 500);
+	    }
+	  }
+	  
+	  var loadOrgansTimeoutCallback = function(speciesName, systemName, partName) {
+	    return function () {
+	      timeoutID = 0;
+	      _this.loadOrgans(speciesName, systemName, partName);
+	    }
+	  }
+	  
+	  this.resetView = function()
+	  {
+	    organsRenderer.resetView();
+	  }
+	  
+	  this.viewAll = function()
+	  {
+	    organsRenderer.viewAll();
+	  }
+	  
+
 	
 	/**
 	 * Add UI callbacks after html page has been loaded.
 	 */
 	var addUICallback = function() {
-		var organLinkeButton = dialogObject.find("#organLinkButton")[0];
-		organLinkeButton.onclick = function() { openOrganModelLink() };
-		//var organsScreenButton = dialogObject.find("#organsScreenButton")[0];
-		//organsScreenButton.onclick = function() { expandCollapseOrgans(organsScreenButton, 'organsDisplayPort') };
-		timeSlider = dialogObject.find("#organ_animation_slider")[0];
-		timeSlider.oninput= function() { timeSliderChanged() };
-		texSlider = dialogObject.find("#texSlider")[0];
-		texSlider.oninput= function() { texSliderChanged() };
-		var organsPlayToggle = dialogObject.find("#organsPlayToggle")[0];
-		organsPlayToggle.onclick = function() { playPauseAnimation(organsPlayToggle) };
 		var element = dialogObject.find("#organsImgContainer")[0];
 		enableImageMouseInteraction(element);
 	}
-	
-  var createNewDialog = function(data) {
-    dialogObject = require("./utility").createDialogContainer(localDialogName, data);
-    addUICallback();
-    initialiseOrgansVisualisation();
-    UIIsReady = true;
-  }
 	
 	/**
 	 * initialise loading of the html layout for the organs panel, 
@@ -721,294 +829,11 @@ exports.OrgansViewer = function(ModelsLoaderIn, DialogName)  {
 	 * @async 
 	 */
 	 var initialise = function() {
-      createNewDialog(require("./snippets/organsViewer.html"));
+	   //addUICallback();
+	   _this.initialiseRenderer(undefined);
+     //createNewDialog(require("./snippets/organsViewer.html"));
   }
-	
-	
-	var getOrganDetails = function(speciesName, systemName, partName) {
-		if (speciesName && systemName && partName) {
-			if (organsFileMap.hasOwnProperty(speciesName) &&
-				organsFileMap[speciesName].hasOwnProperty(systemName) &&
-				organsFileMap[speciesName][systemName].hasOwnProperty(partName))
-				return organsFileMap[speciesName][systemName][partName];
-		}
-		return undefined;
-	}
-	
-	/**
-	 * New organs geometry has been added to the scene, add UIs and make sure
-	 * the viewport is correct.
-	 */
-	var _addOrganPartCallback = function(systemName, partName, useDefautColour) {
-		return function(geometry) {
-			if (geometry.groupName) {
-				if (!organPartGuiControls.hasOwnProperty(geometry.groupName)) {
-					organPartGuiControls[geometry.groupName] = true;
-					organPartsGui.add(organPartGuiControls, geometry.groupName).onChange(changeOrganPartsVisibilityCallback(geometry.groupName));
-				}
-				if (useDefautColour)
-					modelsLoader.setGeometryColour(geometry, systemName, partName);
-				var organDetails = getOrganDetails(currentSpecies, systemName, partName);
-				if (organDetails === undefined || organDetails.view == undefined)
-				{
-					displayScene.viewAll();
-					var zincCameraControl = displayScene.getZincCameraControls();
-					var viewport = zincCameraControl.getCurrentViewport();
-					zincCameraControl.setDefaultCameraSettings(viewport);
-					displayScene.resetView();
-				}
-			}
-		}
-	}
-	
-	/** 
-	 * Toggle data field displays. Data fields displays flow/pressure and other activities of the
-	 * organs.
-	 */
-	var toggleFieldVisibility = function(dataFields) {
-		return function(value) {
-			for ( var i = 0; i < dataFields.length; i ++ ) {
-				if (value != i) {
-					var geometryName = dataFields[i].PartName;
-					changeOrganPartsVisibility(geometryName, false);
-				}
-			}
-			if (value > -1) {
-				var partName = dataFields[value].PartName;
-				if ((displayScene.findGeometriesWithGroupName(partName).length > 0) ||
-					(displayScene.findGlyphsetsWithGroupName(partName).length > 0)) {
-					changeOrganPartsVisibility(partName, true);
-				} else {
-					var partDetails = getOrganDetails(dataFields[value].SystemName, partName);
-					if (partDetails != undefined) {
-						displayScene.loadMetadataURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + partDetails.meta);
-					}
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Return an array containing name(s) of species that also contains the currently displayed organs.
-	 * @returns {Array} containing species name 
-	 */
-	var getAvailableSpecies = function() {
-		var availableSpecies = new Array();
-		availableSpecies.push("none");
-		var keysArray = Object.keys(organsFileMap);
-		for (index in keysArray) {
-			var species = keysArray[index];
-			if (species != currentSpecies) {
-				if (organsFileMap[species].hasOwnProperty(currentSystem) &&
-						organsFileMap[species][currentSystem].hasOwnProperty(currentPart)) {
-					availableSpecies.push(species);
-				}
-			}
-		}
-		return availableSpecies;
-	}
-	
-	var changeComparedSpecies = function(species) {
-		if (species == "none") {
-			comparedSceneIsOn = false;
-			updateLayout();
-		} else{
-			nerveMapIsActive = false;
-			comparedSceneIsOn = true;
-			updateLayout();
-			setupSecondaryRenderer(species);
-		}
-	}
-
-	/**
-	 * Reset dat.gui ui and also update it to fit the current displaying
-	 * organs.
-	 */
-	var updateOrganSpecificGui = function() {
-		organPartGuiControls = function() {
-		};
-		organGui.removeFolder('Visibility Control');
-		organPartsGui = organGui.addFolder('Visibility Control');
-		organPartsGui.open();
-		if (associateData) {
-			organPartGuiControls["Data Geometry"] = false;
-			organPartsGui.add(organPartGuiControls, "Data Geometry").onChange(changeDataGeometryVisibility());
-		}
-		if (dataFields) {
-			organPartGuiControls.Field = -1;
-			var fieldPairs = {};
-			fieldPairs["None"] = -1;
-			for ( var i = 0; i < dataFields.length; i ++ ) {
-				fieldPairs[dataFields[i].PartName] = i; 
-			}
-			organPartsGui.add(organPartGuiControls, 'Field', fieldPairs ).onChange(toggleFieldVisibility(dataFields));
-		}
-		if (nerveMap) {
-			var nerveMapButton = { 'Toggle nerve':function(){ changeNerveMapVisibility() }};
-			organPartsGui.add(nerveMapButton, 'Toggle nerve');
-		}
-		var otherSpecies = getAvailableSpecies();
-		if (otherSpecies.length > 1) {
-			organPartGuiControls["Compared With"] = "none";
-			var comparedSelected = organPartsGui.add(organPartGuiControls, 'Compared With', otherSpecies);
-			comparedSelected.onChange(function(species) {
-				changeComparedSpecies(species);
-			} );
-			
-		}
-				
-		var element = dialogObject.find("#texSlider")[0];
-		element.style.display = "none";
-	}
-	
-	/**
-	 * Load organ(s) with the provided species, system and part. This will update
-	 * the UIs, load in the models.
-	 * If models are not available, it will attempt to display the data instead (same
-	 * geometry as shown on the {@link PJP.BodyViewer}
-	 * 
-	 * @param {String} speciesName
-	 * @param {String} systemName
-	 * @param {String} systemName  
-	 * @async
-	 */
-	this.loadOrgans = function(speciesName, systemName, partName) {
-		//Do the work now if UI is ready otherwise try again later with a timeout setup.
-		if (UIIsReady) {
-			if (speciesName && systemName && partName) {
-				resetZoom();
-				currentSpecies = speciesName;
-				currentSystem = systemName;
-				currentPart = partName;
-				nerveMapIsActive = false;
-				comparedSceneIsOn = false;
-				var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
-				var metaItem = systemMeta[systemName][partName];
-				// This is used as title
-				var name = speciesName + "/" + systemName + "/" + partName;
-				currentName = name;
-				//Get informations from the array
-				var organsDetails = getOrganDetails(currentSpecies, systemName, partName);
-				associateData = undefined;
-				dataFields = undefined;
-				externalOrganLink = undefined;
-				nerveMap = undefined;
-				if (organsDetails !== undefined){
-					if (organsDetails.sceneName !== undefined)
-						name = speciesName + "/" + organsDetails.sceneName;
-					associateData = organsDetails.associateData;
-					if (organsDetails.fields)
-						dataFields = organsDetails.fields;
-					externalOrganLink = organsDetails.externalLink;
-					nerveMap = organsDetails.nerveMap;
-				}
-				var button = dialogObject.find("#organLinkButton")[0];
-				if (externalOrganLink) {
-					button.style.visibility = "visible";
-				} else {
-					button.style.visibility = "hidden";
-				}
-
-				var organScene = organsRenderer.getSceneByName(name);
-				// Check if organ scene exist,
-				// Exist: Set it as current scene and update the gui.
-				// Not: Create a new scene
-				if (organScene == undefined) {
-					updateOrganSpecificGui();
-					organScene = organsRenderer.createScene(name);
-					displayScene = organScene;
-					var directionalLight = organScene.directionalLight;
-					directionalLight.intensity = 1.4;
-					// Models with the same name exists, read in the models.
-					if (organsDetails != undefined) {
-						//Use organs specific viewports if it exists, otherwise use the default viewport.
-						if (organsDetails.view !== undefined)
-							organScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.view);
-						else {
-							organScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
-						}
-						organScene.loadMetadataURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.meta, 
-							_addOrganPartCallback(systemName, partName, false));
-						var zincCameraControl = organScene.getZincCameraControls();
-						zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
-						zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
-						//Create a picker scene if it exists.
-						if (organsDetails.picker != undefined) {
-							var pickerSceneName = name + "_picker_scene";
-							pickerScene = organsRenderer.createScene(pickerSceneName);
-							pickerScene.loadMetadataURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.picker);
-							zincCameraControl.enableRaycaster(pickerScene, _pickingCallback(), _hoverCallback());
-						} else {
-							zincCameraControl.enableRaycaster(organScene, _pickingCallback(), _hoverCallback());
-						}
-					} else {
-						organScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
-						var downloadPath = metaItem["BodyURL"];
-						if (metaItem["FileFormat"] == "JSON") {
-							organScewith_body.htmlne.loadMetadataURL(downloadPath, _addOrganPartCallback(systemName, partName, false));
-						}
-						else if (metaItem["FileFormat"] == "STL")
-							organScene.loadSTL(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
-						else if (metaItem["FileFormat"] == "OBJ") 
-							organScene.loadOBJ(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
-						organsRenderer.setCurrentScene(organScene);
-						var zincCameraControl = organScene.getZincCameraControls();
-						zincCameraControl.enableRaycaster(organScene, _pickingCallback(), _hoverCallback());
-						zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
-						zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
-					}
-					var directionalLight = organScene.directionalLight;
-					directionalLight.intensity = 1.4;
-					organsRenderer.setCurrentScene(organScene);
-				} else if (displayScene != organScene){
-					updateOrganSpecificGui();
-					organsRenderer.setCurrentScene(organScene);
-					displayScene = organScene;
-					var pickerSceneName = name + "_picker_scene";
-					pickerScene = organsRenderer.getSceneByName(pickerSceneName);
-					displayScene.forEachGeometry(_addOrganPartCallback());
-					displayScene.forEachGlyphset(_addOrganPartCallback());
-				}
-				setOrgansPanelTitle(name);
-				updateTimeSlider();
-				updateSpeedSlider();
-			}
-		} else {
-			if (timeoutID == 0)
-				timeoutID = setTimeout(loadOrgansTimeoutCallback(speciesName, systemName, partName), 500);
-		}
-	}
-	
-	var loadOrgansTimeoutCallback = function(speciesName, systemName, partName) {
-		return function () {
-			timeoutID = 0;
-			_this.loadOrgans(speciesName, systemName, partName);
-		}
-	}
-	
-	
-	var triggerAnimation = function() {
-		if (organsRenderer.playAnimation == true) {
-			organsRenderer.playAnimation = false;
-		} else {
-			organsRenderer.playAnimation = true;	
-		}
-	}
-	
-	var resetView = function()
-	{
-		organsRenderer.resetView();
-	}
-	
-	var viewAll = function()
-	{
-		organsRenderer.viewAll();
-	}
-	
-	var openOrganModelLink = function() {
-		window.open(externalOrganLink, '');
-	}
-	
+	 
 	initialise();
 	
 	if (0) {

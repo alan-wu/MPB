@@ -390,7 +390,7 @@ exports.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 	 * 
 	 */
 	var initialiseBodyRenderer = function() {
-	  toolTip = new (require("./tooltip").ToolTip)(dialogObject);
+	  toolTip = new (require("./tooltip").ToolTip)(dialogObject[0]);
 		bodyRenderer = require("./utility").setupRenderer("bodyDisplayArea");
 		bodyGui = new dat.GUI({autoPlace: false});
 		bodyGui.domElement.id = 'gui';
