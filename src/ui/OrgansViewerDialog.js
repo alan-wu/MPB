@@ -14,7 +14,7 @@ var OrgansViewerDialog = function(organsViewerIn) {
   var organPartGuiControls = function() {
   };
   var toolTip = undefined;
-  _this = this;
+  var _myInstance = this;
 
   
   // data used by dat.gui to control non-model specific controls. 
@@ -71,7 +71,7 @@ var OrgansViewerDialog = function(organsViewerIn) {
       var greenValue = parseInt(value[1]);
       var blueValue = parseInt(value[2]);
       var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-      _this.container.find("#organsSecondaryDisplayArea")[0].style.backgroundColor = backgroundColourString;
+      _myInstance.container.find("#organsSecondaryDisplayArea")[0].style.backgroundColor = backgroundColourString;
       organsViewer.changeBackgroundColour(backgroundColourString);
     }
   }
@@ -103,8 +103,8 @@ var OrgansViewerDialog = function(organsViewerIn) {
   var updateOrganSpecificGui = function(sceneData) {
     organPartGuiControls = function() {
     };
-    _this.datGui.removeFolder('Visibility Control');
-    organPartsGui = _this.datGui.addFolder('Visibility Control');
+    _myInstance.datGui.removeFolder('Visibility Control');
+    organPartsGui = _myInstance.datGui.addFolder('Visibility Control');
     organPartsGui.open();
     if (sceneData.associateData) {
       organPartGuiControls["Data Geometry"] = false;
@@ -131,12 +131,12 @@ var OrgansViewerDialog = function(organsViewerIn) {
       comparedSelected.onChange(function(species) { organsViewer.changeComparedSpecies(species); } );
     }
         
-    var element = _this.container.find("#texSlider")[0];
+    var element = _myInstance.container.find("#texSlider")[0];
     element.style.display = "none";
   }
   
   var updateLink = function(sceneData) {
-    var button = _this.container.find("#organLinkButton")[0];
+    var button = _myInstance.container.find("#organLinkButton")[0];
     if (sceneData.externalOrganLink) {
       button.style.visibility = "visible";
     } else {
@@ -147,7 +147,7 @@ var OrgansViewerDialog = function(organsViewerIn) {
   var sceneChangedCallback = function() {
     return function(sceneDataIn) {
       sceneData = sceneDataIn;
-      _this.setTitle(sceneData.currentName);
+      _myInstance.setTitle(sceneData.currentName);
       updateLink(sceneData);
       updateOrganSpecificGui(sceneData);
       updateSpeedSlider();
@@ -174,64 +174,64 @@ var OrgansViewerDialog = function(organsViewerIn) {
 
     if (fullScreen) {
       if (comparedSceneIsOn) {
-        var element = _this.container.find("#organsDisplayArea")[0];
+        var element = _myInstance.container.find("#organsDisplayArea")[0];
         element.style.width = "50%";
-        element = _this.container.find("#organsSecondaryDisplayArea")[0];
+        element = _myInstance.container.find("#organsSecondaryDisplayArea")[0];
         element.className = "organsSecondSceneDisplay";
         element.style.display = "block";
-        element = _this.container.find("#timeSlider_this.container")[0];
+        element = _myInstance.container.find("#timeSlider_myInstance.container")[0];
         element.style.width = "50%";
-        element = _this.container.find("#organsTertieryDisplayArea")[0];
+        element = _myInstance.container.find("#organsTertieryDisplayArea")[0];
         element.style.display = "none";
       } else if (nerveMapIsActive) {
-        var element = _this.container.find("#organsDisplayArea")[0];
+        var element = _myInstance.container.find("#organsDisplayArea")[0];
         element.style.width = "33%";
-        element = _this.container.find("#organsSecondaryDisplayArea")[0];
+        element = _myInstance.container.find("#organsSecondaryDisplayArea")[0];
         element.className = "organsSecondNerveDisplay";
         element.style.display = "block";
-        element = _this.container.find("#timeSlider_this.container")[0];
+        element = _myInstance.container.find("#timeSlider_myInstance.container")[0];
         element.style.width = "33%";
-        element = _this.container.find("#organsTertieryDisplayArea")[0];
+        element = _myInstance.container.find("#organsTertieryDisplayArea")[0];
         element.style.display = "block";
       } else {
-        var element = _this.container.find("#organsDisplayArea")[0];
+        var element = _myInstance.container.find("#organsDisplayArea")[0];
         element.style.width = "100%";
-        element = _this.container.find("#timeSlider_this.container")[0];
+        element = _myInstance.container.find("#timeSlider_myInstance.container")[0];
         element.style.width = "100%";
-        element = _this.container.find("#organsSecondaryDisplayArea")[0];
+        element = _myInstance.container.find("#organsSecondaryDisplayArea")[0];
         element.style.display = "none";
-        element = _this.container.find("#organsTertieryDisplayArea")[0];
+        element = _myInstance.container.find("#organsTertieryDisplayArea")[0];
         element.style.display = "none";
       }
     } else {
-      var element = _this.container.find("#organsDisplayArea")[0];
+      var element = _myInstance.container.find("#organsDisplayArea")[0];
       element.style.width = "100%";
-      element = _this.container.find("#timeSlider_this.container")[0];
+      element = _myInstance.container.find("#timeSlider_myInstance.container")[0];
       element.style.width = "100%";
-      element = _this.container.find("#organsSecondaryDisplayArea")[0];
+      element = _myInstance.container.find("#organsSecondaryDisplayArea")[0];
       element.style.display = "none";
-      element = _this.container.find("#organsTertieryDisplayArea")[0];
+      element = _myInstance.container.find("#organsTertieryDisplayArea")[0];
       element.style.display = "none";
     }
     
     if (nerveMapIsActive) {
-      element = _this.container.find("#texSlider")[0];
+      element = _myInstance.container.find("#texSlider")[0];
       element.style.display = "block";
-      element = _this.container.find("#organsImg_this.container")[0];
+      element = _myInstance.container.find("#organsImg_myInstance.container")[0];
       element.style.display = "block";
-      element = _this.container.find("#organsSecondaryDisplayRenderer")[0];
+      element = _myInstance.container.find("#organsSecondaryDisplayRenderer")[0];
       element.style.display = "none";
-      element = _this.container.find("#CheckboxTree")[0];
+      element = _myInstance.container.find("#CheckboxTree")[0];
       element.style.display = "block";
       
     } else {
-      element = _this.container.find("#texSlider")[0];
+      element = _myInstance.container.find("#texSlider")[0];
       element.style.display = "none";
-      element = _this.container.find("#organsImg_this.container")[0];
+      element = _myInstance.container.find("#organsImg_myInstance.container")[0];
       element.style.display = "none";
-      element = _this.container.find("#organsSecondaryDisplayRenderer")[0];
+      element = _myInstance.container.find("#organsSecondaryDisplayRenderer")[0];
       element.style.display = "block";
-      element = _this.container.find("#CheckboxTree")[0];
+      element = _myInstance.container.find("#CheckboxTree")[0];
       element.style.display = "none";
         
     }
@@ -251,41 +251,41 @@ var OrgansViewerDialog = function(organsViewerIn) {
    * Add UI callbacks after html page has been loaded.
    */
   var addUICallback = function() {
-    var organLinkeButton = _this.container.find("#organLinkButton")[0];
+    var organLinkeButton = _myInstance.container.find("#organLinkButton")[0];
     organLinkeButton.onclick = function() { openOrganModelLink() };
-    //var organsScreenButton = _this.container.find("#organsScreenButton")[0];
+    //var organsScreenButton = _myInstance.container.find("#organsScreenButton")[0];
     //organsScreenButton.onclick = function() { expandCollapseOrgans(organsScreenButton, 'organsDisplayPort') };
-    timeSlider = _this.container.find("#organ_animation_slider")[0];
+    timeSlider = _myInstance.container.find("#organ_animation_slider")[0];
     timeSlider.oninput= function() { timeSliderChanged() };
-    texSlider = _this.container.find("#texSlider")[0];
+    texSlider = _myInstance.container.find("#texSlider")[0];
     texSlider.oninput= function() { texSliderChanged() };
-    var organsPlayToggle = _this.container.find("#organsPlayToggle")[0];
+    var organsPlayToggle = _myInstance.container.find("#organsPlayToggle")[0];
     organsPlayToggle.onclick = function() { playPauseAnimation(organsPlayToggle) };
-    var element = _this.container.find("#organsImgContainer")[0];
+    var element = _myInstance.container.find("#organsImgContainer")[0];
     //enableImageMouseInteraction(element);
   }
   
   var initialiseOrgansControlUI = function() {
     addUICallback();
-    _this.addDatGui();
+    _myInstance.addDatGui();
     var control = new organsControl();
-    var controller = _this.datGui.addColor(control, 'Background');
+    var controller = _myInstance.datGui.addColor(control, 'Background');
     controller.onChange(organsBackGroundChanged());
-    _this.container.find("#organGui")[0].append(_this.datGui.domElement);
+    _myInstance.container.find("#organGui")[0].append(_myInstance.datGui.domElement);
     var resetViewButton = { 'Reset View':function(){ organsViewer.resetView() }};
     var viewAllButton = { 'View All':function(){ organsViewer.viewAll() }};
-    speedSlider = _this.datGui.add(organGuiControls, 'Speed', 0, 5000).step(50).onChange(speedSliderChanged());
-    _this.datGui.add(resetViewButton, 'Reset View');
-    _this.datGui.add(viewAllButton, 'View All');
-    organPartsGui = _this.datGui.addFolder('Visibility Control');
+    speedSlider = _myInstance.datGui.add(organGuiControls, 'Speed', 0, 5000).step(50).onChange(speedSliderChanged());
+    _myInstance.datGui.add(resetViewButton, 'Reset View');
+    _myInstance.datGui.add(viewAllButton, 'View All');
+    organPartsGui = _myInstance.datGui.addFolder('Visibility Control');
     organPartsGui.open();
   }
   
   var initialise = function() {
     if (organsViewer) {
-      _this.create(require("../snippets/organsViewer.html"));
+      _myInstance.create(require("../snippets/organsViewer.html"));
       initialiseOrgansControlUI();
-      var displayArea = _this.container.find("#organsDisplayArea")[0];
+      var displayArea = _myInstance.container.find("#organsDisplayArea")[0];
       organsViewer.initialiseRenderer(displayArea);
       organsViewer.addTimeChangedCallback(timeChangedCallback());
       organsViewer.addSceneChangedCallback(sceneChangedCallback());
