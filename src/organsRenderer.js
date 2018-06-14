@@ -500,6 +500,7 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
 	    var returnedValue = (require("./utility").createRenderer)();
 	    organsRenderer = returnedValue["renderer"];
 	    rendererContainer = returnedValue["container"];
+	    organsRenderer.addPreRenderCallbackFunction(preRenderTimeUpdateCallback());
 	  }
 	  if (displayAreaIn) {
 	    displayArea = displayAreaIn;
