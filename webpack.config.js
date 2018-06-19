@@ -46,13 +46,5 @@ module.exports = {
       "window.jQuery": "jquery",
       "window.$": "jquery"
     })
-  ],
-  externals: {
-    three: {
-      commonjs: 'three',
-      commonjs2: 'three',
-      amd: 'three',
-      root: 'THREE'
-    }
-  }
+  ]
 };
