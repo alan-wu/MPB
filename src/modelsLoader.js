@@ -1,3 +1,5 @@
+var THREE = require("three");
+
 /**
  * Provides utilities function for files IO, this is used primarily by
  * {@link PJP.BodyViewer}.
