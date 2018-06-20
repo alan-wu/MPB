@@ -27,8 +27,6 @@ exports.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 	var modelsTransformationMap = new Array();
 	var bodyGui;
 	var bodyPartsGui;
-	var currentHoveredMaterial = undefined;
-	var currentSelectedMaterial = undefined;
 	// Flag for removing geometry from ZincScene when not visible, thus freeing the memory. Default is false.
 	var removeWhenNotVisible = false;
 	var UIIsReady = false;
@@ -36,6 +34,7 @@ exports.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 	var modelsLoader = ModelsLoaderIn;
 	var dialogObject = undefined;
 	var localDialogName = DialogName;
+	var graphicsHighlight = new (require("./utilities/graphicsHighlight").GraphicsHighlight)();
 	
 	//Represents each physiological organ systems as folder in the dat.gui.
 	var systemGuiFolder = new Array();
@@ -119,14 +118,7 @@ exports.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 					if (!intersects[ i ].object.name.includes("Body")) {
 						if (organsViewer)
 							organsViewer.loadOrgans(currentSpecies, intersects[ i ].object.userData[0], intersects[ i ].object.name);
-						if (currentSelectedMaterial && currentSelectedMaterial != intersects[ i ].object.material) {
-							if (currentSelectedMaterial == currentHoveredMaterial)
-								currentSelectedMaterial.emissive.setHex(0x0000FF);
-							else
-								currentSelectedMaterial.emissive.setHex(0x000000);
-						}
-						currentSelectedMaterial = intersects[ i ].object.material;
-						currentSelectedMaterial.emissive.setHex(0x00FF00);
+						graphicsHighlight.setSelected([intersects[ i ].object]);
 						return;
 					} else {
 						bodyClicked = true;
@@ -152,27 +144,14 @@ exports.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 						dialogObject.find("#bodyDisplayArea")[0].style.cursor = "pointer";
 				    toolTip.setText(intersects[ i ].object.name);
 				    toolTip.show(window_x, window_y);
-						if (currentHoveredMaterial &&
-						  intersects[ i ].object.material != currentHoveredMaterial && currentHoveredMaterial != currentSelectedMaterial) {
-							currentHoveredMaterial.emissive.setHex(0x000000);
-							currentHoveredMaterial.depthFunc = THREE.LessEqualDepth;
-						}
-						if (intersects[ i ].object.material != currentSelectedMaterial) {
-							currentHoveredMaterial = intersects[ i ].object.material;
-							currentHoveredMaterial.emissive.setHex(0x0000FF);
-						} else {
-							currentHoveredMaterial = undefined;
-						}
+				    graphicsHighlight.setHighlighted([intersects[ i ].object]);
 						return;
 					} else {
 						bodyHovered = true;
 					}
 				}
 			}
-			if (currentHoveredMaterial && currentHoveredMaterial != currentSelectedMaterial) {
-				currentHoveredMaterial.emissive.setHex(0x000000);
-			}
-			currentHoveredMaterial = undefined;
+			graphicsHighlight.unsetHighlighted();
 			if (bodyHovered) {
 				dialogObject.find("#bodyDisplayArea")[0].style.cursor = "pointer";
         toolTip.setText("Body");
