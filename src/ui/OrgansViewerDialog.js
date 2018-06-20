@@ -114,10 +114,11 @@ var OrgansViewerDialog = function(organsViewerIn) {
       organPartGuiControls.Field = -1;
       var fieldPairs = {};
       fieldPairs["None"] = -1;
-      for ( var i = 0; i < dataFields.length; i ++ ) {
+      for ( var i = 0; i < sceneData.dataFields.length; i ++ ) {
         fieldPairs[sceneData.dataFields[i].PartName] = i; 
       }
-      organPartsGui.add(organPartGuiControls, 'Field', fieldPairs ).onChange(toggleFieldVisibility(dataFields));
+      organPartsGui.add(organPartGuiControls, 'Field', fieldPairs ).onChange(
+          toggleFieldVisibility(sceneData.dataFields));
     }
     if (sceneData.nerveMap) {
       var nerveMapButton = { 'Toggle nerve':function(){ organsViewer.changeNerveMapVisibility() }};
@@ -159,7 +160,7 @@ var OrgansViewerDialog = function(organsViewerIn) {
       if (!organPartGuiControls.hasOwnProperty(groupName)) {
         organPartGuiControls[groupName] = true;
         organPartsGui.add(organPartGuiControls, groupName).onChange(
-            organsViewer.changeOrganPartsVisibilityCallback(groupName));
+        organsViewer.changeOrganPartsVisibilityCallback(groupName));
       }
     }
   }
