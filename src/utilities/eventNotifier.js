@@ -25,12 +25,12 @@ var Suscription = function(suscriberIn, callbackIn, eventType) {
     return eventType;
   }
   
-  this.notify = function(source, eventType, id) {
+  this.notify = function(source, eventType, ids) {
     if (source !== suscriber && (_this.targetEventType ===  EVENT_TYPE.ALL ||
         _this.targetEventType === eventType)) {
       //should support different type of id e.g lyph, name, fmas...
       //need a function that finds all relavant ids
-      var event = new SelectionEvent(eventType, id);
+      var event = new SelectionEvent(eventType, ids);
       callback(event);
     }
   }
@@ -65,6 +65,5 @@ exports.EventNotifier = function() {
     }
   }
 }  
-
 
 exports.EVENT_TYPE = EVENT_TYPE;

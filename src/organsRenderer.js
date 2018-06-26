@@ -245,55 +245,59 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
       objects.push(glyph.mesh);
     }
   }
+  
+  var publishChanges = function(objects, eventType) {
+    var ids = new Array();
+    for (var i = 0; i < objects.length; i++) {
+      ids[i] = objects[i].name;
+    }
+    for (var i = 0; i < eventNotifiers.length; i++) {
+      eventNotifiers[i].publish(_this, eventType, ids);
+    }
+  }
 	
-  this.setHighlightedByObjects = function(objects) {
-    if (objects.length > 0) {
-      var changes = graphicsHighlight.setHighlighted(objects);
-   //   if (changes.length > 0 ) {
-        var eventType = require("./utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
-        for (var i = 0; i < eventNotifiers.length; i++) {
-          eventNotifiers[i].publish(_this, eventType, objects[0].name);
-        }
-   //   }
-    }  
+  this.setHighlightedByObjects = function(objects, propagateChanges) {
+    var changed = graphicsHighlight.setHighlighted(objects);
+    if (changed && propagateChanges) {
+      var eventType = require("./utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
+      publishChanges(objects, eventType);
+    }
+    return changed;
   }
   
-  this.setSelectedByObjects = function(objects) {
-    if (objects.length > 0) {
-      var changes = graphicsHighlight.setSelected(objects);
-      //if (changes.length > 0 ) {
-        var eventType = require("./utilities/eventNotifier").EVENT_TYPE.SELECTED;
-        for (var i = 0; i < eventNotifiers.length; i++) {
-          eventNotifiers[i].publish(_this, eventType, objects[0].name);
-        }
-      //}
-    } 
+  this.setSelectedByObjects = function(objects, propagateChanges) {
+    var changed = graphicsHighlight.setSelected(objects);
+    if (changed && propagateChanges) {
+      var eventType = require("./utilities/eventNotifier").EVENT_TYPE.SELECTED;
+      publishChanges(objects, eventType);
+    }
+    return changed;
   }
   
-  this.setHighlightedByGroupName = function(GroupName) {
-    var geometries = displayScene.findGeometriesWithGroupName(name);
+  this.setHighlightedByGroupName = function(groupName, propagateChanges) {
+    var geometries = displayScene.findGeometriesWithGroupName(groupName);
     var objects = [];
     for (var i = 0; i < geometries.length; i ++ ) {
       objects.push(geometries[i].morph);
     }
-    var glyphsets = displayScene.findGlyphsetsWithGroupName(name);
+    var glyphsets = displayScene.findGlyphsetsWithGroupName(groupName);
     for (var i = 0; i < glyphsets.length; i ++ ) {
       glyphsets[i].forEachGlyph(addGlyphToArray(objects));
     }
-    _this.setHighlightedByObjects(objects);
+    return _this.setHighlightedByObjects(objects, propagateChanges);
   }
   
-  this.setSelectedByGroupName = function(GroupName) {
-    var geometries = displayScene.findGeometriesWithGroupName(name);
+  this.setSelectedByGroupName = function(groupName, propagateChanges) {
+    var geometries = displayScene.findGeometriesWithGroupName(groupName);
     var objects = [];
     for (var i = 0; i < geometries.length; i ++ ) {
       objects.push(geometries[i].morph);
     }
-    var glyphsets = displayScene.findGlyphsetsWithGroupName(name);
+    var glyphsets = displayScene.findGlyphsetsWithGroupName(groupName);
     for (var i = 0; i < glyphsets.length; i ++ ) {
       glyphsets[i].forEachGlyph(addGlyphToArray(objects));
     }
-    this.setSelectedByObjects(objects);
+    return _this.setSelectedByObjects(objects, propagateChanges);
   }
 	
 
@@ -305,6 +309,7 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
 	 */
 	var _pickingCallback = function() {
 		return function(intersects, window_x, window_y) {
+		  
 			if (intersects[0] !== undefined) {
 				if (displayScene.sceneName == "human/Cardiovascular/Heart") {
 					var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
@@ -318,7 +323,7 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
 						tissueViewer.showButtons(true);
 						tissueViewer.showCollagenVisible(true);
 					}
-					_this.setSelectedByObjects([intersects[ 0 ].object]);
+					_this.setSelectedByObjects([intersects[ 0 ].object], true);
 				} else if (displayScene.sceneName.includes("human/Cardiovascular/Arterial")) {
 				  if (toolTip !== undefined) {
 				    toolTip.setText("Click to show vascular model");
@@ -330,10 +335,11 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
 						cellPanel.resetCellPanel();
 					if (modelPanel)
 						modelPanel.openModel("BG_Circulation_Model.svg");
-					_this.setSelectedByObjects([intersects[ 0 ].object]);
+					_this.setSelectedByObjects([intersects[ 0 ].object], true);
 				} else if (displayScene.sceneName.includes("human/Cardiovascular/ScaffoldHeart")) {
-				  _this.setSelectedByObjects([intersects[ 0 ].object]);
-        } 
+				  if (intersects[ 0 ].object.name)
+				    _this.setSelectedByObjects([intersects[ 0 ].object], true);
+				} 
 			}
 		}
 	};
@@ -354,7 +360,7 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
   	        toolTip.setText("Node " + id);
   	        toolTip.show(window_x, window_y);
 					}
-					_this.setHighlightedByObjects([intersects[ 0 ].object]);
+					_this.setHighlightedByObjects([intersects[ 0 ].object], true);
 					return;
 				} else if (displayScene.sceneName.includes("human/Cardiovascular/Arterial")) {
 				  displayArea.style.cursor = "pointer";
@@ -362,16 +368,21 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
   					toolTip.setText("Click to show vascular model");
   					toolTip.show(window_x, window_y);
 				  }
-				  _this.setHighlightedByObjects([intersects[ 0 ].object]);
+				  _this.setHighlightedByObjects([intersects[ 0 ].object], true);
 				  return;
 				} else if (displayScene.sceneName.includes("human/Cardiovascular/ScaffoldHeart")) {
 				  displayArea.style.cursor = "pointer";
-				  _this.setHighlightedByObjects([intersects[ 0 ].object]);
           if (intersects[ 0 ].object.name) {
-            toolTip.setText(intersects[ 0 ].object.name);
-            toolTip.show(window_x, window_y);
+            if (toolTip !== undefined) {
+              toolTip.setText(intersects[ 0 ].object.name);
+              toolTip.show(window_x, window_y);
+            }
+            _this.setHighlightedByObjects([intersects[ 0 ].object], true);
           } else {
-            tooltip.hide();
+            if (toolTip !== undefined) {
+              toolTip.hide();
+            }
+            _this.setHighlightedByObjects([], true);
           }
         }
 			}
@@ -380,6 +391,7 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
 			    toolTip.hide();
 			  }
 			  displayArea.style.cursor = "auto";
+			  _this.setHighlightedByObjects([], true);
 			}
 		}
 	};
@@ -484,7 +496,8 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
 			                  modelsLoader.getOrgansDirectoryPrefix() + "/digestive/stomach/nerve_map/3d/xi0_time_0.json"];
 			sceneData.nerveMap.additionalReader.loadURLsIntoBufferGeometry(urlsArray);
 		}
-		organsRenderer.setCurrentScene(nerveMapScene);	
+		organsRenderer.setCurrentScene(nerveMapScene);
+		graphicsHighlight.reset();
 	}
 	
 	/**
@@ -556,6 +569,7 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
 			setupNerveMapPrimaryRenderer();
 		else {
 			organsRenderer.setCurrentScene(displayScene);
+			graphicsHighlight.reset();
 		}
 		activateAdditionalNerveMapRenderer();
 	}
@@ -572,8 +586,6 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
     }
 	}
 	
-
-
 	
 	/**
 	 * Initialise the drawing area.
@@ -689,28 +701,28 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
 	   * New organs geometry has been added to the scene, add UIs and make sure
 	   * the viewport is correct.
 	   */
-	  var _addOrganPartCallback = function(systemName, partName, useDefautColour) {
-	    return function(geometry) {
-	      if (geometry.groupName) {
-	        for (var i = 0; i < organPartAddedCallbacks.length;i++) {
-	          organPartAddedCallbacks[i](geometry.groupName);
+  var _addOrganPartCallback = function(systemName, partName, useDefautColour) {
+    return function(geometry) {
+      if (geometry.groupName) {
+        for (var i = 0; i < organPartAddedCallbacks.length;i++) {
+          organPartAddedCallbacks[i](geometry.groupName);
+        }
+        if (useDefautColour)
+          modelsLoader.setGeometryColour(geometry, systemName, partName);
+        if (systemName && partName) {
+	        var organDetails = getOrganDetails(sceneData.currentSpecies, systemName, partName);
+	        if (organDetails === undefined || organDetails.view == undefined)
+	        {
+	          displayScene.viewAll();
+	          var zincCameraControl = displayScene.getZincCameraControls();
+	          var viewport = zincCameraControl.getCurrentViewport();
+	          zincCameraControl.setDefaultCameraSettings(viewport);
+	          displayScene.resetView();
 	        }
-	        if (useDefautColour)
-	          modelsLoader.setGeometryColour(geometry, systemName, partName);
-	        if (systemName && partName) {
-  	        var organDetails = getOrganDetails(sceneData.currentSpecies, systemName, partName);
-  	        if (organDetails === undefined || organDetails.view == undefined)
-  	        {
-  	          displayScene.viewAll();
-  	          var zincCameraControl = displayScene.getZincCameraControls();
-  	          var viewport = zincCameraControl.getCurrentViewport();
-  	          zincCameraControl.setDefaultCameraSettings(viewport);
-  	          displayScene.resetView();
-  	        }
-	        }
-	      }
-	    }
-	  }
+        }
+      }
+    }
+  }
 	  
 	  /** 
 	   * Toggle data field displays. Data fields displays flow/pressure and other activities of the
@@ -856,6 +868,7 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
 	            else if (metaItem["FileFormat"] == "OBJ") 
 	              organScene.loadOBJ(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
 	            organsRenderer.setCurrentScene(organScene);
+	            graphicsHighlight.reset();
 	            var zincCameraControl = organScene.getZincCameraControls();
 	            zincCameraControl.enableRaycaster(organScene, _pickingCallback(), _hoverCallback());
 	            zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
@@ -864,8 +877,10 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
 	          var directionalLight = organScene.directionalLight;
 	          directionalLight.intensity = 1.4;
 	          organsRenderer.setCurrentScene(organScene);
+	          graphicsHighlight.reset();
 	        } else if (displayScene != organScene){
 	          organsRenderer.setCurrentScene(organScene);
+	          graphicsHighlight.reset();
 	          for (var i = 0; i < sceneChangedCallbacks.length;i++) {
 	            sceneChangedCallbacks[i](sceneData);
 	          }
@@ -905,7 +920,13 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
 	    eventNotifiers.push(eventNotifier);
 	  }
 	  
-	
+	  this.alignViewWithSelectedObject = function() {
+	    var objects = graphicsHighlight.getSelected();
+	    if (objects && objects[0] && objects[0].userData) {
+	      displayScene.alignObjectToCameraView(objects[0].userData);
+	    }
+	  }
+
 	/**
 	 * Add UI callbacks after html page has been loaded.
 	 */

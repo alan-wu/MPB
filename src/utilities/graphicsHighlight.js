@@ -30,6 +30,33 @@ exports.GraphicsHighlight = function() {
     return matchingObjects;
   }
   
+  var isDifferent = function(array1, array2) {
+    if ((array1.length == 0) && (array2.length == 0))
+      return false;
+    
+    for (var i = 0; i < array1.length; i++) {
+      var matched = false;
+      for (var j = 0; j < array2.length; j++) {
+        if (array1[i] === array2[j]) {
+          matched = true;
+        }
+      }
+      if (!matched)
+        return true;
+    }
+    for (var i = 0; i < array2.length; i++) {
+      var matched = false;
+      for (var j = 0; j < array1.length; j++) {
+        if (array2[i] === array1[j]) {
+          matched = true;
+        }
+      }
+      if (!matched)
+        return true;
+    }
+    return false;
+  }
+  
   var getUnmatchingObjects = function(objectsArray1, objectsArray2) {
     var unmatchingObjects = [];
     if (objectsArray2.length == 0)
@@ -50,17 +77,17 @@ exports.GraphicsHighlight = function() {
   
   this.setHighlighted = function(objects) {
     var previousHighlightedObjects = currentHighlightedObjects;
-    _this.unsetHighlighted();
+    _this.resetHighlighted();
     // Selected object cannot be highlighted
     var array = getUnmatchingObjects(objects, currentSelectedObjects);
     for (var i = 0; i < array.length; i++) {
       array[i].material.emissive.setHex(_this.highlightColour);
     }
     currentHighlightedObjects = array;
-    return getUnmatchingObjects(currentHighlightedObjects, previousHighlightedObjects);
+    return isDifferent(currentHighlightedObjects, previousHighlightedObjects);
   }
   
-  this.unsetHighlighted = function() {
+  this.resetHighlighted = function() {
     for (var i = 0; i < currentHighlightedObjects.length; i++) {
       currentHighlightedObjects[i].material.emissive.setHex(_this.originalColour);
       currentHighlightedObjects[i].material.depthFunc = THREE.LessEqualDepth;
@@ -68,7 +95,7 @@ exports.GraphicsHighlight = function() {
     currentHighlightedObjects = [];
   }
   
-  this.unsetSelected = function() {
+  this.resetSelected = function() {
     for (var i = 0; i < currentSelectedObjects.length; i++) {
       currentSelectedObjects[i].material.emissive.setHex(_this.originalColour);
       currentSelectedObjects[i].material.depthFunc = THREE.LessEqualDepth;
@@ -81,11 +108,20 @@ exports.GraphicsHighlight = function() {
     var previousHSelectedObjects = currentSelectedObjects;
     var array = getUnmatchingObjects(currentHighlightedObjects, objects);
     currentHighlightedObjects = array;
-    _this.unsetSelected();
+    _this.resetSelected();
     for (var i = 0; i < objects.length; i++) {
       objects[i].material.emissive.setHex(_this.selectColour);
     }
     currentSelectedObjects = objects;
-    return getUnmatchingObjects(currentSelectedObjects, previousHSelectedObjects);
+    return isDifferent(currentSelectedObjects, previousHSelectedObjects);
+  }
+  
+  this.getSelected = function() {
+    return currentSelectedObjects;
+  }
+  
+  this.reset = function() {
+    _this.resetSelected();
+    _this.resetHighlighted();
   }
 }

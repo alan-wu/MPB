@@ -151,7 +151,7 @@ exports.BodyViewer = function(ModelsLoaderIn, DialogName)  {
 					}
 				}
 			}
-			graphicsHighlight.unsetHighlighted();
+			graphicsHighlight.resetHighlighted();
 			if (bodyHovered) {
 				dialogObject.find("#bodyDisplayArea")[0].style.cursor = "pointer";
         toolTip.setText("Body");
