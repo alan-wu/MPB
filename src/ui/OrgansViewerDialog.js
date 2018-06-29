@@ -6,6 +6,7 @@ var OrgansViewerDialog = function(organsViewerIn) {
   var speedSlider = undefined;
   var timeSlider = undefined;
   var texSlider = undefined;
+  var organsPlayToggle = undefined;
   var fullScreen = false;
   var organGuiControls = new function() {
     this.Speed = 500;
@@ -94,7 +95,7 @@ var OrgansViewerDialog = function(organsViewerIn) {
   
   var openOrganModelLink = function() {
     window.open(sceneData.externalOrganLink, '');
-  }
+  } 
   
   /**
    * Reset dat.gui ui and also update it to fit the current displaying
@@ -134,6 +135,7 @@ var OrgansViewerDialog = function(organsViewerIn) {
         
     var element = _myInstance.container.find("#texSlider")[0];
     element.style.display = "none";
+    toggleTimeControlsVisibility(false);
   }
   
   var updateLink = function(sceneData) {
@@ -155,13 +157,37 @@ var OrgansViewerDialog = function(organsViewerIn) {
      }
   }
   
+  var organsPartNameClickedCallback = function(groupName) {
+    return function(event) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      organsViewer.setSelectedByGroupName(groupName, true);
+    } 
+  }
+  
+  var toggleTimeControlsVisibility = function(timeVarying) {
+    var visibility = timeVarying ? "visible" : "hidden";
+    if (organsPlayToggle)
+      organsPlayToggle.style.visibility = visibility;
+    if (timeSlider)
+      timeSlider.style.visibility = visibility;
+  }
+  
   var organPartAddedCallback= function() {
-    return function(groupName) {
+    return function(groupName, timeVarying) {
       if (!organPartGuiControls.hasOwnProperty(groupName)) {
         organPartGuiControls[groupName] = true;
-        organPartsGui.add(organPartGuiControls, groupName).onChange(
-        organsViewer.changeOrganPartsVisibilityCallback(groupName));
+        var controller = organPartsGui.add(organPartGuiControls, groupName);
+        var span = controller.__li.getElementsByTagName("span")[0];
+        controller.onChange(organsViewer.changeOrganPartsVisibilityCallback(groupName));
+        controller.__li.onmouseover = function() {organsViewer.setHighlightedByGroupName(groupName, true);};
+        span.onclick = organsPartNameClickedCallback(groupName);
       }
+      /* controls are hidden when organsViewer update the scene. 
+       * Reenabling it when a geometry is time varying.
+       * */
+      if (timeVarying)
+        toggleTimeControlsVisibility(true);
     }
   }
   
@@ -260,7 +286,7 @@ var OrgansViewerDialog = function(organsViewerIn) {
     timeSlider.oninput= function() { timeSliderChanged() };
     texSlider = _myInstance.container.find("#texSlider")[0];
     texSlider.oninput= function() { texSliderChanged() };
-    var organsPlayToggle = _myInstance.container.find("#organsPlayToggle")[0];
+    organsPlayToggle = _myInstance.container.find("#organsPlayToggle")[0];
     organsPlayToggle.onclick = function() { playPauseAnimation(organsPlayToggle) };
     var element = _myInstance.container.find("#organsImgContainer")[0];
     //enableImageMouseInteraction(element);

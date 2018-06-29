@@ -274,7 +274,7 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
     return changed;
   }
   
-  this.setHighlightedByGroupName = function(groupName, propagateChanges) {
+  this.findObjectsByGroupName = function(groupName) {
     var geometries = displayScene.findGeometriesWithGroupName(groupName);
     var objects = [];
     for (var i = 0; i < geometries.length; i ++ ) {
@@ -284,22 +284,19 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
     for (var i = 0; i < glyphsets.length; i ++ ) {
       glyphsets[i].forEachGlyph(addGlyphToArray(objects));
     }
+    
+    return objects;
+  }
+  
+  this.setHighlightedByGroupName = function(groupName, propagateChanges) {
+    var objects = _this.findObjectsByGroupName(groupName);
     return _this.setHighlightedByObjects(objects, propagateChanges);
   }
   
   this.setSelectedByGroupName = function(groupName, propagateChanges) {
-    var geometries = displayScene.findGeometriesWithGroupName(groupName);
-    var objects = [];
-    for (var i = 0; i < geometries.length; i ++ ) {
-      objects.push(geometries[i].morph);
-    }
-    var glyphsets = displayScene.findGlyphsetsWithGroupName(groupName);
-    for (var i = 0; i < glyphsets.length; i ++ ) {
-      glyphsets[i].forEachGlyph(addGlyphToArray(objects));
-    }
+    var objects = _this.findObjectsByGroupName(groupName);
     return _this.setSelectedByObjects(objects, propagateChanges);
   }
-	
 
 	/** 
 	 * Callback function when a pickable object has been picked. It will then call functions in tissueViewer
@@ -705,7 +702,7 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
     return function(geometry) {
       if (geometry.groupName) {
         for (var i = 0; i < organPartAddedCallbacks.length;i++) {
-          organPartAddedCallbacks[i](geometry.groupName);
+          organPartAddedCallbacks[i](geometry.groupName, geometry.isTimeVarying());
         }
         if (useDefautColour)
           modelsLoader.setGeometryColour(geometry, systemName, partName);
