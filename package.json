@@ -47,6 +47,6 @@
   },
   "dependencies": {
     "three": "^0.92.0",
-    "zincjs": "^0.28.5"
+    "zincjs": "^0.29.0"
   }
 }
