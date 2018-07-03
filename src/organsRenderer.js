@@ -917,7 +917,7 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
 	    eventNotifiers.push(eventNotifier);
 	  }
 	  
-	  this.alignViewWithSelectedObject = function(transitionTime) {
+	  this.alignCameraWithSelectedObject = function(transitionTime) {
 	    var objects = graphicsHighlight.getSelected();
 	    if (objects && objects[0] && objects[0].userData) {
 	      displayScene.alignObjectToCameraView(objects[0].userData, transitionTime);
