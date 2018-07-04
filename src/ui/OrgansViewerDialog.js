@@ -311,6 +311,7 @@ var OrgansViewerDialog = function(organsViewerIn) {
   var initialise = function() {
     if (organsViewer) {
       _myInstance.create(require("../snippets/organsViewer.html"));
+      _myInstance.setTitle("Organs");
       initialiseOrgansControlUI();
       var displayArea = _myInstance.container.find("#organsDisplayArea")[0];
       organsViewer.initialiseRenderer(displayArea);
