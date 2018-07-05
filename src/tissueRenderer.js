@@ -1,3 +1,8 @@
+var dat = require("./dat.gui.js");
+require("./styles/dat-gui-swec.css");
+require("./styles/my_styles.css");
+var THREE = require("three");
+
 /**
  * Used for viewing 3D tissue image stacks, it may include clickable points which
  * may provide additional informations and trigger actions on other panels.
@@ -8,7 +13,7 @@
  * @author Alan Wu
  * @returns {PJP.TissueViewer}
  */
-PJP.TissueViewer = function(DialogName)  {
+exports.TissueViewer = function(DialogName)  {
 	//ZincScene for this renderer.
 	var textureScene;
 	var sceneFirstPass, renderer;
@@ -32,6 +37,7 @@ PJP.TissueViewer = function(DialogName)  {
 	var modelPanel = undefined;
   var dialogObject = undefined;
   var localDialogName = DialogName;
+  var toolTip = undefined;
 	var _this = this;
 	
 	this.setCellPanel = function(CellPanelIn) {
@@ -41,25 +47,6 @@ PJP.TissueViewer = function(DialogName)  {
 	this.setModelPanel = function(ModelPanelIn) {
 		modelPanel = ModelPanelIn;
 	}
-	
-	var showCellTooltip = function(id, x, y) {
-		setToolTipText("Cell model " + id);
-		tooltipcontainerElement.style.left = x +"px";
-		tooltipcontainerElement.style.top = (y - 20) + "px";
-		tipElement.style.visibility = "visible";
-		tipElement.style.opacity = 1;
-		tiptextElement.style.visibility = "visible";
-		tiptextElement.style.opacity = 1;
-		currentHoverId = id;
-	}
-	
-	var hideCellTooltip = function() {
-		tipElement.style.visibility = "hidden";
-		tipElement.style.opacity = 0;
-		tiptextElement.style.visibility = "hidden";
-		tiptextElement.style.opacity = 0;
-	}
-	
 	
 	var openConstitutiveLawsLink = function() {
 		window.open(constitutiveLawsLink, '');
@@ -98,11 +85,12 @@ PJP.TissueViewer = function(DialogName)  {
 		return function(intersects, window_x, window_y) {
 			if (intersects[0] !== undefined && intersects[0].object !== undefined &&
 					(intersects[0].object.geometry instanceof THREE.SphereGeometry)) {
-				showCellTooltip(1, window_x, window_y);
+			  toolTip.setText("Cell model " + 1);
+			  toolTip.show(window_x, window_y);
 				dialogObject.find("#tissueDisplayArea")[0].style.cursor = "pointer";
 			}
 			else {
-				hideCellTooltip();
+			  toolTip.hide();
 				dialogObject.find("#tissueDisplayArea")[0].style.cursor = "auto";
 			}
 		}	
@@ -226,7 +214,7 @@ PJP.TissueViewer = function(DialogName)  {
 	
 	//Setup volume renderer
 	var volumeRenderStart = function(shaderText) {
-	
+	  toolTip = new (require("./tooltip").ToolTip)(dialogObject[0]);
 		guiControls = new function() {
 			this.model = 'collagen';
 			this.steps = 256.0;
@@ -247,7 +235,7 @@ PJP.TissueViewer = function(DialogName)  {
 		dialogObject.find("#tissueDisplayArea")[0].appendChild( container );
 		container.style.height = "100%"
 		container.style.backgroundColor = "white";
-		tissueRenderer = new Zinc.Renderer(container, window);
+		tissueRenderer = new (require("zincjs").Renderer)(container, window);
 		tissueRenderer.initialiseVisualisation();
 		tissueRenderer.playAnimation = false;
 		
@@ -411,26 +399,31 @@ PJP.TissueViewer = function(DialogName)  {
 	
 	//initialising the loading of the volume renderer
 	var volumeRenderInit = function() {
-		Zinc.loadExternalFiles(['shaders/tissueShaderFirstPass.vs', 'shaders/tissueShaderFirstPass.fs',
-		                   'shaders/tissueShaderSecondPass.vs', 'shaders/tissueShaderSecondPass.fs'], 
-		                   function (shaderText) {
-								volumeRenderStart(shaderText);
-							}, function (url) {
-							alert('Failed to download "' + url + '"');});
+	  var shaderText = [
+      require('./shaders/tissueShaderFirstPass.vs'),
+      require('./shaders/tissueShaderFirstPass.fs'),
+      require('./shaders/tissueShaderSecondPass.vs'),
+      require('./shaders/tissueShaderSecondPass.fs')];
+	  volumeRenderStart(shaderText);
+	  /*
+	  require('zincjs').loadExternalFiles([
+	    require('./shaders/tissueShaderFirstPass.vs'),
+	    require('./shaders/tissueShaderFirstPass.fs'),
+	    require('./shaders/tissueShaderSecondPass.vs'),
+	    require('./shaders/tissueShaderSecondPass.fs')], 
+      function (shaderText) {
+	      volumeRenderStart(shaderText);
+	    }, function (url) {
+        alert('Failed to download "' + url + '"');
+      });
+      */
 	}
 	
-  var createNewDialog = function(link) {
-    dialogObject = PJP.createDialogContainer(localDialogName, link);
+  var createNewDialog = function(data) {
+    dialogObject = require("./utility").createDialogContainer(localDialogName, data);
     addUICallback();
     volumeRenderInit();
     UIIsReady = true;
-  }
-  
-  var loadHTMLComplete = function(link) {
-    return function(event) {
-      link.isReady = true;
-      createNewDialog(link);
-    }
   }
   
   /**
@@ -439,20 +432,7 @@ PJP.TissueViewer = function(DialogName)  {
    * @async
    */
   var initialise = function() {
-    var link = document.getElementById("#tissueSnippet");
-    if (link == undefined) {
-      link = document.createElement('link');
-      link.id = "tissueSnippet";
-      link.rel = 'import';
-      link.href = 'snippets/tissueViewer.html';
-      link.onload = loadHTMLComplete(link);
-      link.onerror = loadHTMLComplete(link);
-      document.head.appendChild(link);
-    } else if (link.isReady !== true) {
-      setTimeout(function(){initialise()}, 500);
-    } else {
-      createNewDialog(link);
-    }
+    createNewDialog(require("./snippets/tissueViewer.html"));
   }
 	
 	/**
