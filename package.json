@@ -1,0 +1,52 @@
+{
+  "name": "physiomeportal",
+  "version": "0.2.0alpha",
+  "description": "Physiome Portal",
+  "main": "build/physiomeportal.min.js",
+  "files": [
+    "package.json",
+    "LICENSE",
+    "README.md",
+    "build/physiomeportal.js",
+    "build/physiomeportal.min.js",
+    "webpack.config.js"
+  ],
+  "scripts": {
+    "build": "webpack --mode=none",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alan-wu/ZincJS.git"
+  },
+  "keywords": [
+    "library",
+    "webgl",
+    "3d",
+    "zincjs",
+    "physiome",
+    "bioengineering",
+    "modelling"
+  ],
+  "author": "Alan Wu <alan.wu@auckland.ac.nz>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/alan-wu/MPB/issues"
+  },
+  "homepage": "http://alan-wu.github.io/MPB/",
+  "devDependencies": {
+    "file-loader": "^1.1.11",
+    "html-loader": "^0.5.5",
+    "raw-loader": "^0.5.1",
+    "style-loader": "^0.21.0",
+    "uglifyjs-webpack-plugin": "^1.2.5",
+    "url-loader": "^1.0.1",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.1.2",
+    "webpack-jquery-ui": "^1.0.0"
+  },
+  "dependencies": {
+    "three": "^0.92.0",
+    "zincjs": "^0.29.0"
+  }
+}

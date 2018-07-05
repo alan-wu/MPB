@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>2. Organ Viewer &mdash; PJP 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PJP 0.1 documentation" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="organ-viewer">
+<span id="organviewer"></span><h1>2. Organ Viewer<a class="headerlink" href="#organ-viewer" title="Permalink to this headline">¶</a></h1>
+<p>Organ Viewer is used for viewing models that users have previously selected on the body viewer.
+If a matching anatomical model is found, the anatomical model will be displayed, otherwise the
+geometry data similar to the one displayed on the body viewer will be displayed instead.</p>
+<div class="figure" id="id1">
+<a class="reference internal image-reference" href="_images/organ1.png"><img alt="Expanded view of the Organ Viewer" src="_images/organ1.png" style="width: 100%;" /></a>
+<p class="caption"><span class="caption-text">Expanded view of the Organ Viewer with a heart model on display:</span></p>
+<div class="legend">
+<ol class="arabic simple">
+<li><a class="reference internal" href="#organgui"><span>Organ Control GUI</span></a></li>
+<li><a class="reference internal" href="#organtimecontrol"><span>Organ Time Control</span></a></li>
+<li><a class="reference internal" href="#organrenderer"><span>Organ Renderer</span></a></li>
+<li><a class="reference internal" href="#organexternal"><span>Organ External Link</span></a></li>
+</ol>
+</div>
+</div>
+<div class="section" id="organ-control-gui">
+<span id="organgui"></span><h2>2.1. Organ Control GUI<a class="headerlink" href="#organ-control-gui" title="Permalink to this headline">¶</a></h2>
+<p>Individual visibility settings for different parts of a model can be toggled using this interface by clicking on the tickbox.
+In the case of the heart model, the visibility of different parts of a model such as terminal and nerves can be toggled.</p>
+<p>Similar to the GUI controls on body viewer, basic settings shared between organs/parts can be changed, such as background colour and
+animation speed.</p>
+</div>
+<div class="section" id="organ-time-control">
+<span id="organtimecontrol"></span><h2>2.2. Organ Time Control<a class="headerlink" href="#organ-time-control" title="Permalink to this headline">¶</a></h2>
+<p>Fields such as geometry, electrical activity and etc. are often time varying and visualisation of these data are supported by the Organ Viewer.</p>
+<p>Play/pause button and a time slider allow users to navigate between different time steps and allow the users to visualise changes overtime.</p>
+</div>
+<div class="section" id="organ-renderer">
+<span id="organrenderer"></span><h2>2.3. Organ Renderer<a class="headerlink" href="#organ-renderer" title="Permalink to this headline">¶</a></h2>
+<p>3D renderer of organs, users can freely rotate, pan and zoom in/out the models.</p>
+<p>Users may click on an interest point (as shown below) when present which may trigger the <a class="reference internal" href="tissueviewer.html#tissueviewer"><span>Tissue Viewer</span></a> to load and display tissue models.</p>
+<div class="figure align-center" id="id2">
+<a class="reference internal image-reference" href="_images/organ2.png"><img alt="Clickable point on a heart model" src="_images/organ2.png" style="width: 50%;" /></a>
+<p class="caption"><span class="caption-text">The image above shows a clickable point: &#8216;Node 86&#8217; on the heart model.</span></p>
+</div>
+</div>
+<div class="section" id="organ-external-link">
+<span id="organexternal"></span><h2>2.4. Organ External Link<a class="headerlink" href="#organ-external-link" title="Permalink to this headline">¶</a></h2>
+<p>Additional buttons may present, these buttons provides additional informations about the organs on display when pressed.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2. Organ Viewer</a><ul>
+<li><a class="reference internal" href="#organ-control-gui">2.1. Organ Control GUI</a></li>
+<li><a class="reference internal" href="#organ-time-control">2.2. Organ Time Control</a></li>
+<li><a class="reference internal" href="#organ-renderer">2.3. Organ Renderer</a></li>
+<li><a class="reference internal" href="#organ-external-link">2.4. Organ External Link</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/organviewer.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Alan Wu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/organviewer.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

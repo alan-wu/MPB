@@ -1,0 +1,9 @@
+.project
+.settings
+.tern-project
+jsdoc_conf.json
+node_modules
+sphinx
+test
+generate_structure_meta.py
+
