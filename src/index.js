@@ -13,6 +13,7 @@ exports.TissueViewer = require("./tissueRenderer").TissueViewer;
 exports.TissueViewer = require("./tissueRenderer").TissueViewer;
 exports.BaseDialog = require("./ui/BaseDialog").BaseDialog;
 exports.OrgansViewerDialog = require("./ui/OrgansViewerDialog").OrgansViewerDialog;
+exports.BodyViewerDialog = require("./ui/BodyViewerDialog").BodyViewerDialog;
 exports.EVENT_TYPE = require("./utilities/eventNotifier").EVENT_TYPE;
 exports.EventNotifier = require("./utilities/eventNotifier").EventNotifier;
 //exports.CellPanelDialog = require("./ui/CellPanelDialog").CellPanelDialog;
