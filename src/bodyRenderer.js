@@ -34,6 +34,8 @@ exports.BodyViewer = function(ModelsLoaderIn)  {
 	var graphicsHighlight = new (require("./utilities/graphicsHighlight").GraphicsHighlight)();
 	//ZincRenderer for this viewer.
 	var bodyRenderer = null;
+	 /**  Notifier handle for informing other modules of any changes **/
+  var eventNotifiers = [];
 	//Represents each physiological organ systems as folder in the dat.gui.
 	 var systemList =["Musculo-skeletal", "Cardiovascular", "Respiratory", "Digestive",
 	    "Skin (integument)", "Urinary", "Brain & Central Nervous", "Immunological",
@@ -61,7 +63,7 @@ exports.BodyViewer = function(ModelsLoaderIn)  {
 					if (!intersects[ i ].object.name.includes("Body")) {
 						if (organsViewer)
 							organsViewer.loadOrgans(currentSpecies, intersects[ i ].object.userData[0], intersects[ i ].object.name);
-						graphicsHighlight.setSelected([intersects[ i ].object]);
+						_this.setSelectedByObjects([intersects[ i ].object], true);
 						return;
 					} else {
 						bodyClicked = true;
@@ -87,14 +89,14 @@ exports.BodyViewer = function(ModelsLoaderIn)  {
 					  displayArea.style.cursor = "pointer";
 				    toolTip.setText(intersects[ i ].object.name);
 				    toolTip.show(window_x, window_y);
-				    graphicsHighlight.setHighlighted([intersects[ i ].object]);
+				    _this.setHighlightedByObjects([intersects[ i ].object], true);
 						return;
 					} else {
 						bodyHovered = true;
 					}
 				}
 			}
-			graphicsHighlight.resetHighlighted();
+			_this.setHighlightedByObjects([], true);
 			if (bodyHovered) {
 			  displayArea.style.cursor = "pointer";
         toolTip.setText("Body");
@@ -107,6 +109,16 @@ exports.BodyViewer = function(ModelsLoaderIn)  {
 		}
 	};
 	
+  var publishChanges = function(objects, eventType) {
+    var ids = new Array();
+    for (var i = 0; i < objects.length; i++) {
+      ids[i] = objects[i].name;
+    }
+    for (var i = 0; i < eventNotifiers.length; i++) {
+      eventNotifiers[i].publish(_this, eventType, ids);
+    }
+  }
+	
 	var removeGeometry = function(systemName, name) {
 		if (removeWhenNotVisible) {
 			var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
@@ -118,6 +130,48 @@ exports.BodyViewer = function(ModelsLoaderIn)  {
 			
 		}
 	}
+	
+  this.setHighlightedByObjects = function(objects, propagateChanges) {
+    var changed = graphicsHighlight.setHighlighted(objects);
+    if (changed && propagateChanges) {
+      var eventType = require("./utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
+      publishChanges(objects, eventType);
+    }
+    return changed;
+  }
+  
+  this.setSelectedByObjects = function(objects, propagateChanges) {
+    var changed = graphicsHighlight.setSelected(objects);
+    if (changed && propagateChanges) {
+      var eventType = require("./utilities/eventNotifier").EVENT_TYPE.SELECTED;
+      publishChanges(objects, eventType);
+    }
+    return changed;
+  }
+  
+  this.findObjectsByGroupName = function(groupName) {
+    var geometries = displayScene.findGeometriesWithGroupName(groupName);
+    var objects = [];
+    for (var i = 0; i < geometries.length; i ++ ) {
+      objects.push(geometries[i].morph);
+    }
+    var glyphsets = displayScene.findGlyphsetsWithGroupName(groupName);
+    for (var i = 0; i < glyphsets.length; i ++ ) {
+      glyphsets[i].forEachGlyph(addGlyphToArray(objects));
+    }
+    
+    return objects;
+  }
+  
+  this.setHighlightedByGroupName = function(groupName, propagateChanges) {
+    var objects = _this.findObjectsByGroupName(groupName);
+    return _this.setHighlightedByObjects(objects, propagateChanges);
+  }
+  
+  this.setSelectedByGroupName = function(groupName, propagateChanges) {
+    var objects = _this.findObjectsByGroupName(groupName);
+    return _this.setSelectedByObjects(objects, propagateChanges);
+  }
 	
 	/**
 	 * This is called when a body part visibility control is switch on/off.
@@ -253,6 +307,10 @@ exports.BodyViewer = function(ModelsLoaderIn)  {
 	var initialise = function() {
 	  _this.initialiseRenderer(undefined);
 	}
+	
+  this.addNotifier = function(eventNotifier) {
+    eventNotifiers.push(eventNotifier);
+  }
 	
 	var readModel = function(systemName, partName, startup) {
 		var systemMeta = modelsLoader.getSystemMeta(currentSpecies);

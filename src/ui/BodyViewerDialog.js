@@ -200,7 +200,7 @@ var BodyViewerDialog = function(bodyViewerIn) {
     controller.onChange(bodyBackGroundChanged());
     _myInstance.container.find("#bodyGui")[0].append(_myInstance.datGui.domElement);
     var resetViewButton = { 'Reset View':function(){ bodyViewer.resetView() }};
-    var viewAllButton = { 'View All':function(){ organsViewer.viewAll() }};
+    var viewAllButton = { 'View All':function(){ bodyViewer.viewAll() }};
     _myInstance.datGui.add(resetViewButton, 'Reset View');
     _myInstance.datGui.add(viewAllButton, 'View All');
     addSystemFolders();
