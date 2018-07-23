@@ -67,7 +67,6 @@ BaseDialog.prototype.getWidth = function() {
 };
 
 BaseDialog.prototype.setWidth = function(widthIn) {
-  console.log(widthIn);
   if (typeof(widthIn) == "string") {
     if (/^\d+(\.\d+)?%$/.test(widthIn)) {
       var value = parseFloat(widthIn) / 100.0;
@@ -84,6 +83,10 @@ BaseDialog.prototype.setWidth = function(widthIn) {
       this.container.dialog( "option", "width", actualWidth );
   }
 };
+
+BaseDialog.prototype.moveToTop = function() {
+  return this.container.dialog( "moveToTop" );
+}
 
 BaseDialog.prototype.setLeft = function(leftIn) {
   this.container[0].parentNode.style.left = leftIn;

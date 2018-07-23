@@ -18,6 +18,10 @@ var OrgansViewerDialog = function(organsViewerIn) {
   var _myInstance = this;
 
   
+  this.getModule = function() {
+    return organsViewer;
+  }
+  
   // data used by dat.gui to control non-model specific controls. 
   var organsControl = function() {
       this.Background = [ 255, 255, 255 ]; // RGB array

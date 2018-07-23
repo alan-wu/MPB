@@ -14,12 +14,12 @@ exports.ModelsLoader = function()  {
 	var bodyDirectoryPrefix = "models/body";
 	var organsDirectoryPrefix = "models/organsViewerModels";
 	this.systemMetaURL = bodyDirectoryPrefix + "/" + "bodyMeta.json";
-	var systemMeta = new Array();
-	systemMeta['human'] = new Array();
-	systemMeta['pig'] = new Array();
-	systemMeta['rat'] = new Array();
-	systemMeta['mouse'] = new Array();
-	var systemColour = new Array();
+	var systemMeta = {};
+	systemMeta['human'] = {};
+	systemMeta['pig'] = {};
+	systemMeta['rat'] = {};
+	systemMeta['mouse'] = {};
+	var systemColour = {};
 	var numberOfDownloadings = 0;
 	var systemMetaReadyCallbackFunctions = [];
 	systemColour["Cardiovascular"] = new THREE.Color("rgb(50%, 12%, 0%)");
@@ -30,7 +30,6 @@ exports.ModelsLoader = function()  {
 	systemColour["Skin (integument)"] = new THREE.Color("rgb(90%, 70%, 50%)");
 	systemColour["Urinary"] = new THREE.Color("rgb(50%, 12%, 10%)");
 	systemColour["Musculo-skeletal"] = new THREE.Color("rgb(90%, 90%, 70%)");
-	
 	var partColour = new Array();
 	partColour["Muscle"] = new THREE.Color("rgb(50%, 12%, 10%)");
 	
@@ -79,6 +78,20 @@ exports.ModelsLoader = function()  {
 	this.addSystemMetaIsReadyCallback = function(callbackFunctions) {		
 		systemMetaReadyCallbackFunctions.push(callbackFunctions);
 	}
+	
+	var clone = function(obj) {
+    if (null == obj || "object" != typeof obj) return obj;
+    var copy = obj.constructor();
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
+    }
+    return copy;
+	}
+	
+	this.cloneSystemMeta = function() {
+    return clone(systemMeta);
+}
+
 	
 	//Load the json file containing informations about models availability
 	var loadSystemMetaURL = function(url) {

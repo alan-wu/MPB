@@ -8,6 +8,10 @@ var BodyViewerDialog = function(bodyViewerIn) {
   var systemPartsGuiControls = new Array();
   var _myInstance = this;
 
+  this.getModule = function() {
+    return bodyViewer;
+  }
+  
   //Array of settings of the body viewer gui controls.
   var bodyControl = function() {
       this.Background = [ 255, 255, 255 ]; // RGB array
@@ -22,13 +26,14 @@ var BodyViewerDialog = function(bodyViewerIn) {
       bodyViewer.changeBackgroundColour(backgroundColourString);
     }
   }
-
+  
   /**
    * Update the style of the system buttons
    */
   var updateSystemButtons = function(systemName, value, isPartial) {
-    var name = "#" + systemName;
+    var name = "[id='" + systemName + "']";
     var element = _myInstance.container.find(name)[0];
+    
     if (value == true)
       element.className = "w3-circle systemToggleButton systemToggleButtonOn";
     else {
@@ -119,7 +124,6 @@ var BodyViewerDialog = function(bodyViewerIn) {
   }
   
   var systemGuiFolderHasPartControls = function(systemName, partName) {
-    
     for (var i = 0; i < systemGuiFolder[systemName].__controllers.length; i++) {
       if (systemGuiFolder[systemName].__controllers[i].property == partName) {
         return true;
@@ -207,7 +211,7 @@ var BodyViewerDialog = function(bodyViewerIn) {
     bodyViewer.forEachPartInBody(systemPartAddedCallback());
     bodyViewer.addSystemPartAddedCallback(systemPartAddedCallback());
   }
-  
+    
   var initialise = function() {
     if (bodyViewer) {
       _myInstance.create(require("../snippets/bodyViewer.html"));
@@ -217,6 +221,7 @@ var BodyViewerDialog = function(bodyViewerIn) {
       bodyViewer.initialiseRenderer(displayArea);
     }
   }
+  
   
   initialise();
 }

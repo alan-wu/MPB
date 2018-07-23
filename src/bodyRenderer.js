@@ -14,8 +14,8 @@ var ITEM_LOADED = require("./utility").ITEM_LOADED;
  * @author Alan Wu
  * @returns {PJP.BodyViewer}
  */
-exports.BodyViewer = function(ModelsLoaderIn)  {
-
+var BodyViewer = function(ModelsLoaderIn)  {
+  (require('./BaseModule').BaseModule).call(this);
 	var currentScene = undefined;
 	var currentSpecies = 'human';
 	var bodyScenes = new Array();
@@ -37,10 +37,12 @@ exports.BodyViewer = function(ModelsLoaderIn)  {
 	 /**  Notifier handle for informing other modules of any changes **/
   var eventNotifiers = [];
 	//Represents each physiological organ systems as folder in the dat.gui.
-	 var systemList =["Musculo-skeletal", "Cardiovascular", "Respiratory", "Digestive",
-	    "Skin (integument)", "Urinary", "Brain & Central Nervous", "Immunological",
-	    "Endocrine", "Female Reproductive", "Male Reproductive", "Special sense organs"];
+	var systemList =["Musculo-skeletal", "Cardiovascular", "Respiratory", "Digestive",
+	  "Skin (integument)", "Urinary", "Brain & Central Nervous", "Immunological",
+	  "Endocrine", "Female Reproductive", "Male Reproductive", "Special sense organs"];
+	var systemMeta = undefined;
 	var _this = this;
+	_this.typeName = "Body Viewer";
 	
 	/**
 	 * Set the organs viewer this {@link PJP.BodyViewer} fires event to.
@@ -121,11 +123,11 @@ exports.BodyViewer = function(ModelsLoaderIn)  {
 	
 	var removeGeometry = function(systemName, name) {
 		if (removeWhenNotVisible) {
-			var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
-			if (systemMeta[systemName].hasOwnProperty(name) && systemMeta[systemName][name].geometry) {
-				currentScene.removeZincGeometry(systemMeta[systemName][name].geometry);
-				systemMeta[systemName][name]["loaded"] = ITEM_LOADED.FALSE;
-				systemMeta[systemName][name].geometry = undefined;
+			var speciesMeta = systemMeta[currentSpecies];
+			if (speciesMeta[systemName].hasOwnProperty(name) && speciesMeta[systemName][name].geometry) {
+				currentScene.removeZincGeometry(speciesMeta[systemName][name].geometry);
+				speciesMeta[systemName][name]["loaded"] = ITEM_LOADED.FALSE;
+				speciesMeta[systemName][name].geometry = undefined;
 			}
 			
 		}
@@ -178,9 +180,9 @@ exports.BodyViewer = function(ModelsLoaderIn)  {
 	 * @callback
 	 */
 	this.changeBodyPartsVisibility = function(name, systemName, value) {
-		var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
-		if (systemMeta[systemName].hasOwnProperty(name) && systemMeta[systemName][name].geometry) {
-			systemMeta[systemName][name].geometry.setVisibility(value);
+    var speciesMeta = systemMeta[currentSpecies];
+		if (speciesMeta[systemName].hasOwnProperty(name) && speciesMeta[systemName][name].geometry) {
+		  speciesMeta[systemName][name].geometry.setVisibility(value);
 		}
 		if (value == false) {
 			removeGeometry(systemName, name);
@@ -284,9 +286,9 @@ exports.BodyViewer = function(ModelsLoaderIn)  {
 	}
 	
 	this.forEachPartInBody = function(callback) {
-    var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
-    for (var systemName  in systemMeta) {
-      var partMap = systemMeta[systemName];
+    var speciesMeta = systemMeta[currentSpecies];
+    for (var systemName  in speciesMeta) {
+      var partMap = speciesMeta[systemName];
       for (var partName in partMap) {
         if (partMap.hasOwnProperty(partName)) {
           var item = partMap[partName];
@@ -313,8 +315,8 @@ exports.BodyViewer = function(ModelsLoaderIn)  {
   }
 	
 	var readModel = function(systemName, partName, startup) {
-		var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
-		item = systemMeta[systemName][partName];
+    var speciesMeta = systemMeta[currentSpecies];
+		item = speciesMeta[systemName][partName];
 		if (item["loaded"] ==  ITEM_LOADED.FALSE) {
 			var downloadPath = item["BodyURL"];
 			var scaling = false;
@@ -352,12 +354,18 @@ exports.BodyViewer = function(ModelsLoaderIn)  {
 	 * @async
 	 */
 	this.readSystemMeta = function() {
-		var systemMeta = modelsLoader.getSystemMeta(currentSpecies);
-		for (var systemItem  in systemMeta) {
-			readBodyRenderModel(systemItem, systemMeta[systemItem]);	
-		}
+	  if (!systemMeta) {
+  		systemMeta = modelsLoader.cloneSystemMeta();
+  		var speciesMeta = systemMeta[currentSpecies];
+  		//systemMeta = systemMeta.slice();
+  		for (var speciesItem  in speciesMeta) {
+  			readBodyRenderModel(speciesItem, speciesMeta[speciesItem]);	
+  		}
+	  }
 	}
 	
 	initialise();
 }
 
+BodyViewer.prototype = Object.create((require('./BaseModule').BaseModule).prototype);
+exports.BodyViewer = BodyViewer;

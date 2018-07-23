@@ -16,6 +16,8 @@ exports.OrgansViewerDialog = require("./ui/OrgansViewerDialog").OrgansViewerDial
 exports.BodyViewerDialog = require("./ui/BodyViewerDialog").BodyViewerDialog;
 exports.EVENT_TYPE = require("./utilities/eventNotifier").EVENT_TYPE;
 exports.EventNotifier = require("./utilities/eventNotifier").EventNotifier;
+exports.ModuleManager = require("./manager").ModuleManager;
+exports.ManagerSidebar = require("./ui/ManagerSidebar").ManagerSidebar;
 //exports.CellPanelDialog = require("./ui/CellPanelDialog").CellPanelDialog;
 exports.VERSION = '0.2.0';
 

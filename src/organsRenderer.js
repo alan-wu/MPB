@@ -27,7 +27,8 @@ var OrgansSceneData = function() {
  * @author Alan Wu
  * @returns {PJP.OrgansViewer}
  */
-exports.OrgansViewer = function(ModelsLoaderIn)  {
+var OrgansViewer = function(ModelsLoaderIn)  {
+  (require('./BaseModule').BaseModule).call(this);
 	var pickerScene = undefined;
 	var displayScene = undefined;
 	var defaultScene = undefined;
@@ -61,6 +62,7 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
 	var modelsLoader = ModelsLoaderIn;
 	var graphicsHighlight = new (require("./utilities/graphicsHighlight").GraphicsHighlight)();
 	var _this = this;
+	_this.typeName = "Organs Viewer";
 
 	//ZincRenderer for the primary display of model.
 	var organsRenderer = null;
@@ -1055,3 +1057,6 @@ exports.OrgansViewer = function(ModelsLoaderIn)  {
     });
 	}
 }
+
+OrgansViewer.prototype = Object.create((require('./BaseModule').BaseModule).prototype);
+exports.OrgansViewer = OrgansViewer;
