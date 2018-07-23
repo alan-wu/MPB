@@ -7,7 +7,7 @@ var BodyViewerDialog = function(bodyViewerIn) {
   var systemGuiFolder = new Array();
   var systemPartsGuiControls = new Array();
   var _myInstance = this;
-
+    
   this.getModule = function() {
     return bodyViewer;
   }
@@ -16,6 +16,7 @@ var BodyViewerDialog = function(bodyViewerIn) {
   var bodyControl = function() {
       this.Background = [ 255, 255, 255 ]; // RGB array
   }
+  
 
   var bodyBackGroundChanged = function() {
     return function(value) {
@@ -182,6 +183,7 @@ var BodyViewerDialog = function(bodyViewerIn) {
     }
   }
   
+  
   /**
    * Add UI callbacks after html page has been loaded.
    */
@@ -211,6 +213,15 @@ var BodyViewerDialog = function(bodyViewerIn) {
     bodyViewer.forEachPartInBody(systemPartAddedCallback());
     bodyViewer.addSystemPartAddedCallback(systemPartAddedCallback());
   }
+  
+  var _bodyViewerDialogClose = function() {
+    return function(myDialog) {
+      if (_myInstance.destroyModuleOnClose) {
+        bodyViewer.destroy();
+        bodyViewer = undefined;
+      }
+    }
+  }
     
   var initialise = function() {
     if (bodyViewer) {
@@ -219,6 +230,7 @@ var BodyViewerDialog = function(bodyViewerIn) {
       initialiseBodyControlUI();
       var displayArea = _myInstance.container.find("#bodyDisplayArea")[0];
       bodyViewer.initialiseRenderer(displayArea);
+      _myInstance.onCloseCallbacks.push(_bodyViewerDialogClose());
     }
   }
   

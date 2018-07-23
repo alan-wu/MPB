@@ -12,7 +12,26 @@ var BaseDialog = function() {
   this.content = undefined;
   this.datGui = undefined;
   this.UIIsReady = false;
+  this.beforeCloseCallbacks = [];
+  this.onCloseCallbacks = [];
   this.title = "Default";
+}
+
+BaseDialog.prototype.close = function(myInstance) {
+  return function(event, ui) {
+    myInstance.container.dialog('destroy').remove();
+    for (var i = 0; i < myInstance.onCloseCallbacks.length; i++) {
+      myInstance.onCloseCallbacks[i]( this);
+    }
+  }
+}
+
+BaseDialog.prototype.beforeClose = function(myInstance) {
+  return function(event, ui) {
+    for (var i = 0; i < myInstance.beforeCloseCallbacks.length; i++) {
+      myInstance.beforeCloseCallbacks[i]( this );
+    }
+  }
 }
 
 BaseDialog.prototype.create = function(htmlData, dataController) {
@@ -28,12 +47,24 @@ BaseDialog.prototype.create = function(htmlData, dataController) {
   for (i = 0; i < childNodes.length; i++) {
     this.content[0].appendChild(childNodes[i]);
   }
+
+  this.container.dialog({
+    beforeClose: this.beforeClose(this)
+  });
+
+  this.container.dialog({
+    close: this.close(this)
+  });
 };
 
 BaseDialog.prototype.addDatGui = function() {
   this.datGui = new dat.GUI({autoPlace: false});
   this.datGui.domElement.id = 'gui';
   this.datGui.close();
+};
+
+BaseDialog.prototype.addBeforeCloseCallback = function(callback) {
+  this.beforeCloseCallbacks.push(callback);
 };
 
 BaseDialog.prototype.setTitle = function(titleIn) {

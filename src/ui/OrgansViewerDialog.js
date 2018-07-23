@@ -312,6 +312,15 @@ var OrgansViewerDialog = function(organsViewerIn) {
     organPartsGui.open();
   }
   
+  var _organsViewerDialogClose = function() {
+    return function(myDialog) {
+      if (_myInstance.destroyModuleOnClose) {
+        organsViewer.destroy();
+        organsViewer = undefined;
+      }
+    }
+  }
+  
   var initialise = function() {
     if (organsViewer) {
       _myInstance.create(require("../snippets/organsViewer.html"));
@@ -322,6 +331,7 @@ var OrgansViewerDialog = function(organsViewerIn) {
       organsViewer.addTimeChangedCallback(timeChangedCallback());
       organsViewer.addSceneChangedCallback(sceneChangedCallback());
       organsViewer.addOrganPartAddedCallback(organPartAddedCallback());
+      _myInstance.onCloseCallbacks.push(_organsViewerDialogClose());
     }
   }
   

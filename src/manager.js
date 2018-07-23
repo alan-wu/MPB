@@ -1,3 +1,5 @@
+var MANAGER_MODULE_CHANGE = { CHANGED: 0, ADDED: 1, REMOVED: 2 };
+
 exports.ModuleManager = function()  {
   var ready = false;
   var moduleCounter = 0; 
@@ -7,9 +9,9 @@ exports.ModuleManager = function()  {
   };
   
   var modules = [];
-  var ui_viewers = [];
+  var ui_dialogs = [];
   var modelsLoader = undefined;
-  var moduleAddedCallbacks = new Array();
+  var moduleChangedCallbacks = [];
   var _this = this;
   
   this.getAllModules = function() {
@@ -32,10 +34,10 @@ exports.ModuleManager = function()  {
     }
   }
   
-  this.getViewerWithName = function(name) {
-    for (var i = 0; i< ui_viewers.length; i++) {
-      if (name.localeCompare(ui_viewers[i].getModule().getName()) == 0)
-        return ui_viewers[i];
+  this.getDialogWithName = function(name) {
+    for (var i = 0; i< ui_dialogs.length; i++) {
+      if (name.localeCompare(ui_dialogs[i].getModule().getName()) == 0)
+        return ui_dialogs[i];
     }
   }
   
@@ -59,24 +61,58 @@ exports.ModuleManager = function()  {
     return modelsLoader; 
   }
   
-  this.addViewer = function(viewer) {
-    if (ui_viewers.includes(viewer) == false) {
-      ui_viewers.push(viewer);
+  var dialogDestroyCallback = function() {
+    return function(dialog) {
+     _this.removeDialog(dialog);
+    }
+  }
+  
+  this.addDialog = function(dialog) {
+    if (ui_dialogs.includes(dialog) == false) {
+      ui_dialogs.push(dialog);
+      dialog.addBeforeCloseCallback(dialogDestroyCallback());
+    }
+  }
+  
+  this.removeDialog = function(dialog) {
+    var index = ui_dialogs.indexOf(dialog);
+    if (index > -1) {
+      ui_dialogs.splice(index, 1);
+    }
+  }
+  
+  var moduleChangedCallback = function() {
+    return function(module, change) {
+      if (change ===  require("./BaseModule").MODULE_CHANGE.DESTROYED)
+        _this.removeModule(module);
     }
   }
   
   this.addModule = function(module) {
     if (modules.includes(module) == false) {
       modules.push(module);
-      for (var i = 0; i < moduleAddedCallbacks.length;i++) {
-        moduleAddedCallbacks[i](module);
+      for (var i = 0; i < moduleChangedCallbacks.length;i++) {
+        moduleChangedCallbacks[i](module, MANAGER_MODULE_CHANGE.ADDED);
       }
+      module.addChangedCallback(moduleChangedCallback());
     }
   }
   
-  this.addModuleAddedCallback = function(callback) {
+  this.removeModule = function(module) {
+    var index = modules.indexOf(module);
+    if (index > -1) {
+      modules.splice(index, 1);
+      for (var i = 0; i < moduleChangedCallbacks.length;i++) {
+        moduleChangedCallbacks[i](module, MANAGER_MODULE_CHANGE.REMOVED);
+      }
+      
+      module.removeChangedCallback(moduleChangedCallback());
+    }
+  }
+  
+  this.addModuleChangedCallback = function(callback) {
     if (typeof(callback === "function"))
-      moduleAddedCallbacks.push(callback);
+      moduleChangedCallbacks.push(callback);
   }
   
   this.createModule = function(moduleName) {
@@ -109,3 +145,5 @@ exports.ModuleManager = function()  {
   
   initialise();
 }
+
+exports.MANAGER_MODULE_CHANGE = MANAGER_MODULE_CHANGE;

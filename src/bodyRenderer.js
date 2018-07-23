@@ -349,6 +349,12 @@ var BodyViewer = function(ModelsLoaderIn)  {
 		}
 	}
 	
+	this.destroy = function() {
+	  bodyRenderer = undefined;
+	  systemMeta = undefined;
+	  (require('./BaseModule').BaseModule).prototype.destroy.call( _this );
+	}
+	
 	/**
 	 * Signal the {@link PJP.BodyViewer} to start reading the meta file.
 	 * @async

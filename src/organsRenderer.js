@@ -905,13 +905,11 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	    }
 	  }
 	  
-	  this.resetView = function()
-	  {
+	  this.resetView = function() {
 	    organsRenderer.resetView();
 	  }
 	  
-	  this.viewAll = function()
-	  {
+	  this.viewAll = function() {
 	    organsRenderer.viewAll();
 	  }
 	  
@@ -924,6 +922,12 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	    if (objects && objects[0] && objects[0].userData) {
 	      displayScene.alignObjectToCameraView(objects[0].userData, transitionTime);
 	    }
+	  }
+	  
+	  this.destroy = function() {
+	    organsRenderer = null;
+	    secondaryRenderer = null;
+	    (require('./BaseModule').BaseModule).prototype.destroy.call( _this );
 	  }
 
 	/**

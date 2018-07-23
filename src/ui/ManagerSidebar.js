@@ -26,7 +26,9 @@ var ManagerSidebar = function(parentIn, moduleManagerIn) {
     var module = moduleManager.createModule("Body Viewer");
     module.readSystemMeta();
     var dialog = new (require("./BodyViewerDialog").BodyViewerDialog)(module);
-    moduleManager.addViewer(dialog);
+    dialog.setTitle(module.getName());
+    dialog.destroyModuleOnClose = true;
+    moduleManager.addDialog(dialog);
   }
   
   var create = function(htmlData) {
@@ -40,9 +42,9 @@ var ManagerSidebar = function(parentIn, moduleManagerIn) {
   }
   
   var onModuleClick = function(name, module) {
-    var viewer = moduleManager.getViewerWithName(name);
-    if (viewer)
-      viewer.moveToTop();
+    var dialog = moduleManager.getDialogWithName(name);
+    if (dialog)
+      dialog.moveToTop();
   }
   
   var addModuleToSidebar = function(module) {
@@ -55,9 +57,18 @@ var ManagerSidebar = function(parentIn, moduleManagerIn) {
     sidebarEle.appendChild(element);
   }
   
-  var moduleAddedCallback = function() {
-    return function(module) {
-      addModuleToSidebar(module);
+  var removeModuleFromSidebar = function(module) {
+    var itemsElem = $(sidebarEle);
+    //sidebarEle.removeChild(itemsElem.find("#" + module.getName())[0]);
+    itemsElem.find("#" + module.getName()).remove();
+  }
+  
+  var moduleChangedCallback = function() {
+    return function(module, eventType) {
+      if (eventType === require("../manager").MANAGER_MODULE_CHANGE.ADDED)
+        addModuleToSidebar(module);
+      else if (eventType === require("../manager").MANAGER_MODULE_CHANGE.REMOVED)
+        removeModuleFromSidebar(module);
     }
   }
   
@@ -71,7 +82,7 @@ var ManagerSidebar = function(parentIn, moduleManagerIn) {
         if (module)
           addModuleToSidebar(module);
       }
-      moduleManager.addModuleAddedCallback(moduleAddedCallback());
+      moduleManager.addModuleChangedCallback(moduleChangedCallback());
     }
   }
   

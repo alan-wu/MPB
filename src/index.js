@@ -18,6 +18,8 @@ exports.EVENT_TYPE = require("./utilities/eventNotifier").EVENT_TYPE;
 exports.EventNotifier = require("./utilities/eventNotifier").EventNotifier;
 exports.ModuleManager = require("./manager").ModuleManager;
 exports.ManagerSidebar = require("./ui/ManagerSidebar").ManagerSidebar;
+exports.MANAGER_MODULE_CHANGE = require("./manager").MANAGER_MODULE_CHANGE;
+exports.MODULE_CHANGE = require("./BaseModule").MODULE_CHANGE;
 //exports.CellPanelDialog = require("./ui/CellPanelDialog").CellPanelDialog;
 exports.VERSION = '0.2.0';
 
