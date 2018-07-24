@@ -1,6 +1,7 @@
 
 //require("./styles/bootstrap.min.css");
 require("./styles/w3.css");
+require("./styles/dropmenu.css");
 require("./styles/jquery-ui.min.css");
 require('./styles/bootstrap.min.css');
 
@@ -16,9 +17,9 @@ exports.OrgansViewerDialog = require("./ui/OrgansViewerDialog").OrgansViewerDial
 exports.BodyViewerDialog = require("./ui/BodyViewerDialog").BodyViewerDialog;
 exports.EVENT_TYPE = require("./utilities/eventNotifier").EVENT_TYPE;
 exports.EventNotifier = require("./utilities/eventNotifier").EventNotifier;
-exports.ModuleManager = require("./manager").ModuleManager;
 exports.ManagerSidebar = require("./ui/ManagerSidebar").ManagerSidebar;
-exports.MANAGER_MODULE_CHANGE = require("./manager").MANAGER_MODULE_CHANGE;
+exports.ModuleManager = require("./utilities/manager").ModuleManager;
+exports.MANAGER_ITEM_CHANGE = require("./utilities/manager").MANAGER_ITEM_CHANGE;
 exports.MODULE_CHANGE = require("./BaseModule").MODULE_CHANGE;
 //exports.CellPanelDialog = require("./ui/CellPanelDialog").CellPanelDialog;
 exports.VERSION = '0.2.0';

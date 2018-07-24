@@ -67,6 +67,13 @@ BaseDialog.prototype.addBeforeCloseCallback = function(callback) {
   this.beforeCloseCallbacks.push(callback);
 };
 
+BaseDialog.prototype.removeBeforeCloseCallback = function(callback) {
+  var index = this.beforeCloseCallbacks.indexOf(callback);
+  if (index > -1) {
+    this.beforeCloseCallbacks.splice(index, 1);
+  }
+};
+
 BaseDialog.prototype.setTitle = function(titleIn) {
   this.title = titleIn;
   this.container.dialog("option", "title", this.title);

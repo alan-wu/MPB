@@ -350,7 +350,11 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	}
 	
 	this.destroy = function() {
-	  bodyRenderer = undefined;
+	  if (bodyRenderer) {
+	    bodyRenderer.dispose();
+	    bodyRenderer.getThreeJSRenderer().dispose();
+	    bodyRenderer = undefined;
+	  }
 	  systemMeta = undefined;
 	  (require('./BaseModule').BaseModule).prototype.destroy.call( _this );
 	}

@@ -925,8 +925,15 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	  }
 	  
 	  this.destroy = function() {
-	    organsRenderer = null;
-	    secondaryRenderer = null;
+	    if (organsRenderer) {
+	      organsRenderer.dispose();
+	      organsRenderer.getThreeJSRenderer().dispose();
+	      organsRenderer = undefined;
+	    }
+	    if (secondaryRenderer) {
+	      secondaryRenderer.dispose();
+	      secondaryRenderer = null;
+	    }
 	    (require('./BaseModule').BaseModule).prototype.destroy.call( _this );
 	  }
 

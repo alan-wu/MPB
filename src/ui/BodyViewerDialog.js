@@ -222,18 +222,27 @@ var BodyViewerDialog = function(bodyViewerIn) {
       }
     }
   }
+  
+  var bodyViewerChangedCallback = function() {
+    return function(module, change) {
+      if (change === require("../BaseModule").MODULE_CHANGE.NAME_CHANGED) {
+        _myInstance.setTitle(module.getName());
+      }
+    }
+  }
     
   var initialise = function() {
     if (bodyViewer) {
       _myInstance.create(require("../snippets/bodyViewer.html"));
-      _myInstance.setTitle("Body");
+      var name = bodyViewer.getName();
+      _myInstance.setTitle(name);
       initialiseBodyControlUI();
       var displayArea = _myInstance.container.find("#bodyDisplayArea")[0];
       bodyViewer.initialiseRenderer(displayArea);
+      bodyViewer.addChangedCallback(bodyViewerChangedCallback());
       _myInstance.onCloseCallbacks.push(_bodyViewerDialogClose());
     }
   }
-  
   
   initialise();
 }

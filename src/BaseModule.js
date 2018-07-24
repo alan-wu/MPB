@@ -1,15 +1,21 @@
-var MODULE_CHANGE = { ALL: 0, CHANGED: 1, DESTROYED: 2 };
+var MODULE_CHANGE = { ALL: 0, DESTROYED: 1, NAME_CHANGED: 2 };
 
 
 var BaseModule = function() {
   this.typeName = "Base Module";
   this.instanceName = "default";
   this.onChangedCallbacks = [];
-  this.destroyModuleOnClose = false;
+
 }
 
 BaseModule.prototype.setName = function(name) {
-  this.instanceName = name;
+  if (name && this.instanceName !== name) {
+    this.instanceName = name;
+    var callbackArray = this.onChangedCallbacks.slice();
+    for (var i = 0; i < callbackArray.length; i++) {
+      callbackArray[i]( this, MODULE_CHANGE.NAME_CHANGED );
+    }
+  }
 }
 
 BaseModule.prototype.getName = function() {

@@ -321,16 +321,26 @@ var OrgansViewerDialog = function(organsViewerIn) {
     }
   }
   
+  var organsViewerChangedCallback = function() {
+    return function(module, change) {
+      if (change === require("../BaseModule").MODULE_CHANGE.NAME_CHANGED) {
+        _myInstance.setTitle(module.getName());
+      }
+    }
+  }
+  
   var initialise = function() {
     if (organsViewer) {
       _myInstance.create(require("../snippets/organsViewer.html"));
-      _myInstance.setTitle("Organs");
+      var name = organsViewer.getName();
+      _myInstance.setTitle(name);
       initialiseOrgansControlUI();
       var displayArea = _myInstance.container.find("#organsDisplayArea")[0];
       organsViewer.initialiseRenderer(displayArea);
       organsViewer.addTimeChangedCallback(timeChangedCallback());
       organsViewer.addSceneChangedCallback(sceneChangedCallback());
       organsViewer.addOrganPartAddedCallback(organPartAddedCallback());
+      organsViewer.addChangedCallback(organsViewerChangedCallback());
       _myInstance.onCloseCallbacks.push(_organsViewerDialogClose());
     }
   }
