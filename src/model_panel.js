@@ -13,30 +13,24 @@ require("./styles/my_styles.css");
  * @author Alan Wu
  * @returns {PJP.ModelPanel}
  */
-exports.ModelPanel = function(DialogName)  {
-	var modelGui = undefined;
-	var otherModelControls = undefined;
-	var runModelURL = undefined;
+var ModelPanel = function()  {
+  (require('./BaseModule').BaseModule).call(this);
+ 	var runModelURL = undefined;
 	var _this = this;
 	var svgController= undefined;
-	var targetSVGPanelName = undefined;
-	var modelControl = function() {
-		  this.Background = [ 255, 255, 255 ]; // RGB array
-	};
-	var dialogObject = undefined;
-	var localDialogName = DialogName;
-	
+	var targetSVGPanelElement = undefined;
+	 _this.typeName = "Model Panel";
 	/**
 	 * Create and enable SVGController on the provided panelName, if no element with the id is found,
 	 * try after loadHTMLComplete is completed.
 	 *  
 	 * @param {String} panelName - Id of the target element to create the  {@link PJP.SVGController} on.
 	 */
-	this.enableSVGController = function(svgPanelName) {
+	this.enableSVGController = function(SVGPanelElement) {
 		if (svgController === undefined) {
-			targetSVGPanelName = svgPanelName;
-			if (document.getElementById(targetSVGPanelName) != null)
-				svgController = new (require('./svgController').SVGController)(targetSVGPanelName);
+		  targetSVGPanelElement = SVGPanelElement;
+			if (targetSVGPanelElement != null)
+				svgController = new (require('./svgController').SVGController)(targetSVGPanelElement);
 		}
 	}
 	
@@ -48,8 +42,6 @@ exports.ModelPanel = function(DialogName)  {
 	this.openModel = function(svgName) {
 		if (svgController) {
 			svgController.loadSVG(svgName);
-			dialogObject.find("#modelsController")[0].style.visibility = "visible";
-			dialogObject.find("#modelsContainer")[0].style.visibility = "visible";
 			if (svgName == "Myocyte_v6_Grouped.svg") {
 				runModelURL = 'https://models.cellml.org/workspace/noble_1962/rawfile/c70f8962407db00673f1fdcac9f35a2593781c17/noble_1962.sedml';
 			} else {
@@ -59,44 +51,34 @@ exports.ModelPanel = function(DialogName)  {
 	}
 	
 	//Callback function for onclick event of "Run Simulation", it attempts to run the  cell models using OpenCOR
-	var runModel = function() {
+	this.runModel = function() {
 		var opencorURL = 'opencor://openFile/' + runModelURL;
-		
 		window.open(opencorURL, '_self');
 	}
 
-	var modelBackGroundChanged = function() {
-		return function(value) {
-			var redValue = parseInt(value[0]);
-			var greenValue = parseInt(value[1]);
-			var blueValue = parseInt(value[2]);
-			
-			var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-			dialogObject[0].style.backgroundColor = backgroundColourString;
-		}
-	}
 	
-	var expandCollapseModels = function(source, portName) {
+	this.expandCollapseModels = function(source, portName) {
 		if (svgController !== undefined)
 			svgController.expandCollapse(source);
 		expandCollapse(source, portName);
 	}
 	
-	var zoomIn = function(value) {
+	this.zoomIn = function(value) {
 		if (svgController !== undefined)
 			svgController.zoomIn(value);
 	}
 	
-	var zoomOut = function(value) {
+	this.zoomOut = function(value) {
 		if (svgController !== undefined)
 			svgController.zoomOut(value);
 	}
 	
-	var zoomReset = function() {
+	this.zoomReset = function() {
 		if (svgController !== undefined)
 			svgController.zoomReset();
 	}
 	
+	/*
 	var addUICallback = function() {
 		var callbackElement = dialogObject.find("#modelsControllerButton")[0];
 		callbackElement.onclick = function() { runModel() };
@@ -116,7 +98,7 @@ exports.ModelPanel = function(DialogName)  {
 		var controller = modelGui.addColor(control, 'Background');
 		controller.onChange(modelBackGroundChanged());
 		otherModelControls = modelGui.addFolder('Others');
-		var customContainer = dialogObject.find("#modelGui")[0].append(modelGui.domElement);
+
 		if (targetSVGPanelName !== undefined && svgController === undefined)
 			_this.enableSVGController(targetSVGPanelName);
 	}
@@ -127,15 +109,21 @@ exports.ModelPanel = function(DialogName)  {
     addUICallback();
     UIIsReady = true;
   }
-    
+    */
+	
+	
+	
+	
   /**
    * Initialise loading of the page, this is called when 
    * the {@link PJP.ModelPanel} is created.
    * @async
    */
   var initialise = function() {
-    createNewDialog(require("./snippets/modelPanel.html"));
   }
-	
+  
 	initialise();
 }
+
+ModelPanel.prototype = Object.create((require('./BaseModule').BaseModule).prototype);
+exports.ModelPanel = ModelPanel;

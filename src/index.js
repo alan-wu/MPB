@@ -9,6 +9,7 @@ exports.BodyViewer = require("./bodyRenderer").BodyViewer;
 exports.CellPanel = require("./cell_panel").CellPanel;
 exports.ModelsLoader = require("./modelsLoader").ModelsLoader;
 exports.ModelPanel = require("./model_panel").ModelPanel;
+exports.ModelViewerDialog = require("./ui/ModelViewerDialog").ModelViewerDialog;
 exports.OrgansViewer = require("./organsRenderer").OrgansViewer;
 exports.TissueViewer = require("./tissueRenderer").TissueViewer;
 exports.TissueViewer = require("./tissueRenderer").TissueViewer;

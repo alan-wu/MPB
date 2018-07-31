@@ -12,6 +12,7 @@ exports.ModuleManager = function() {
   var constructors = new function() {
     this["Body Viewer"] = require("../bodyRenderer").BodyViewer;
     this["Organs Viewer"] = require("../organsRenderer").OrgansViewer;
+    this["Model Panel"] = require("../model_panel").ModelPanel;
   };
   var modelsLoader = undefined;
   var itemChangedCallbacks = [];

@@ -3,12 +3,12 @@
  * such as zooming and translation on mouse interactions.
  * 
  * @class
- * @param {String} SVGPanelName - Id of the target element for this {@link PJP.SVGController} to control.
+ * @param {String} SVGPanel- Target element for this {@link PJP.SVGController} to control.
  * @author Alan Wu
  * @returns {PJP.SVGController}
  */
-exports.SVGController = function(SVGPanelName)  {
-	var svgObject = document.getElementById(SVGPanelName);
+exports.SVGController = function(SVGPanel)  {
+	var svgObject = SVGPanel;
 	//used for tracking right click
 	var svgRightClickDown = false;
 	// Temoporary hardcoded array on interactive elements/groups of the svg
@@ -235,6 +235,14 @@ exports.SVGController = function(SVGPanelName)  {
 		addRespsonseToSVGElements();
 	}
 	
+	var genericSVGLoaded = function() {
+	  var svgDocument = svgObject.contentDocument;
+	  var svgElements = svgDocument.getElementsByClassName("draggable");
+	  for (var i = 0; i < svgElements.length; i++) {
+	    svgElements[i].style.cursor = "pointer"; 
+	  }
+	}
+	
 	/**
 	 * Display svg diagram with the matching svgName name.
 	 *  
@@ -248,9 +256,11 @@ exports.SVGController = function(SVGPanelName)  {
 				runModelURL = 'https://models.cellml.org/workspace/noble_1962/rawfile/c70f8962407db00673f1fdcac9f35a2593781c17/noble_1962.sedml';
 			}
 		} else {
-			svgObject.onload = undefined;
-			runModelURL = 'https://models.physiomeproject.org/workspace/4ac/rawfile/99f626ad282c900cf3665f2119ab70f61ec2ba3c/Circulation_Model.sedml';
-		}
+      svgObject.onload =  function() {
+        genericSVGLoaded();
+        runModelURL = 'https://models.physiomeproject.org/workspace/4ac/rawfile/99f626ad282c900cf3665f2119ab70f61ec2ba3c/Circulation_Model.sedml';
+      }
+    }	
 		
 		svgObject.setAttribute('data', svgFullName );
 	}

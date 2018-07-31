@@ -264,7 +264,7 @@ img.model {
 	height:90%;
 	right:0%;
 	bottom:1%;
-	visibility: hidden;
+	visibility: visible;
 	position: relative;
 	overflow-x: auto;
 	overflow-y: auto;
@@ -281,7 +281,7 @@ img.model {
 }
 
 #ZoomControl{
-	visibility: hidden;
+	visibility: visible;
 }
 
 .fullPortDisplay #ZoomControl{
@@ -336,7 +336,7 @@ img.model {
 }
 
 .modelButton {
-	margin-top:10%;
+	margin-top:5%;
 }
 
 .fullPortDisplay .modelButton{
@@ -347,7 +347,7 @@ img.model {
 #modelsController {
 	position:relative;
 	text-align:center;
-	visibility:hidden;
+	visibility:visible;
 	display:block;
 }.leftTopButton {
     position:absolute;
