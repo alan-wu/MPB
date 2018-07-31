@@ -310,6 +310,7 @@ var OrgansViewerDialog = function(organsViewerIn) {
     _myInstance.datGui.add(viewAllButton, 'View All');
     organPartsGui = _myInstance.datGui.addFolder('Visibility Control');
     organPartsGui.open();
+    updateOrganSpecificGui(organsViewer.getSceneData());
   }
   
   var _organsViewerDialogClose = function() {

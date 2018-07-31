@@ -143,7 +143,10 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			picker: undefined,
 			associateData: undefined};
   humanOrgansFileMap["Cardiovascular"]["ScaffoldHeart"] = {
-      meta: "cardiovascular/scaffold_heart/heart_scaffold_metadata.json"};
+      meta: "cardiovascular/scaffold_heart/heart_metadata.json"};
+  humanOrgansFileMap["Cardiovascular"]["Neuro"] = {
+      view: "cardiovascular/neuro/cardiac_neuro_view.json",
+      meta: "cardiovascular/neuro/cardiac_neuro_metadata.json"};
 	
 	organsFileMap['human'] = humanOrgansFileMap;
 	organsFileMap['rat'] = ratOrgansFileMap;
@@ -159,6 +162,10 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	
 	this.setModelPanel = function(ModelPanelIn) {
 		modelPanel = ModelPanelIn;
+	}
+	
+	this.getSceneData = function() {
+	  return sceneData;
 	}
 
 	/**
@@ -233,8 +240,9 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	}
 	
 	this.addSceneChangedCallback = function(callback) {
-	  if (typeof(callback === "function"))
+	  if (typeof(callback === "function")) {
 	    sceneChangedCallbacks.push(callback);
+	  }
 	}
 	
 	this.addOrganPartAddedCallback = function(callback) {
@@ -335,7 +343,8 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 					if (modelPanel)
 						modelPanel.openModel("BG_Circulation_Model.svg");
 					_this.setSelectedByObjects([intersects[ 0 ].object], true);
-				} else if (displayScene.sceneName.includes("human/Cardiovascular/ScaffoldHeart")) {
+				} else if ((displayScene.sceneName.includes("human/Cardiovascular/ScaffoldHeart"))||
+            (displayScene.sceneName.includes("human/Cardiovascular/ScaffoldVentricle"))) {
 				  if (intersects[ 0 ].object.name)
 				    _this.setSelectedByObjects([intersects[ 0 ].object], true);
 				} 
@@ -369,7 +378,8 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 				  }
 				  _this.setHighlightedByObjects([intersects[ 0 ].object], true);
 				  return;
-				} else if (displayScene.sceneName.includes("human/Cardiovascular/ScaffoldHeart")) {
+				} else if ((displayScene.sceneName.includes("human/Cardiovascular/ScaffoldHeart")) ||
+				    (displayScene.sceneName.includes("human/Cardiovascular/ScaffoldVentricle"))) {
 				  displayArea.style.cursor = "pointer";
           if (intersects[ 0 ].object.name) {
             if (toolTip !== undefined) {
