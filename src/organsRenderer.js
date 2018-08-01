@@ -320,6 +320,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			if (intersects[0] !== undefined) {
 				if (displayScene.sceneName == "human/Cardiovascular/Heart") {
 					var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
+					intersects[ 0 ].object.name = id.toString();
 					if (toolTip !== undefined) {
   					toolTip.setText("Node " + id);
   					toolTip.show(window_x, window_y);
@@ -363,6 +364,8 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			if (intersects[0] !== undefined) {
 				if (displayScene.sceneName == "human/Cardiovascular/Heart") {
 					var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
+					//a temporary hack to put id into object name, this will be done differently
+					intersects[ 0 ].object.name = id.toString();
 					displayArea.style.cursor = "pointer";
 					if (toolTip !== undefined) {
   	        toolTip.setText("Node " + id);
