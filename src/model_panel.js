@@ -78,42 +78,6 @@ var ModelPanel = function()  {
 			svgController.zoomReset();
 	}
 	
-	/*
-	var addUICallback = function() {
-		var callbackElement = dialogObject.find("#modelsControllerButton")[0];
-		callbackElement.onclick = function() { runModel() };
-		callbackElement = dialogObject.find("#svgZoomOut")[0];
-		callbackElement.onclick = function() { zoomOut(0.2); };
-		callbackElement = dialogObject.find("#svgZoomReset")[0];
-		callbackElement.onclick = function() { zoomReset(); };
-		callbackElement = dialogObject.find("#svgZoomIn")[0];
-		callbackElement.onclick = function() { zoomIn(0.2) };	
-	}
-	
-	var initialiseModelPanel = function() {
-		modelGui = new dat.GUI({autoPlace: false});
-		modelGui.domElement.id = 'gui';
-		modelGui.close();
-		var control = new modelControl();
-		var controller = modelGui.addColor(control, 'Background');
-		controller.onChange(modelBackGroundChanged());
-		otherModelControls = modelGui.addFolder('Others');
-
-		if (targetSVGPanelName !== undefined && svgController === undefined)
-			_this.enableSVGController(targetSVGPanelName);
-	}
-	
-  var createNewDialog = function(data) {
-    dialogObject = require("./utility").createDialogContainer(localDialogName, data);
-    initialiseModelPanel();
-    addUICallback();
-    UIIsReady = true;
-  }
-    */
-	
-	
-	
-	
   /**
    * Initialise loading of the page, this is called when 
    * the {@link PJP.ModelPanel} is created.

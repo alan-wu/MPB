@@ -59,48 +59,66 @@ var SidebarItemArray = function() {
   }
 }
 
-
-
 var ManagerSidebar = function(parentIn, moduleManagerIn) {
   var parent = parentIn;
   var jelem = undefined;
   var sidebarEle = undefined;
   var moduleManager = moduleManagerIn;
   var renameDialog = undefined;
+  var addDialog = undefined;
   var currentItemElement = undefined;
+  var messageDialog = undefined;
   var itemsArray = new SidebarItemArray();
   _this = this;
 
   var open = function() {
     sidebarEle.style.display = "block";
+    jelem.find("#sidebarOpen")[0].style.display = "none";
   }
 
   var close = function() {
     sidebarEle.style.display = "none";
+    jelem.find("#sidebarOpen")[0].style.display = "block";
   }
 
   var addUICallback = function() {
     var element = jelem.find("#sidebarClose")[0];
     element.onclick = function() {
-      close()
+      close();
     };
-    var element = jelem.find("#sidebarOpen")[0];
+    element = jelem.find("#sidebarOpen")[0];
     element.onclick = function() {
-      open()
+      open();
     };
-    var element = jelem.find("#addPanel")[0];
-    element.onclick = function() {
-      addPanelPressed()
-    };
+    element = jelem.find("#addDialog")[0];
+    element.onclick = addDialogClicked();
   }
-
-  var addPanelPressed = function() {
-    var module = moduleManager.createModule("Body Viewer");
-    module.readSystemMeta();
-    var dialog = new (require("./BodyViewerDialog").BodyViewerDialog)(module);
-    dialog.setTitle(module.getName());
-    dialog.destroyModuleOnClose = true;
-    moduleManager.manageDialog(dialog);
+  
+  var addDialogCallback = function() {
+    var dialogSelection = addDialog.find("#dialog_selection");
+    var dialogName = dialogSelection.find(":selected").text();
+    var name = addDialog.find("#dialog_name")[0].value;
+    if ((dialogName !== "Please pick one") && name !== "") {
+      var module = moduleManager.createModule(dialogName);
+      module.setName(name);
+      var dialog = moduleManager.createDialog(module);
+      dialog.destroyModuleOnClose = true;
+      moduleManager.manageDialog(dialog);
+      addDialog.dialog("close");
+    } else {
+      messageDialog.dialog("open");
+    }
+  }
+  
+  var addDialogClicked= function() {
+    return function(event) {
+      event.stopPropagation();
+      if (addDialog) {
+        addDialog.find("#dialog_selection").val("Please pick one");
+        addDialog.find("#dialog_name")[0].value = "";
+        addDialog.dialog("open"); 
+      }
+    }
   }
 
   var renameDialogCallback = function() {
@@ -108,6 +126,19 @@ var ManagerSidebar = function(parentIn, moduleManagerIn) {
     var managerItem = itemsArray.findManagerItemForElement(currentItemElement);
     managerItem.getModule().setName(nameElem.value);
     renameDialog.dialog("close");
+  }
+  
+  var renameModuleClicked = function(element) {
+    return function(event) {
+      currentItemElement = element;
+      event.stopPropagation();
+      if (renameDialog) {
+        currentItemElement = element;
+        var nameElem = renameDialog.find("#new_name");
+        nameElem[0].value = element.id;
+        renameDialog.dialog("open");
+      }
+    }
   }
 
   var create = function(htmlData) {
@@ -121,7 +152,8 @@ var ManagerSidebar = function(parentIn, moduleManagerIn) {
     renameDialog = renameElem.dialog({
       autoOpen : false,
       height : 300,
-      width : 300,
+      width : 400,
+      resizable : false,
       modal : true,
       buttons : {
         "Rename" : renameDialogCallback,
@@ -133,7 +165,38 @@ var ManagerSidebar = function(parentIn, moduleManagerIn) {
         renameDialog.dialog("close");
       }
     });
-
+    
+    var dialog_selection = jelem.find("#dialog_selection");
+    var availableModules = moduleManager.getAvailableModules();
+    for (var i = 0; i < availableModules.length; i++) {
+      dialog_selection.append($('<option>', {value: availableModules[i], text:availableModules[i]}));
+    }
+    
+    var addDialogElem = jelem.find("#add-dialog-form");
+    addDialog = addDialogElem.dialog({
+      autoOpen : false,
+      height : 300,
+      width : 400,
+      resizable : false,
+      modal : true,
+      buttons : {
+        "Confirm" : addDialogCallback,
+        Cancel : function() {
+          addDialog.dialog("close");
+        }
+      },
+      close : function() {
+        addDialog.dialog("close");
+      }
+    });
+    
+    var messageDialogElem = jelem.find("#message-dialog");
+    messageDialog = messageDialogElem.dialog({
+      autoOpen : false,
+      resizable : false,
+      modal : true
+    });
+    
 
     addUICallback();
   }
@@ -142,19 +205,6 @@ var ManagerSidebar = function(parentIn, moduleManagerIn) {
     var dialog = managerItem.getDialog();
     if (dialog)
       dialog.moveToTop();
-  }
-
-  var renameModuleClicked = function(element) {
-    return function(event) {
-      currentItemElement = element;
-      event.stopPropagation();
-      if (renameDialog) {
-        currentItemElement = element;
-        var nameElem = renameDialog.find("#new_name");
-        nameElem[0].value = element.id;
-        renameDialog.dialog("open");
-      }
-    }
   }
 
   var addItemToSidebar = function(managerItem) {

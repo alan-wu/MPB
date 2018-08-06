@@ -4,15 +4,42 @@ var MANAGER_ITEM_CHANGE = {
   REMOVED : 2,
   NAME_CHANGED : 3
 };
+
 var ManagerItem = require("./managerItem").ManagerItem;
+
 
 exports.ModuleManager = function() {
   var ready = false;
   var moduleCounter = 0;
   var constructors = new function() {
-    this["Body Viewer"] = require("../bodyRenderer").BodyViewer;
-    this["Organs Viewer"] = require("../organsRenderer").OrgansViewer;
-    this["Model Panel"] = require("../model_panel").ModelPanel;
+    this["Body Viewer"] = [];
+    this["Body Viewer"].module = function() {
+      var module = new (require("../bodyRenderer").BodyViewer)(modelsLoader);
+      module.readSystemMeta();
+      return module; 
+    }
+    this["Body Viewer"].dialog = function(module) {
+      var dialog = new (require("../ui/BodyViewerDialog").BodyViewerDialog)(module);
+      return dialog; 
+    }
+    this["Organs Viewer"] = [];
+    this["Organs Viewer"].module =  function() {
+      var module = new (require("../organsRenderer").OrgansViewer)(modelsLoader);
+      return module; 
+    }
+    this["Organs Viewer"].dialog=  function(module) {
+      var dialog = new (require("../ui/OrgansViewerDialog").OrgansViewerDialog)(module);
+      return dialog; 
+    }
+    this["Model Panel"] = [];
+    this["Model Panel"].module =  function() {
+      var module = new (require("../model_panel").ModelPanel)();
+      return module; 
+    }
+    this["Model Panel"].dialog=  function(module) {
+      var dialog = new (require("../ui/ModelViewerDialog").ModelViewerDialog)(module);
+      return dialog; 
+    }
   };
   var modelsLoader = undefined;
   var itemChangedCallbacks = [];
@@ -169,17 +196,30 @@ exports.ModuleManager = function() {
     if (typeof (callback === "function"))
       itemChangedCallbacks.push(callback);
   }
+  
+  this.createDialog = function(module) {
+    if (module && ready) {
+      if (constructors[module.typeName]) {
+        var dialog = constructors[module.typeName].dialog(module);
+        _this.manageDialog(dialog);
+        return dialog;
+      }
+    }
+
+    return;
+  }
 
   this.createModule = function(moduleName) {
     if (modelsLoader && ready) {
-      var module = new constructors[moduleName](modelsLoader);
+      var module = constructors[moduleName].module();
       moduleCounter = moduleCounter + 1;
       var name = pad(moduleCounter, 4);
       module.setName(name);
       _this.manageModule(module);
+      return module;
     }
-
-    return module;
+    return;
+    
   }
 
   this.isReady = function() {
