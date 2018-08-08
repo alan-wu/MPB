@@ -1,6 +1,8 @@
 <div class="w3-sidebar w3-bar-block w3-dark-grey w3-animate-left" style="display:none;z-index:20000000;opacity:0.9;" id="managerSidebar">
   <button class="w3-bar-item w3-button w3-large" id="sidebarClose">Close &times;</button>
-  <button class="w3-bar-item w3-button" style="border-style: solid;border-width: 0px 0px 2px 0px;" id="addDialog">+ Add Dialog</button>
+  <div style="border-style: solid;border-width: 2px 2px 2px 2px;">
+  <button class="w3-bar-item w3-button" style="border-style: solid;border-width: 0px 0px 2px 0px;" id="addManager">+ Add Manager</button>
+  </div>
 </div>
 
 <div>
@@ -14,6 +16,20 @@
       <label for="name">Name</label>
       <input type="text" name="name" id="new_name" value="New Name" class="text ui-widget-content ui-corner-all">
       <!-- Allow form submission with keyboard without duplicating the dialog button -->
+      <input type="confirm" tabindex="-1" style="position:absolute; top:-1000px">
+    </fieldset>
+  </form>
+</div>
+
+<div id="add-manager-form" title="Add Manager">
+  <p style="border: 1px solid transparent; padding: 0.3em;">Choose a name for the manager</p>
+  <form>
+    <fieldset>
+    	<p>
+	      <label for="manager_name">Manager Name: </label>
+	      <input type="text" name="manager_name" id="manager_name" class="text ui-widget-content ui-corner-all">
+	      <!-- Allow form submission with keyboard without duplicating the dialog button -->
+      </p>
       <input type="confirm" tabindex="-1" style="position:absolute; top:-1000px">
     </fieldset>
   </form>

@@ -1,16 +1,10 @@
-var MANAGER_ITEM_CHANGE = {
-  CHANGED : 0,
-  ADDED : 1,
-  REMOVED : 2,
-  NAME_CHANGED : 3
-};
-
 var ManagerItem = require("./managerItem").ManagerItem;
-
+var MANAGER_ITEM_CHANGE = require("./managerItem").MANAGER_ITEM_CHANGE;
 
 exports.ModuleManager = function() {
   var ready = false;
   var moduleCounter = 0;
+  var name = "Default Manager";
   var constructors = new function() {
     this["Body Viewer"] = [];
     this["Body Viewer"].module = function() {
@@ -43,6 +37,7 @@ exports.ModuleManager = function() {
   };
   var modelsLoader = undefined;
   var itemChangedCallbacks = [];
+  var renameCallbacks = [];
   var managerItems = [];
   var _this = this;
 
@@ -208,6 +203,25 @@ exports.ModuleManager = function() {
 
     return;
   }
+  
+  this.addRenameCallback = function(callback) {
+    if (typeof(callback === "function"))
+      renameCallbacks.push(callback);
+  }
+  
+  this.getName = function() {
+    return name;
+  }
+  
+  this.setName = function(nameIn) {
+    if (name.localeCompare(nameIn) != 0) {
+      var oldName = name;
+      name = nameIn;
+      for (var i = 0; i < renameCallbacks.length;i++) {
+        renameCallbacks[i](_this, oldName, name);
+      }
+    }
+  }
 
   this.createModule = function(moduleName) {
     if (modelsLoader && ready) {
@@ -240,5 +254,3 @@ exports.ModuleManager = function() {
 
   initialise();
 }
-
-exports.MANAGER_ITEM_CHANGE = MANAGER_ITEM_CHANGE;

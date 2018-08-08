@@ -1,4 +1,3 @@
-
 //require("./styles/bootstrap.min.css");
 require("./styles/w3.css");
 require("./styles/dropmenu.css");
@@ -20,8 +19,7 @@ exports.EVENT_TYPE = require("./utilities/eventNotifier").EVENT_TYPE;
 exports.EventNotifier = require("./utilities/eventNotifier").EventNotifier;
 exports.ManagerSidebar = require("./ui/ManagerSidebar").ManagerSidebar;
 exports.ModuleManager = require("./utilities/manager").ModuleManager;
-exports.MANAGER_ITEM_CHANGE = require("./utilities/manager").MANAGER_ITEM_CHANGE;
+exports.MANAGER_ITEM_CHANGE = require("./utilities/managerItem").MANAGER_ITEM_CHANGE;
 exports.MODULE_CHANGE = require("./BaseModule").MODULE_CHANGE;
 //exports.CellPanelDialog = require("./ui/CellPanelDialog").CellPanelDialog;
 exports.VERSION = '0.2.0';
-
