@@ -1,6 +1,6 @@
 //require("./styles/bootstrap.min.css");
 require("./styles/w3.css");
-require("./styles/dropmenu.css");
+require("./styles/sidebar.css");
 require("./styles/jquery-ui.min.css");
 require('./styles/bootstrap.min.css');
 

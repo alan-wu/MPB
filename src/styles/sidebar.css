@@ -1,0 +1,70 @@
+.dropdown {}
+
+.dropdown-content {
+    display: none;
+    position: relative;
+    float: right;
+    background-color: #d1d1d1;
+    min-width: 100%;
+    z-index: 1;
+    border-radius: 5px;
+}
+
+.dropdown-content div {
+    color: black;
+    padding: 4px 4px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown:hover .dropdown-content {display: block;}
+.dropdown-content:hover {background-color: #f1f1f1;}
+
+
+.dropdown:hover .dropbtn {background-color: #3e8e41;}
+
+.sidebar-manager {
+  background-color: #2b7ccc;
+  color: #000000;
+  font-weight: 700;
+  padding: 5px 8px !important; 
+  margin-bottom: 3px;
+  border-radius: 10px;
+}
+
+.sidebar-manager:hover {background-color: #7fc0ff !important;}
+
+.add-dialog {
+	background-color: #2b7ccc;
+  padding: 5px 8px !important; 
+  font-weight: normal;
+  margin-bottom: 2px;
+  border-radius: 5px;
+}
+
+.add-dialog:hover {background-color: #b2d8ff  !important;}
+
+.sidebar-module {
+  padding: 5px 8px !important;
+  color: #000;
+	background-color:#3ab3f7;
+  font-weight: normal;
+  margin-bottom: 2px;
+  border-radius: 5px;
+}
+
+.sidebar-module:hover {background-color: #b2d8ff  !important;}
+
+.sidebar {
+	display:none;
+	z-index:20000000;
+	opacity:0.9;
+	color: #fff;
+	background-color:#00357d;
+}
+
+#addManager {
+	border-radius: 5px;
+}
+
+#addManager:hover {background-color: #b2d8ff  !important;}

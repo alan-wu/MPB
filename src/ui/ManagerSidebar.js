@@ -127,18 +127,18 @@ var ManagerElement = function(manager, jelemIn) {
   var addItemToSidebar = function(managerItem) {
     var name = managerItem.getModule().getName();
     var element = document.createElement("div");
-    element.style.padding = "5px 8px 5px 8px";
-    element.className = "dropdown w3-grey w3-bar-item w3-button";
+    element.className = "w3-bar-item w3-button dropdown sidebar-module ";
     element.innerHTML = name;
     element.id = name;
     itemsArray.push(name, managerItem, element);
     element.onclick = function() {
-      onModuleClick(managerItem)
+      onModuleClick(managerItem);
     };
     var menuContent = document.createElement("div");
     menuContent.className = "dropdown-content";
     var menuItem = document.createElement("div");
     menuItem.innerHTML = "Rename";
+    menuItem.style.fontWeight = "normal";
     menuItem.onclick = renameModuleClicked(managerItem);
     menuContent.appendChild(menuItem);
     element.appendChild(menuContent);
@@ -158,9 +158,7 @@ var ManagerElement = function(manager, jelemIn) {
   
   var addAddDialogButton = function() {
     var button = document.createElement("button");
-    button.className = "w3-bar-item w3-button";
-    button.style.borderWidth="0px 0px 2px 0px;"
-    button.style.borderSttle="solid;"
+    button.className = "w3-bar-item w3-button add-dialog";
     button.innerHTML = "+ Add Dialog";
     button.id="addDialog";
     button.onclick = addDialogClicked();
@@ -171,9 +169,7 @@ var ManagerElement = function(manager, jelemIn) {
   var addManagerToSidebar = function() {
     var name = moduleManager.getName();
     managerElem = document.createElement("div");
-    managerElem.className = "w3-grey w3-bar-item w3-button";
-    managerElem.style.padding = "5px 8px 5px 8px";
-    managerElem.style.borderWidth="2px";
+    managerElem.className = "w3-bar-item w3-button sidebar-manager ";
     managerElem.innerHTML = name;
     managerElem.id = name;
     sidebarEle.appendChild(managerElem);
