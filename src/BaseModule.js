@@ -5,7 +5,8 @@ var BaseModule = function() {
   this.typeName = "Base Module";
   this.instanceName = "default";
   this.onChangedCallbacks = [];
-
+  /**  Notifier handle for informing other modules of any changes **/
+  this.eventNotifiers = [];
 }
 
 BaseModule.prototype.setName = function(name) {
@@ -43,6 +44,10 @@ BaseModule.prototype.removeChangedCallback = function(callback) {
     this.onChangedCallbacks.splice(index, 1);
   }
 } 
+
+BaseModule.prototype.addNotifier = function(eventNotifier) {
+  this.eventNotifiers.push(eventNotifier);
+}
 
 exports.BaseModule = BaseModule;
 exports.MODULE_CHANGE = MODULE_CHANGE;

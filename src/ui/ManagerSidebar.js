@@ -203,24 +203,28 @@ var ManagerSidebar = function(parentIn) {
   var ManagerElementArray = [];
   var _this = this;
 
-  var open = function() {
+  this.open = function() {
     sidebarEle.style.display = "block";
     jelem.find("#sidebarOpen")[0].style.display = "none";
   }
 
-  var close = function() {
+  this.close = function() {
     sidebarEle.style.display = "none";
     jelem.find("#sidebarOpen")[0].style.display = "block";
+  }
+  
+  this.setWidth = function(widthIn) {
+    sidebarEle.style.width  = widthIn;
   }
 
   var addUICallback = function() {
     var element = jelem.find("#sidebarClose")[0];
     element.onclick = function() {
-      close();
+      _this.close();
     };
     element = jelem.find("#sidebarOpen")[0];
     element.onclick = function() {
-      open();
+      _this.open();
     };
     element = jelem.find("#addManager")[0];
     element.onclick = addManagerClicked();
@@ -276,7 +280,7 @@ var ManagerSidebar = function(parentIn) {
     jelem = $(parent);
     var childNodes = $.parseHTML(htmlData);
     for (i = 0; i < childNodes.length; i++) {
-      parent.appendChild(childNodes[i]);
+      (jelem[0]).appendChild(childNodes[i]);
     }
     sidebarEle = jelem.find("#managerSidebar")[0];
     var renameElem = jelem.find("#rename-form");

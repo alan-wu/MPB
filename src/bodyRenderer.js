@@ -34,8 +34,6 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	var graphicsHighlight = new (require("./utilities/graphicsHighlight").GraphicsHighlight)();
 	//ZincRenderer for this viewer.
 	var bodyRenderer = null;
-	 /**  Notifier handle for informing other modules of any changes **/
-  var eventNotifiers = [];
 	//Represents each physiological organ systems as folder in the dat.gui.
 	var systemList =["Musculo-skeletal", "Cardiovascular", "Respiratory", "Digestive",
 	  "Skin (integument)", "Urinary", "Brain & Central Nervous", "Immunological",
@@ -112,12 +110,12 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	};
 	
   var publishChanges = function(objects, eventType) {
-    var ids = new Array();
+    var ids = [];
     for (var i = 0; i < objects.length; i++) {
       ids[i] = objects[i].name;
     }
-    for (var i = 0; i < eventNotifiers.length; i++) {
-      eventNotifiers[i].publish(_this, eventType, ids);
+    for (var i = 0; i < _this.eventNotifiers.length; i++) {
+      _this.eventNotifiers[i].publish(_this, eventType, ids);
     }
   }
 	
@@ -233,12 +231,12 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	
 	this.resetView = function() {
 	  if (bodyRenderer)
-	    bodyRenderer.resetVIew;
+	    bodyRenderer.resetView();
 	}
 	
 	this.viewAll = function() {
 	  if (bodyRenderer)
-	    bodyRenderer.viewAll;
+	    bodyRenderer.viewAll();
 	}
 	
 	this.changeSpecies = function(speciesName) {
@@ -309,11 +307,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	var initialise = function() {
 	  _this.initialiseRenderer(undefined);
 	}
-	
-  this.addNotifier = function(eventNotifier) {
-    eventNotifiers.push(eventNotifier);
-  }
-	
+		
 	var readModel = function(systemName, partName, startup) {
     var speciesMeta = systemMeta[currentSpecies];
 		item = speciesMeta[systemName][partName];

@@ -50,8 +50,6 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	var organPartAddedCallbacks = new Array();
 	/** Suscriptions to changes **/
 	var suscriptions = [];
-	/**  Notifier handle for informing other modules of any changes **/
-	var eventNotifiers = [];
 	/**
 	 * {ImageCombiner}.
 	 */
@@ -257,12 +255,12 @@ var OrgansViewer = function(ModelsLoaderIn)  {
   }
   
   var publishChanges = function(objects, eventType) {
-    var ids = new Array();
+    var ids = [];
     for (var i = 0; i < objects.length; i++) {
       ids[i] = objects[i].name;
     }
-    for (var i = 0; i < eventNotifiers.length; i++) {
-      eventNotifiers[i].publish(_this, eventType, ids);
+    for (var i = 0; i < _this.eventNotifiers.length; i++) {
+      _this.eventNotifiers[i].publish(_this, eventType, ids);
     }
   }
 	
@@ -924,10 +922,6 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	  
 	  this.viewAll = function() {
 	    organsRenderer.viewAll();
-	  }
-	  
-	  this.addNotifier = function(eventNotifier) {
-	    eventNotifiers.push(eventNotifier);
 	  }
 	  
 	  this.alignCameraWithSelectedObject = function(transitionTime) {

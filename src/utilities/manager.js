@@ -39,6 +39,8 @@ exports.ModuleManager = function() {
   var itemChangedCallbacks = [];
   var renameCallbacks = [];
   var managerItems = [];
+  var eventNotifier = new (require("./eventNotifier").EventNotifier)();
+  var suscription = undefined;
   var _this = this;
 
   this.getAllManagerItems = function() {
@@ -161,6 +163,7 @@ exports.ModuleManager = function() {
       var managerItem = new ManagerItem();
       managerItem.setModule(moduleIn);
       moduleIn.addChangedCallback(moduleChangedCallback());
+      moduleIn.addNotifier(eventNotifier);
       managerItems.push(managerItem);
       for (var i = 0; i < itemChangedCallbacks.length; i++)
         itemChangedCallbacks[i](managerItem, MANAGER_ITEM_CHANGE.ADDED);
@@ -235,6 +238,13 @@ exports.ModuleManager = function() {
     return;
     
   }
+  
+  var eventNotifierCallback = function() {
+    return function(event) {
+      console.log(event);
+      
+    }
+  }
 
   this.isReady = function() {
     return ready;
@@ -250,6 +260,7 @@ exports.ModuleManager = function() {
     modelsLoader = new (require("../modelsLoader").ModelsLoader)();
     modelsLoader.addSystemMetaIsReadyCallback(systemMetaReadyCallback());
     modelsLoader.initialiseLoading();
+    eventNotifier.suscribe(_this, eventNotifierCallback(), undefined);
   }
 
   initialise();
