@@ -1,7 +1,7 @@
 //require("./styles/bootstrap.min.css");
 require("./styles/w3.css");
 require("./styles/sidebar.css");
-require("./styles/jquery-ui.min.css");
+require("./styles/jquery-ui.theme.min.css");
 require('./styles/bootstrap.min.css');
 
 exports.BodyViewer = require("./bodyRenderer").BodyViewer;
