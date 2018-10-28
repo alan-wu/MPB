@@ -250,7 +250,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
  
   var addGlyphToArray = function(objects) {
     return function(glyph) {
-      objects.push(glyph.mesh);
+      objects.push(glyph.getMesh());
     }
   }
   
@@ -319,6 +319,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 				if (displayScene.sceneName == "human/Cardiovascular/Heart") {
 					var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
 					intersects[ 0 ].object.name = id.toString();
+					//console.log(intersects[ 0 ].object.userData);
 					if (toolTip !== undefined) {
   					toolTip.setText("Node " + id);
   					toolTip.show(window_x, window_y);
@@ -729,6 +730,9 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	          zincCameraControl.setDefaultCameraSettings(viewport);
 	          displayScene.resetView();
 	        }
+	        var annotation = new (require('./utilities/annotation').annotation)();
+	        annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName};
+	        geometry.userData = [annotation];
         }
       }
     }

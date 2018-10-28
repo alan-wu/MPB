@@ -241,9 +241,23 @@ exports.ModuleManager = function() {
   
   var eventNotifierCallback = function() {
     return function(event) {
-      console.log(event);
-      
+      if (event && (event.eventType === require("./eventNotifier").EVENT_TYPE.SELECTED) && 
+          event.identifiers && event.identifiers[0]) {
+        var id = event.identifiers[0]
+        if (id.type == "anatomical") {
+          for (var i = 0; (i < managerItems.length); i++) {
+            var module = managerItems[i].getModule();
+            if (module.typeName === "Organs Viewer")
+              module.loadOrgans(id.data.species, id.data.system, id.data.part);
+          }
+        }
+      }
     }
+  }
+  
+  this.destroy = function() {
+    if (eventNotifier && suscription)
+      eventNotifier.unsuscribe(suscription);
   }
 
   this.isReady = function() {
@@ -260,7 +274,7 @@ exports.ModuleManager = function() {
     modelsLoader = new (require("../modelsLoader").ModelsLoader)();
     modelsLoader.addSystemMetaIsReadyCallback(systemMetaReadyCallback());
     modelsLoader.initialiseLoading();
-    eventNotifier.suscribe(_this, eventNotifierCallback(), undefined);
+    suscription = eventNotifier.suscribe(_this, eventNotifierCallback(), undefined);
   }
 
   initialise();

@@ -61,8 +61,11 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			for (var i = 0; i < intersects.length; i++) {
 				if (intersects[i] !== undefined && (intersects[ i ].object.name !== undefined)) {
 					if (!intersects[ i ].object.name.includes("Body")) {
-						if (organsViewer)
-							organsViewer.loadOrgans(currentSpecies, intersects[ i ].object.userData[0], intersects[ i ].object.name);
+						if (organsViewer) {
+						  var zincGeometry = intersects[ i ].object.userData;
+						  var annotation = zincGeometry.userData[0];
+						  organsViewer.loadOrgans(annotation.data.species, annotation.data.system, annotation.data.part);
+						}
 						_this.setSelectedByObjects([intersects[ i ].object], true);
 						return;
 					} else {
@@ -110,12 +113,12 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	};
 	
   var publishChanges = function(objects, eventType) {
-    var ids = [];
+    var annotations = [];
     for (var i = 0; i < objects.length; i++) {
-      ids[i] = objects[i].name;
+      annotations[i] = objects[i].userData.userData[0];
     }
     for (var i = 0; i < _this.eventNotifiers.length; i++) {
-      _this.eventNotifiers[i].publish(_this, eventType, ids);
+      _this.eventNotifiers[i].publish(_this, eventType, annotations);
     }
   }
 	
@@ -212,7 +215,9 @@ var BodyViewer = function(ModelsLoaderIn)  {
 				geometry.setAlpha(0.5);
 				geometry.morph.material.side = THREE.FrontSide;
 			}
-			geometry.morph.userData = [systemName, partName];
+			var annotation = new (require('./utilities/annotation').annotation)();
+			annotation.data = {species:currentSpecies, system:systemName, part:partName};
+			geometry.userData = [annotation];
 		}
 	};
 	
@@ -226,7 +231,6 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	
 	this.getSystemList = function() {
 	  return systemList;
-	  
 	}
 	
 	this.resetView = function() {

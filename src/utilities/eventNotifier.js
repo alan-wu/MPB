@@ -1,6 +1,5 @@
 var EVENT_TYPE = { ALL: 0, SELECTED: 1, HIGHLIGHTED: 2 };
 
-
 var SelectionEvent = function(eventTypeIn, identifiersIn) {
   this.eventType = eventTypeIn;
   this.identifiers = identifiersIn;
