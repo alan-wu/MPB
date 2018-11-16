@@ -45,11 +45,13 @@ BaseDialog.prototype.resizeStopCallback = function(myInstance) {
 }
 
 BaseDialog.prototype.create = function(htmlData, dataController) {
-  this.container = $('<div style="width:600px;height:500px;"></div>');
+  this.container = $('<div></div>');
   this.container.attr('title', this.title);
   this.container.dialog({
     show: "blind",
     hide: "blind",
+    width: 600,
+    height: 500,
     resize: function() {
       var heightPadding = parseInt($(this).css('padding-top'), 10) + parseInt($(this).css('padding-bottom'), 10),
         widthPadding = parseInt($(this).css('padding-left'), 10) + parseInt($(this).css('padding-right'), 10),

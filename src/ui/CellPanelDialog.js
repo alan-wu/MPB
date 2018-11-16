@@ -9,7 +9,7 @@ var CellPanelDialog = function() {
       var greenValue = parseInt(value[1]);
       var blueValue = parseInt(value[2]);
       var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-      content[0].style.backgroundColor = backgroundColourString;
+      this.container[0].style.backgroundColor = backgroundColourString;
     }
   }
   
