@@ -17,7 +17,7 @@ var ModelViewerDialog = function(modelPanelIn) {
       var greenValue = parseInt(value[1]);
       var blueValue = parseInt(value[2]);
       var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-      this.container[0].style.backgroundColor = backgroundColourString;
+      _myInstance.container[0].style.backgroundColor = backgroundColourString;
     }
   }
   

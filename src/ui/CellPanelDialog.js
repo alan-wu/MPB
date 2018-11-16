@@ -1,7 +1,7 @@
 var CellPanelDialog = function() {
   (require('./BaseDialog').BaseDialog).call(this);
   var otherCellControls = undefined;
-  _this = this;
+  var _this = this;
 
   var cellBackGroundChanged = function() {
     return function(value) {
