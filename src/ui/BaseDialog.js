@@ -6,6 +6,7 @@ require('webpack-jquery-ui/selectable');
 require('webpack-jquery-ui/sortable');
 var dat = require("../dat.gui.js");
 require("../styles/dat-gui-swec.css");
+require("../styles/jquery-ui.theme.min.css");
 
 var BaseDialog = function() {
   this.container = undefined;
@@ -14,6 +15,7 @@ var BaseDialog = function() {
   this.UIIsReady = false;
   this.beforeCloseCallbacks = [];
   this.onCloseCallbacks = [];
+  this.resizeStopCallbacks = [];
   this.title = "Default";
 }
 
@@ -34,19 +36,37 @@ BaseDialog.prototype.beforeClose = function(myInstance) {
   }
 }
 
+BaseDialog.prototype.resizeStopCallback = function(myInstance) {
+  return function(event) {
+    for (var i = 0; i < myInstance.resizeStopCallbacks.length; i++) {
+      myInstance.resizeStopCallbacks[i]( this );
+    }
+  }
+}
+
 BaseDialog.prototype.create = function(htmlData, dataController) {
-  this.container = $('<div></div>');
+  this.container = $('<div style="width:600px;height:500px;"></div>');
   this.container.attr('title', this.title);
-  this.content = $('<div class="ui-widget-content" style="position:absolute;width:100%;height:100%;"></div>');
-  this.container.append(this.content);
   this.container.dialog({
-    width: 600,
-    height: 500});
+    show: "blind",
+    hide: "blind",
+    resize: function() {
+      var heightPadding = parseInt($(this).css('padding-top'), 10) + parseInt($(this).css('padding-bottom'), 10),
+        widthPadding = parseInt($(this).css('padding-left'), 10) + parseInt($(this).css('padding-right'), 10),
+        titlebarMargin = parseInt($(this).prev('.ui-dialog-titlebar').css('margin-bottom'), 10);
+      $(this).height($(this).parent().height() - $(this).prev('.ui-dialog-titlebar').outerHeight(true) - heightPadding - titlebarMargin);
+
+      $(this).width($(this).prev('.ui-dialog-titlebar').outerWidth(true) - widthPadding);
+    }});
 
   var childNodes = $.parseHTML(htmlData);
   for (i = 0; i < childNodes.length; i++) {
-    this.content[0].appendChild(childNodes[i]);
+    this.container[0].appendChild(childNodes[i]);
   }
+  
+  this.container.dialog({
+    resizeStop: this.resizeStopCallback(this)
+  });
 
   this.container.dialog({
     beforeClose: this.beforeClose(this)
