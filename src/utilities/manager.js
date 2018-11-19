@@ -8,7 +8,7 @@ exports.ModuleManager = function() {
   var constructors = new function() {
     this["Body Viewer"] = [];
     this["Body Viewer"].module = function() {
-      var module = new (require("../bodyRenderer").BodyViewer)(modelsLoader);
+      var module = new (require("../modules/bodyRenderer").BodyViewer)(modelsLoader);
       module.readSystemMeta();
       return module; 
     }
@@ -18,7 +18,7 @@ exports.ModuleManager = function() {
     }
     this["Organs Viewer"] = [];
     this["Organs Viewer"].module =  function() {
-      var module = new (require("../organsRenderer").OrgansViewer)(modelsLoader);
+      var module = new (require("../modules/organsRenderer").OrgansViewer)(modelsLoader);
       return module; 
     }
     this["Organs Viewer"].dialog=  function(module) {
@@ -27,7 +27,7 @@ exports.ModuleManager = function() {
     }
     this["Model Panel"] = [];
     this["Model Panel"].module =  function() {
-      var module = new (require("../model_panel").ModelPanel)();
+      var module = new (require("../modules/model_panel").ModelPanel)();
       return module; 
     }
     this["Model Panel"].dialog=  function(module) {
@@ -139,9 +139,9 @@ exports.ModuleManager = function() {
 
   var moduleChangedCallback = function() {
     return function(module, change) {
-      if (change === require("../BaseModule").MODULE_CHANGE.DESTROYED)
+      if (change === require("../modules/BaseModule").MODULE_CHANGE.DESTROYED)
         _this.removeModule(module);
-      else if (change === require("../BaseModule").MODULE_CHANGE.NAME_CHANGED) {
+      else if (change === require("../modules/BaseModule").MODULE_CHANGE.NAME_CHANGED) {
         var item = findManagerItemWithModule(module);
         if (item)
           for (var i = 0; i < itemChangedCallbacks.length; i++) {

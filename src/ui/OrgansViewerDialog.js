@@ -324,7 +324,7 @@ var OrgansViewerDialog = function(organsViewerIn) {
   
   var organsViewerChangedCallback = function() {
     return function(module, change) {
-      if (change === require("../BaseModule").MODULE_CHANGE.NAME_CHANGED) {
+      if (change === require("../modules/BaseModule").MODULE_CHANGE.NAME_CHANGED) {
         _myInstance.setTitle(module.getName());
       }
     }

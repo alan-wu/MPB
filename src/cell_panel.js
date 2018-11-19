@@ -1,4 +1,4 @@
-var dat = require("./dat.gui.js");
+var dat = require("./ui/dat.gui.js");
 require("./styles/dat-gui-swec.css");
 
 /**

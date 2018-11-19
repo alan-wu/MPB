@@ -1,4 +1,4 @@
-require("./styles/tooltip.css");
+require("../styles/tooltip.css");
 
 exports.ToolTip = function(container) {
   var tooltipcontainerElement = undefined;

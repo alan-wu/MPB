@@ -1,4 +1,4 @@
-var dat = require("./dat.gui.js");
+var dat = require("./ui/dat.gui.js");
 require("./styles/dat-gui-swec.css");
 require("./styles/my_styles.css");
 var THREE = require("three");
@@ -214,7 +214,7 @@ exports.TissueViewer = function(DialogName)  {
 	
 	//Setup volume renderer
 	var volumeRenderStart = function(shaderText) {
-	  toolTip = new (require("./tooltip").ToolTip)(dialogObject[0]);
+	  toolTip = new (require("./ui/tooltip").ToolTip)(dialogObject[0]);
 		guiControls = new function() {
 			this.model = 'collagen';
 			this.steps = 256.0;

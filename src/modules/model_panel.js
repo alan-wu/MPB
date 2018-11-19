@@ -1,6 +1,6 @@
-var dat = require("./dat.gui.js");
-require("./styles/dat-gui-swec.css");
-require("./styles/my_styles.css");
+var dat = require("../ui/dat.gui.js");
+require("../styles/dat-gui-swec.css");
+require("../styles/my_styles.css");
 
 /**
  * Provide a panel for viewing system models. Currently, this panel displays
@@ -30,7 +30,7 @@ var ModelPanel = function()  {
 		if (svgController === undefined) {
 		  targetSVGPanelElement = SVGPanelElement;
 			if (targetSVGPanelElement != null)
-				svgController = new (require('./svgController').SVGController)(targetSVGPanelElement);
+				svgController = new (require('../utilities/svgController').SVGController)(targetSVGPanelElement);
 		}
 	}
 	

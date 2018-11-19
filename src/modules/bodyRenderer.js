@@ -1,8 +1,8 @@
-var dat = require("./dat.gui.js");
-require("./styles/dat-gui-swec.css");
-require("./styles/my_styles.css");
+var dat = require("../ui/dat.gui.js");
+require("../styles/dat-gui-swec.css");
+require("../styles/my_styles.css");
 var THREE = require("three");
-var ITEM_LOADED = require("./utility").ITEM_LOADED;
+var ITEM_LOADED = require("../utility").ITEM_LOADED;
 
 /**
  * Provides rendering of the 3D-scaffold data in the dom of the provided id with models
@@ -31,7 +31,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	var modelsLoader = ModelsLoaderIn;
 	var displayArea = undefined;
 	var systemPartAddedCallbacks = new Array();
-	var graphicsHighlight = new (require("./utilities/graphicsHighlight").GraphicsHighlight)();
+	var graphicsHighlight = new (require("../utilities/graphicsHighlight").GraphicsHighlight)();
 	//ZincRenderer for this viewer.
 	var bodyRenderer = null;
 	//Represents each physiological organ systems as folder in the dat.gui.
@@ -137,7 +137,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
   this.setHighlightedByObjects = function(objects, propagateChanges) {
     var changed = graphicsHighlight.setHighlighted(objects);
     if (changed && propagateChanges) {
-      var eventType = require("./utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
+      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
       publishChanges(objects, eventType);
     }
     return changed;
@@ -146,7 +146,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
   this.setSelectedByObjects = function(objects, propagateChanges) {
     var changed = graphicsHighlight.setSelected(objects);
     if (changed && propagateChanges) {
-      var eventType = require("./utilities/eventNotifier").EVENT_TYPE.SELECTED;
+      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
       publishChanges(objects, eventType);
     }
     return changed;
@@ -215,7 +215,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
 				geometry.setAlpha(0.5);
 				geometry.morph.material.side = THREE.FrontSide;
 			}
-			var annotation = new (require('./utilities/annotation').annotation)();
+			var annotation = new (require('../utilities/annotation').annotation)();
 			annotation.data = {species:currentSpecies, system:systemName, part:partName};
 			geometry.userData = [annotation];
 		}
@@ -264,7 +264,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	 */
 	this.initialiseRenderer = function(displayAreaIn) {
 	  if (bodyRenderer === undefined || rendererContainer === undefined) {
-	    var returnedValue = (require("./utility").createRenderer)();
+	    var returnedValue = (require("../utility").createRenderer)();
 	    bodyRenderer = returnedValue["renderer"];
 	    rendererContainer = returnedValue["container"];
 	    var scene = bodyRenderer.createScene("human");
@@ -283,7 +283,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	    displayArea.appendChild( rendererContainer );
 	    bodyRenderer.animate();
 	    if (toolTip === undefined)
-	      toolTip = new (require("./tooltip").ToolTip)(displayArea);
+	      toolTip = new (require("../ui/tooltip").ToolTip)(displayArea);
 	  } 
 	}
 	

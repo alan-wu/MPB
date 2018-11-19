@@ -4,7 +4,7 @@ require('webpack-jquery-ui/droppable');
 require('webpack-jquery-ui/resizable');
 require('webpack-jquery-ui/selectable');
 require('webpack-jquery-ui/sortable');
-var dat = require("../dat.gui.js");
+var dat = require("./dat.gui.js");
 require("../styles/dat-gui-swec.css");
 require("../styles/jquery-ui.theme.min.css");
 

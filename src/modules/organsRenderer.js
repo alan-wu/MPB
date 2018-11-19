@@ -58,7 +58,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	var cellPanel = undefined;
 	var modelPanel = undefined;
 	var modelsLoader = ModelsLoaderIn;
-	var graphicsHighlight = new (require("./utilities/graphicsHighlight").GraphicsHighlight)();
+	var graphicsHighlight = new (require("../utilities/graphicsHighlight").GraphicsHighlight)();
 	var _this = this;
 	_this.typeName = "Organs Viewer";
 
@@ -267,7 +267,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
   this.setHighlightedByObjects = function(objects, propagateChanges) {
     var changed = graphicsHighlight.setHighlighted(objects);
     if (changed && propagateChanges) {
-      var eventType = require("./utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
+      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
       publishChanges(objects, eventType);
     }
     return changed;
@@ -276,7 +276,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
   this.setSelectedByObjects = function(objects, propagateChanges) {
     var changed = graphicsHighlight.setSelected(objects);
     if (changed && propagateChanges) {
-      var eventType = require("./utilities/eventNotifier").EVENT_TYPE.SELECTED;
+      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
       publishChanges(objects, eventType);
     }
     return changed;
@@ -603,7 +603,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	 */ 
 	this.initialiseRenderer = function(displayAreaIn) {
 	  if (organsRenderer === undefined || rendererContainer === undefined) {
-	    var returnedValue = (require("./utility").createRenderer)();
+	    var returnedValue = (require("../utility").createRenderer)();
 	    organsRenderer = returnedValue["renderer"];
 	    rendererContainer = returnedValue["container"];
 	    organsRenderer.addPreRenderCallbackFunction(preRenderTimeUpdateCallback());
@@ -613,12 +613,12 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	    displayArea.appendChild( rendererContainer );
 	    organsRenderer.animate();
 	    if (toolTip === undefined)
-	      toolTip = new (require("./tooltip").ToolTip)(displayArea);
+	      toolTip = new (require("../ui/tooltip").ToolTip)(displayArea);
 	  } 
 	}
 
 	var imgZoom = function() {
-		var cssRule = (require('./utility').findCSSRule)(".organsImg");
+		var cssRule = (require('../utility').findCSSRule)(".organsImg");
 		var zoom = currentImgZoom * 100 + "%";
 		cssRule.style["max-height"] = zoom; 
 		cssRule.style["max-width"] = zoom;
@@ -730,7 +730,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	          zincCameraControl.setDefaultCameraSettings(viewport);
 	          displayScene.resetView();
 	        }
-	        var annotation = new (require('./utilities/annotation').annotation)();
+	        var annotation = new (require('../utilities/annotation').annotation)();
 	        annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName};
 	        geometry.userData = [annotation];
         }
