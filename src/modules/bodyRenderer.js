@@ -1,5 +1,3 @@
-var dat = require("../ui/dat.gui.js");
-require("../styles/dat-gui-swec.css");
 require("../styles/my_styles.css");
 var THREE = require("three");
 var ITEM_LOADED = require("../utility").ITEM_LOADED;
@@ -15,25 +13,18 @@ var ITEM_LOADED = require("../utility").ITEM_LOADED;
  * @returns {PJP.BodyViewer}
  */
 var BodyViewer = function(ModelsLoaderIn)  {
-  (require('./BaseModule').BaseModule).call(this);
-	var currentScene = undefined;
+  (require('./RendererModule').RendererModule).call(this);
 	var currentSpecies = 'human';
 	var bodyScenes = new Array();
-	var toolTip = undefined;
 	bodyScenes['human'] = undefined;
 	bodyScenes['pig'] = undefined;
 	bodyScenes['mouse'] = undefined;
 	bodyScenes['rat'] = undefined;
-	var rendererContainer = undefined;
 	// Flag for removing geometry from ZincScene when not visgble, thus freeing the memory. Default is false.
 	var removeWhenNotVisible = false;
 	var organsViewer = undefined;
 	var modelsLoader = ModelsLoaderIn;
-	var displayArea = undefined;
 	var systemPartAddedCallbacks = new Array();
-	var graphicsHighlight = new (require("../utilities/graphicsHighlight").GraphicsHighlight)();
-	//ZincRenderer for this viewer.
-	var bodyRenderer = null;
 	//Represents each physiological organ systems as folder in the dat.gui.
 	var systemList =["Musculo-skeletal", "Cardiovascular", "Respiratory", "Digestive",
 	  "Skin (integument)", "Urinary", "Brain & Central Nervous", "Immunological",
@@ -89,9 +80,9 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			for (var i = 0; i < intersects.length; i++) {
 				if (intersects[i] !== undefined && (intersects[ i ].object.name !== undefined)) {
 					if (!intersects[ i ].object.name.includes("Body")) {
-					  displayArea.style.cursor = "pointer";
-				    toolTip.setText(intersects[ i ].object.name);
-				    toolTip.show(window_x, window_y);
+					  _this.displayArea.style.cursor = "pointer";
+					  _this.toolTip.setText(intersects[ i ].object.name);
+					  _this.toolTip.show(window_x, window_y);
 				    _this.setHighlightedByObjects([intersects[ i ].object], true);
 						return;
 					} else {
@@ -101,26 +92,18 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			}
 			_this.setHighlightedByObjects([], true);
 			if (bodyHovered) {
-			  displayArea.style.cursor = "pointer";
-        toolTip.setText("Body");
-        toolTip.show(window_x, window_y);
+			  _this.displayArea.style.cursor = "pointer";
+			  _this.toolTip.setText("Body");
+			  _this.toolTip.show(window_x, window_y);
 			} else {
-			  toolTip.hide();
-			  displayArea.style.cursor = "auto";
+			  _this.toolTip.hide();
+			  _this.displayArea.style.cursor = "auto";
 			}
 			
 		}
 	};
 	
-  var publishChanges = function(objects, eventType) {
-    var annotations = [];
-    for (var i = 0; i < objects.length; i++) {
-      annotations[i] = objects[i].userData.userData[0];
-    }
-    for (var i = 0; i < _this.eventNotifiers.length; i++) {
-      _this.eventNotifiers[i].publish(_this, eventType, annotations);
-    }
-  }
+
 	
 	var removeGeometry = function(systemName, name) {
 		if (removeWhenNotVisible) {
@@ -133,48 +116,6 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			
 		}
 	}
-	
-  this.setHighlightedByObjects = function(objects, propagateChanges) {
-    var changed = graphicsHighlight.setHighlighted(objects);
-    if (changed && propagateChanges) {
-      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
-      publishChanges(objects, eventType);
-    }
-    return changed;
-  }
-  
-  this.setSelectedByObjects = function(objects, propagateChanges) {
-    var changed = graphicsHighlight.setSelected(objects);
-    if (changed && propagateChanges) {
-      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
-      publishChanges(objects, eventType);
-    }
-    return changed;
-  }
-  
-  this.findObjectsByGroupName = function(groupName) {
-    var geometries = displayScene.findGeometriesWithGroupName(groupName);
-    var objects = [];
-    for (var i = 0; i < geometries.length; i ++ ) {
-      objects.push(geometries[i].morph);
-    }
-    var glyphsets = displayScene.findGlyphsetsWithGroupName(groupName);
-    for (var i = 0; i < glyphsets.length; i ++ ) {
-      glyphsets[i].forEachGlyph(addGlyphToArray(objects));
-    }
-    
-    return objects;
-  }
-  
-  this.setHighlightedByGroupName = function(groupName, propagateChanges) {
-    var objects = _this.findObjectsByGroupName(groupName);
-    return _this.setHighlightedByObjects(objects, propagateChanges);
-  }
-  
-  this.setSelectedByGroupName = function(groupName, propagateChanges) {
-    var objects = _this.findObjectsByGroupName(groupName);
-    return _this.setSelectedByObjects(objects, propagateChanges);
-  }
 	
 	/**
 	 * This is called when a body part visibility control is switch on/off.
@@ -219,72 +160,25 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			annotation.data = {species:currentSpecies, system:systemName, part:partName};
 			geometry.userData = [annotation];
 		}
-	};
-	
-	this.changeBackgroundColour = function(backgroundColourString) {
-	  var colour = new THREE.Color(backgroundColourString);
-	  if (bodyRenderer) {
-	    var internalRenderer = bodyRenderer.getThreeJSRenderer();
-	    internalRenderer.setClearColor( colour, 1 );
-	  }
 	}
 	
 	this.getSystemList = function() {
 	  return systemList;
 	}
 	
-	this.resetView = function() {
-	  if (bodyRenderer)
-	    bodyRenderer.resetView();
-	}
-	
-	this.viewAll = function() {
-	  if (bodyRenderer)
-	    bodyRenderer.viewAll();
-	}
-	
 	this.changeSpecies = function(speciesName) {
 	  currentSpecies = speciesName;
-	  var scene = bodyRenderer.getSceneByName(currentSpecies);
+	  var scene = _this.zincRenderer.getSceneByName(currentSpecies);
 	  if (scene == undefined) {
-	    scene = bodyRenderer.createScene(currentSpecies);
+	    scene = _this.zincRenderer.createScene(currentSpecies);
 	  }
-	  currentScene = scene;
-	  bodyRenderer.setCurrentScene(scene);
+	  _this.scene = scene;
+	  _this.zincRenderer.setCurrentScene(scene);
 	}
 	
 	this.addSystemPartAddedCallback = function(callback) {
 	  if (typeof(callback === "function"))
 	    systemPartAddedCallbacks.push(callback);
-	}
-	
-	/** Initialise everything in the bodyRender, including the 3D renderer,
-	 *  dat.gui UI and picker for the 3D renderer.
-	 * 
-	 */
-	this.initialiseRenderer = function(displayAreaIn) {
-	  if (bodyRenderer === undefined || rendererContainer === undefined) {
-	    var returnedValue = (require("../utility").createRenderer)();
-	    bodyRenderer = returnedValue["renderer"];
-	    rendererContainer = returnedValue["container"];
-	    var scene = bodyRenderer.createScene("human");
-	    bodyRenderer.setCurrentScene(scene);
-	    scene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
-	    currentScene = scene;
-	    var directionalLight = scene.directionalLight;
-	    directionalLight.intensity = 1.4;
-	    var zincCameraControl = scene.getZincCameraControls();
-	    zincCameraControl.enableRaycaster(scene, _pickingBodyCallback(), _hoverBodyCallback());
-	    zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
-	    zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
-	  }
-	  if (displayAreaIn) {
-	    displayArea = displayAreaIn;
-	    displayArea.appendChild( rendererContainer );
-	    bodyRenderer.animate();
-	    if (toolTip === undefined)
-	      toolTip = new (require("../ui/tooltip").ToolTip)(displayArea);
-	  } 
 	}
 	
 	this.forEachPartInBody = function(callback) {
@@ -310,6 +204,15 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	 */
 	var initialise = function() {
 	  _this.initialiseRenderer(undefined);
+    _this.scene = _this.zincRenderer.createScene("human");
+    _this.zincRenderer.setCurrentScene(_this.scene);
+    _this.scene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
+    var directionalLight = _this.scene.directionalLight;
+    directionalLight.intensity = 1.4;
+    var zincCameraControl = _this.scene.getZincCameraControls();
+    zincCameraControl.enableRaycaster(_this.scene, _pickingBodyCallback(), _hoverBodyCallback());
+    zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
+    zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
 	}
 		
 	var readModel = function(systemName, partName, startup) {
@@ -322,12 +225,12 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			if (item["FileFormat"] == "JSON") {
 				if (systemName == "Musculo-skeletal" || systemName == "Skin (integument)")
 					scaling = true;
-				currentScene.loadMetadataURL(downloadPath, _addBodyPartCallback(systemName, partName, item, scaling, false, startup));
+				_this.scene.loadMetadataURL(downloadPath, _addBodyPartCallback(systemName, partName, item, scaling, false, startup));
 			}
 			else if (item["FileFormat"] == "STL")
-				currentScene.loadSTL(downloadPath, partName, _addBodyPartCallback(systemName, partName, item, scaling, true, startup));
+			  _this.scene.loadSTL(downloadPath, partName, _addBodyPartCallback(systemName, partName, item, scaling, true, startup));
 			else if (item["FileFormat"] == "OBJ") 
-				currentScene.loadOBJ(downloadPath, partName, _addBodyPartCallback(systemName, partName, item, scaling, true, startup));
+			  _this.scene.loadOBJ(downloadPath, partName, _addBodyPartCallback(systemName, partName, item, scaling, true, startup));
 		}
 	}
 	
@@ -345,16 +248,6 @@ var BodyViewer = function(ModelsLoaderIn)  {
 				}
 			}
 		}
-	}
-	
-	this.destroy = function() {
-	  if (bodyRenderer) {
-	    bodyRenderer.dispose();
-	    bodyRenderer.getThreeJSRenderer().dispose();
-	    bodyRenderer = undefined;
-	  }
-	  systemMeta = undefined;
-	  (require('./BaseModule').BaseModule).prototype.destroy.call( _this );
 	}
 	
 	/**
@@ -375,5 +268,5 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	initialise();
 }
 
-BodyViewer.prototype = Object.create((require('./BaseModule').BaseModule).prototype);
+BodyViewer.prototype = Object.create((require('./RendererModule').RendererModule).prototype);
 exports.BodyViewer = BodyViewer;

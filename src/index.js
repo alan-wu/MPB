@@ -4,6 +4,7 @@ require("./styles/sidebar.css");
 require('./styles/bootstrap.min.css');
 
 exports.BodyViewer = require("./modules/bodyRenderer").BodyViewer;
+exports.RendererModule = require("./modules/RendererModule").RendererModule;
 exports.CellPanel = require("./cell_panel").CellPanel;
 exports.ModelsLoader = require("./modelsLoader").ModelsLoader;
 exports.ModelPanel = require("./modules/model_panel").ModelPanel;
