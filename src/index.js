@@ -19,6 +19,6 @@ exports.ManagerSidebar = require("./ui/ManagerSidebar").ManagerSidebar;
 exports.ModuleManager = require("./utilities/manager").ModuleManager;
 exports.MANAGER_ITEM_CHANGE = require("./utilities/managerItem").MANAGER_ITEM_CHANGE;
 exports.MODULE_CHANGE = require("./modules/BaseModule").MODULE_CHANGE;
-exports.ChartDialog = require("./ui/ChartDialog").ChartDialog;
+//exports.ChartDialog = require("./ui/ChartDialog").ChartDialog;
 //exports.CellPanelDialog = require("./ui/CellPanelDialog").CellPanelDialog;
 exports.VERSION = '0.2.0';
