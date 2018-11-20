@@ -1,4 +1,4 @@
-var THREE = require('three');
+var THREE = require('zincjs').THREE;
 
 //Current model's associate data, data fields, external link, nerve map informations,
 //these are proived in the organsFileMap array.

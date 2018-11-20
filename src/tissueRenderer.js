@@ -1,7 +1,7 @@
 var dat = require("./ui/dat.gui.js");
 require("./styles/dat-gui-swec.css");
 require("./styles/my_styles.css");
-var THREE = require("three");
+var THREE = require('zincjs').THREE;
 
 /**
  * Used for viewing 3D tissue image stacks, it may include clickable points which

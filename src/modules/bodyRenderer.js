@@ -1,5 +1,5 @@
 require("../styles/my_styles.css");
-var THREE = require("three");
+var THREE = require('zincjs').THREE;
 var ITEM_LOADED = require("../utility").ITEM_LOADED;
 
 /**

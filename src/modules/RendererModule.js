@@ -1,4 +1,4 @@
-var THREE = require("three");
+var THREE = require('zincjs').THREE;
 
 var RendererModule = function()  {
   (require('./BaseModule').BaseModule).call(this);

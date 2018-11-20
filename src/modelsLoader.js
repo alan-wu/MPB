@@ -1,4 +1,4 @@
-var THREE = require("three");
+var THREE = require('zincjs').THREE;
 
 /**
  * Provides utilities function for files IO, this is used primarily by

@@ -1,4 +1,4 @@
-var THREE = require("three");
+var THREE = require('zincjs').THREE;
 
 exports.GraphicsHighlight = function() {
   var currentHighlightedObjects = [];
