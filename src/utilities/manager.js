@@ -34,6 +34,15 @@ exports.ModuleManager = function() {
       var dialog = new (require("../ui/ModelViewerDialog").ModelViewerDialog)(module);
       return dialog; 
     }
+    this["Scaffold Viewer"] = [];
+    this["Scaffold Viewer"].module = function() {
+      var module = new (require("../modules/ScaffoldViewer").ScaffoldViewer)();
+      return module; 
+    }
+    this["Scaffold Viewer"].dialog = function(module) {
+      var dialog = new (require("../ui/ScaffoldDialog").ScaffoldDialog)(module);
+      return dialog; 
+    }
   };
   var modelsLoader = undefined;
   var itemChangedCallbacks = [];
