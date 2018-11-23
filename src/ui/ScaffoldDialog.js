@@ -102,12 +102,11 @@ var ScaffoldDialog = function(scaffoldViewerIn) {
   var initialiseScaffoldControlUI = function() {
     _this.addDatGui();
     _this.container.find("#meshGui")[0].append(_this.datGui.domElement);
-    var viewAllButton = { 'View All':function(){ viewAll() }};
-    var resetButton = { 'Reset':function(){ resetView() }};
-    var readButton = { 'Read':function(){ readWorkspacePrompt() }};
-    var commitButton = {'Commit':function() { commitWorkspace() }};
-    var pushButton = {'Push':function() { pushWorkspace() }};
-    var writeButton = { 'Write':function(){ write() }};
+    var viewAllButton = { 'View All':function(){ scaffoldViewer.viewAll() }};
+    var resetButton = { 'Reset':function(){ scaffoldViewer.resetView() }};
+    var readButton = { 'Read':function(){ scaffoldViewer.readWorkspacePrompt() }};
+    var commitButton = {'Commit':function() { scaffoldViewer.commitWorkspace() }};
+    var pushButton = {'Push':function() { scaffoldViewer.pushWorkspace() }};
     _this.datGui.add(viewAllButton, 'View All');
     _this.datGui.add(resetButton, 'Reset');
     _this.datGui.add(readButton, 'Read');
@@ -143,7 +142,7 @@ var ScaffoldDialog = function(scaffoldViewerIn) {
       else
         scaffoldViewer.addMeshTypesCallback(meshTypesResponseCallback());
       scaffoldViewer.addCSGGui(_this.container.find("#csgGui")[0]);
-      scaffoldViewer.addMeshTypesCallback(meshUpdatedCallback());
+      scaffoldViewer.addMeshUpdatedCallbacks(meshUpdatedCallback());
       scaffoldViewer.addChangedCallback(scaffoldViewerChangedCallback());
       _this.onCloseCallbacks.push(_scaffoldViewerDialogClose());
     }

@@ -1,3 +1,4 @@
+require("../styles/modal.css");
 
 exports.PortalModal = function(modalIn) {
   var modal = modalIn;

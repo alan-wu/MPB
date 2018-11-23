@@ -22,6 +22,8 @@ var ScaffoldViewer = function()  {
   var currentMeshType = "3d_heart1";
   var currentOptions = undefined;
   var currentLandmarks = undefined;
+  var currentWorkspaceURL = undefined;
+  var currentFilename = undefined;
   var landmarks = [];
   var meshChanged = false;
   var settingsChanged = false;
@@ -67,7 +69,7 @@ var ScaffoldViewer = function()  {
   var createMarker = function(location, labelIn) {
     var label = labelIn;
     if (label == null || label == "") {
-      this.promptFunction("Please enter the annotation", "Landmark", annotationCallback(location));
+      _this.promptFunction("Please enter the annotation", "Landmark", annotationCallback(location));
     } else {
       registerLandmarks(location, label);
     }
@@ -109,7 +111,8 @@ var ScaffoldViewer = function()  {
   
   var _addOrganPartCallback = function() {
     return function(zincGeometry) {
-      csg.addOrganPartCallback(zincGeometry);
+      if (csg)
+        csg.addOrganPartCallback(zincGeometry);
       _this.zincRenderer.viewAll();
     }
   }
@@ -121,14 +124,16 @@ var ScaffoldViewer = function()  {
           addSphereFromLandmarksData(currentLandmarks[i]);
         }
       }
-      csg.updatePlane();
+      if (csg)
+        csg.updatePlane();
       settingsChanged = false;
     }
   }
   
   var confirmRemesh = function(itemDownloadCallback, allCompletedCallback) {
     _this.scene.clearAll();
-    csg.reset();
+    if (csg)
+      csg.reset();
     for (i = 0; i < landmarks.length; i++) {
       _this.scene.removeObject(landmarks[i]);
     }
@@ -249,7 +254,7 @@ var ScaffoldViewer = function()  {
     }
   }
   
-  var readWorkspacePrompt = function() {
+  this.readWorkspacePrompt = function() {
     var url = currentWorkspaceURL;
     if (currentWorkspaceURL == null || currentWorkspaceURL == "")
       url = "Enter workspace url...";
@@ -277,7 +282,7 @@ var ScaffoldViewer = function()  {
     }
   }
   
-  var commitWorkspace = function() {
+  this.commitWorkspace = function() {
     if (meshChanged === true) {
       meshChanged = false;
       var msg = "Commit Message";
@@ -306,7 +311,7 @@ var ScaffoldViewer = function()  {
     }
   }
   
-  var pushWorkspace = function() {
+  this.pushWorkspace = function() {
     if (changesCommitted) {
       if (meshChanged)
         _this.confirmFunction("There are uncommitted changes. Are you sure you want to push the changes?", confirmPushCallback());
@@ -446,7 +451,8 @@ var ScaffoldViewer = function()  {
   }
   
   this.addCSGGui = function(parent) {
-    csg.addDatGui(parent);
+    if (csg)
+      csg.addDatGui(parent);
   }
   
   /**
@@ -458,6 +464,7 @@ var ScaffoldViewer = function()  {
     _this.scene = _this.zincRenderer.createScene("scaffold");
     _this.zincRenderer.setCurrentScene(_this.scene);
     _this.zincRenderer.getThreeJSRenderer().localClippingEnabled = true;
+    _this.scene.loadViewURL("/static/view.json");
     //scene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
     var directionalLight = _this.scene.directionalLight;
     directionalLight.intensity = 1.4;
