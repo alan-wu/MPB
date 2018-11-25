@@ -56,7 +56,7 @@ var ScaffoldDialog = function(scaffoldViewerIn) {
     meshPartsGui.add(meshGuiControls, key);
   }
 
-  var modifyOptions = function(options) {
+  var addOptions = function(options) {
     for (var key in options) {
         // check if the property/key is defined in the object itself, not in parent
         if (options.hasOwnProperty(key)) {
@@ -81,7 +81,7 @@ var ScaffoldDialog = function(scaffoldViewerIn) {
     };
     meshPartsGui = _this.datGui.addFolder('Parameters');
     meshPartsGui.open();
-    modifyOptions(options);
+    addOptions(options);
     var confirmButton = { 'Confirm':function(){ confirmPressed() }};
     meshPartsGui.add(confirmButton, 'Confirm');
   }
