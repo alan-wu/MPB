@@ -104,7 +104,7 @@ var ScaffoldViewer = function()  {
       if (newString == "")
         newString = compatibleParamName + "=" + parametersValue;
       else
-        newString = originalString + "&" + compatibleParamName + "=" + parametersValue;
+        newString = newString + "&" + compatibleParamName + "=" + parametersValue;
     }
     return newString;
   }
@@ -152,10 +152,24 @@ var ScaffoldViewer = function()  {
       currentMeshType = data.meshtype;
       currentOptions = data.options;
       currentLandmarks = data.landmarks;
-      for (var i = 0; i < meshUpdatedCallbacks.length;i++) {
-        meshUpdatedCallbacks[i](data.meshtype, data.options);
+      var argumentString = "meshtype=" + currentMeshType;
+      argumentString = addOptionsToURL(argumentString);
+      var finalURL = "/generator?" + argumentString;
+      var xmlhttp = new XMLHttpRequest();
+      xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+          var options = JSON.parse(xmlhttp.responseText);
+          currentOptions = options;
+          data.options = options;
+          for (var i = 0; i < meshUpdatedCallbacks.length;i++) {
+            meshUpdatedCallbacks[i](data.meshtype, data.options);
+          }
+          confirmRemesh(_addOrganPartCallback(), importDataDownloadedCompletedCallback());
+        }     
       }
-      confirmRemesh(_addOrganPartCallback(), importDataDownloadedCompletedCallback());
+      var finalURL = "/checkMeshTypeOptions?" + argumentString;
+      xmlhttp.open("GET", finalURL, true);
+      xmlhttp.send();
     } 
   }
   
