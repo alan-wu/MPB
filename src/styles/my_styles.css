@@ -399,3 +399,11 @@ img.model {
 	overflow-y: auto;
 }
 
+#meshGui li.folder .dg .c {
+	width:20%;
+}
+
+#meshGui li.folder .dg .property-name {
+	width:80%;
+	font-size:10px;
+}
