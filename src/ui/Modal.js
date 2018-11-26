@@ -1,7 +1,10 @@
+var dialogPolyfill = require("dialog-polyfill");
+require("dialog-polyfill/dialog-polyfill.css");
 require("../styles/modal.css");
 
 exports.PortalModal = function(modalIn) {
   var modal = modalIn;
+  dialogPolyfill.registerDialog(modal);
   var messageElement = modal.querySelector("p");
   var inputElement = modal.querySelector("#textInput");
   var closeBtn = modal.querySelector(".small.close-modal-btn");
@@ -22,9 +25,17 @@ exports.PortalModal = function(modalIn) {
   }
   
   modal.querySelector("form").addEventListener('keydown', function(event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      okPressed();
+    switch (event.key) {
+      case "Enter":
+        okPressed();
+        event.preventDefault();
+        break;
+      case "Escape":
+        closePressed();
+        event.preventDefault();
+        break;
+      default:
+        break;
     }
   }, false);
   

@@ -30,7 +30,11 @@ module.exports = {
           'raw-loader'
         ]
       },
-      { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' }
+      { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' },
+//      {
+//        test: /node_modules/,
+//        loader: 'ify-loader'
+//      }
     ]
   },
   plugins: [
