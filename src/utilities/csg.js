@@ -161,7 +161,7 @@ exports.csg = function(sceneIn, zincRendererIn) {
   this.addDatGui = function(parent) {
     datGui = new dat.GUI({autoPlace: false});
     datGui.domElement.id = 'csgGui';
-    parent.append(datGui.domElement);
+    parent.appendChild(datGui.domElement);
     controls["viewport"] = function() {
       console.log(scene.getZincCameraControls().getCurrentViewport())
     };

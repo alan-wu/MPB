@@ -25,7 +25,7 @@ var CellPanelDialog = function() {
     var controller = datGui.addColor(control, 'Background');
     console.log(container)
     controller.onChange(cellBackGroundChanged());
-    container.find("#cellGui")[0].append(datGui.domElement);
+    container.find("#cellGui")[0].appendChild(datGui.domElement);
     otherCellControls = datGui.addFolder('Others');
   }
   

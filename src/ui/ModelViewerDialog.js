@@ -42,7 +42,7 @@ var ModelViewerDialog = function(modelPanelIn) {
     var control = new modelControl();
     var controller = _myInstance.datGui.addColor(control, 'Background');
     controller.onChange(modelBackGroundChanged());
-    _myInstance.container.find("#modelGui")[0].append(_myInstance.datGui.domElement);
+    _myInstance.container.find("#modelGui")[0].appendChild(_myInstance.datGui.domElement);
     otherModelControls = _myInstance.datGui.addFolder('Others');
   }
   

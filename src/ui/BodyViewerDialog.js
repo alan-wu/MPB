@@ -204,7 +204,7 @@ var BodyViewerDialog = function(bodyViewerIn) {
     var control = new bodyControl();
     var controller = _myInstance.datGui.addColor(control, 'Background');
     controller.onChange(bodyBackGroundChanged());
-    _myInstance.container.find("#bodyGui")[0].append(_myInstance.datGui.domElement);
+    _myInstance.container.find("#bodyGui")[0].appendChild(_myInstance.datGui.domElement);
     var resetViewButton = { 'Reset View':function(){ bodyViewer.resetView() }};
     var viewAllButton = { 'View All':function(){ bodyViewer.viewAll() }};
     _myInstance.datGui.add(resetViewButton, 'Reset View');

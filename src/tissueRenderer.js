@@ -364,7 +364,7 @@ exports.TissueViewer = function(DialogName)  {
 		gui = new dat.GUI({autoPlace: false});
 		gui.domElement.id = 'gui';
 		gui.close();
-		var customContainer = dialogObject.find("#tissueGui")[0].append(gui.domElement);
+		var customContainer = dialogObject.find("#tissueGui")[0].appendChild(gui.domElement);
 		var controller = gui.addColor(guiControls, 'Background');
 		controller.onChange(volumeRenderBackGroundChanged());
 		var modelSelected = gui.add(guiControls, 'model', [ 'collagen', 'crop', 'collagen_large', 'crop_large'] );

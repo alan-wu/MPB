@@ -101,7 +101,7 @@ var ScaffoldDialog = function(scaffoldViewerIn) {
   
   var initialiseScaffoldControlUI = function() {
     _this.addDatGui();
-    _this.container.find("#meshGui")[0].append(_this.datGui.domElement);
+    _this.container.find("#meshGui")[0].appendChild(_this.datGui.domElement);
     var viewAllButton = { 'View All':function(){ scaffoldViewer.viewAll() }};
     var resetButton = { 'Reset':function(){ scaffoldViewer.resetView() }};
     var readButton = { 'Read':function(){ scaffoldViewer.readWorkspacePrompt() }};

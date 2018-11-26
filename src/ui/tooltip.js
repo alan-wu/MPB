@@ -47,7 +47,7 @@ exports.ToolTip = function(container) {
     tooltipcontainerElement = parent[0];
     tipElement = parent.find("#tip")[0];
     tiptextElement = parent.find("#tiptext")[0];
-    container.append(parent[0]);
+    container.appendChild(parent[0]);
   }
   
   setupToolTipContainer();

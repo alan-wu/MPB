@@ -302,7 +302,7 @@ var OrgansViewerDialog = function(organsViewerIn) {
     var control = new organsControl();
     var controller = _myInstance.datGui.addColor(control, 'Background');
     controller.onChange(organsBackGroundChanged());
-    _myInstance.container.find("#organGui")[0].append(_myInstance.datGui.domElement);
+    _myInstance.container.find("#organGui")[0].appendChild(_myInstance.datGui.domElement);
     var resetViewButton = { 'Reset View':function(){ organsViewer.resetView() }};
     var viewAllButton = { 'View All':function(){ organsViewer.viewAll() }};
     speedSlider = _myInstance.datGui.add(organGuiControls, 'Speed', 0, 5000).step(50).onChange(speedSliderChanged());
