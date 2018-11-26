@@ -52,6 +52,7 @@ BaseDialog.prototype.create = function(htmlData, dataController) {
     hide: "blind",
     width: 600,
     height: 500,
+    closeOnEscape: false,
     resize: function() {
       var heightPadding = parseInt($(this).css('padding-top'), 10) + parseInt($(this).css('padding-bottom'), 10),
         widthPadding = parseInt($(this).css('padding-left'), 10) + parseInt($(this).css('padding-right'), 10),
@@ -59,24 +60,16 @@ BaseDialog.prototype.create = function(htmlData, dataController) {
       $(this).height($(this).parent().height() - $(this).prev('.ui-dialog-titlebar').outerHeight(true) - heightPadding - titlebarMargin);
 
       $(this).width($(this).prev('.ui-dialog-titlebar').outerWidth(true) - widthPadding);
-    }});
+    },
+    resizeStop: this.resizeStopCallback(this),
+    beforeClose: this.beforeClose(this),
+    close: this.close(this)
+  });
 
   var childNodes = $.parseHTML(htmlData);
   for (i = 0; i < childNodes.length; i++) {
     this.container[0].appendChild(childNodes[i]);
   }
-  
-  this.container.dialog({
-    resizeStop: this.resizeStopCallback(this)
-  });
-
-  this.container.dialog({
-    beforeClose: this.beforeClose(this)
-  });
-
-  this.container.dialog({
-    close: this.close(this)
-  });
 };
 
 BaseDialog.prototype.addDatGui = function() {
