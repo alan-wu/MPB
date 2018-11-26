@@ -393,3 +393,9 @@ img.model {
 	position:absolute;
 }
 
+.portalDatGui {
+	position:absolute;
+	height: 99%;
+	overflow-y: auto;
+}
+
