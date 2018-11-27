@@ -397,6 +397,7 @@ img.model {
 	position:absolute;
 	height: 99%;
 	overflow-y: auto;
+	pointer-events: none;
 }
 
 #meshGui li.folder .dg .c {

@@ -2,7 +2,10 @@
        color: black;
        font: 500 15px "Lucida Sans Unicode", "Lucida Grande", sans-serif;
        text-shadow: white 0 0 0;
-} 
+}
+.dg.main{
+	pointer-events: auto;
+}
 .dg .c .slider {
        background: silver
 } 
