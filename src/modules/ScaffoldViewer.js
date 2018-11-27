@@ -29,40 +29,48 @@ var ScaffoldViewer = function()  {
   var settingsChanged = false;
   _this.typeName = "Scaffold Viewer";
   
-  var registerLandmarks = function(location, label) {
+  var registerLandmarks = function(location, label, predefined) {
     if (!(label == null || label == "")) {
       var geometry = new THREE.SphereGeometry(0.02, 16, 16);
+      var landmarkColor = predefined ? 0xee0000 : 0x00ee00;
+      var emissiveColor = predefined ? 0x550000 : 0x005500;
       var material = new THREE.MeshLambertMaterial({
-        color : 0x00ff00,
-        emissive :0x008800
+        color : landmarkColor,
+        emissive : emissiveColor
       });
       var sphere = new THREE.Mesh(geometry, material);
       sphere.position.copy(location);
       _this.scene.addObject(sphere);
       landmarks.push(sphere);
-      var xmlhttp = new XMLHttpRequest();
-      xmlhttp.onreadystatechange = function() {
-              if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                      var xi = JSON.parse(xmlhttp.responseText);
-                      if (xi && xi.element && xi.xi) {
-                        sphere.userData.xi = xi.xi;
-                        sphere.userData.element = xi.element;
-                        sphere.name = label;
-                        meshChanged = true;
-                        //getLandmarksJSON();
-                      }
-              }     
+      if (predefined === false) {
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        var xi = JSON.parse(xmlhttp.responseText);
+                        if (xi && xi.element && xi.xi) {
+                          sphere.userData.xi = xi.xi;
+                          sphere.userData.element = xi.element;
+                          sphere.userData.hoverable = true;
+                          sphere.name = label;
+                          meshChanged = true;
+                          //getLandmarksJSON();
+                        }
+                }     
+        }
+        var requestString = "./registerLandmarks" + "?name=" + label + "&xi1=" + location.x + "&xi2=" + location.y + "&xi3=" + location.z;
+        xmlhttp.open("GET", requestString, true);
+        xmlhttp.send();
+      } else {
+        sphere.name = label;
+        sphere.userData.hoverable = true;
       }
-      var requestString = "./registerLandmarks" + "?name=" + label + "&xi1=" + location.x + "&xi2=" + location.y + "&xi3=" + location.z;
-      xmlhttp.open("GET", requestString, true);
-      xmlhttp.send();
     }
   }
   
   var annotationCallback = function(location) {
     return function(status, label) {
       if (status == true)
-        registerLandmarks(location, label);
+        registerLandmarks(location, label, false);
     }
   }
   
@@ -71,10 +79,32 @@ var ScaffoldViewer = function()  {
     if (label == null || label == "") {
       _this.promptFunction("Please enter the annotation", "Landmark", annotationCallback(location));
     } else {
-      registerLandmarks(location, label);
+      registerLandmarks(location, label, false);
     }
 
     return true;
+  }
+  
+  var addPredefinedLandmarks = function() {
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        var returnedObject = JSON.parse(xmlhttp.responseText);
+        if (returnedObject["error"] === undefined) {
+          for (var i = 0; i < returnedObject.length;i++) {
+            var datapoint = returnedObject[i];
+            var coords = new THREE.Vector3( datapoint["coordinates"][0], datapoint["coordinates"][1],
+                datapoint["coordinates"][2] );
+            registerLandmarks(coords, datapoint.name, true);
+          }
+        } else {
+          _this.alertFunction(returnedObject['error']);
+        }
+        
+      }
+    }
+    xmlhttp.open("GET", "/getPredefinedLandmarks", true);
+    xmlhttp.send();
   }
   
   var addSphereFromLandmarksData = function(landmarksData) {
@@ -119,6 +149,7 @@ var ScaffoldViewer = function()  {
   
   var importDataDownloadedCompletedCallback = function() {
     return function() {
+      addPredefinedLandmarks();
       if (currentLandmarks) {
         for (var i = 0; i < currentLandmarks.length; i++) {
           addSphereFromLandmarksData(currentLandmarks[i]);
@@ -437,10 +468,13 @@ var ScaffoldViewer = function()  {
       for (var i = 0; i < intersects.length; i++) {
         var currentObject = intersects[i].object;
         //if (intersects[i].object.name && intersects[i].object.name.includes("Element")) {
-        if (currentObject.name && currentObject.userData.xi && currentObject.userData.element) {
-          var displayString = currentObject.name + "<br />{ Element " + 
-            currentObject.userData.element + ", xi: " + currentObject.userData.xi[0] + ", " + 
-            currentObject.userData.xi[1] + ", " + currentObject.userData.xi[2]+"}";
+        if (currentObject.name && currentObject.userData.hoverable) {
+          var displayString = currentObject.name;
+          if (currentObject.userData.xi && currentObject.userData.element) {
+            displayString = displayString + "<br />{ Element " + 
+              currentObject.userData.element + ", xi: " + currentObject.userData.xi[0] + ", " + 
+              currentObject.userData.xi[1] + ", " + currentObject.userData.xi[2]+"}";
+          }
           _this.toolTip.setText(displayString);
           _this.toolTip.show(window_x, window_y);
           return;
