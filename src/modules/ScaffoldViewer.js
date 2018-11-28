@@ -103,7 +103,7 @@ var ScaffoldViewer = function()  {
         
       }
     }
-    xmlhttp.open("GET", "/getPredefinedLandmarks", true);
+    xmlhttp.open("GET", "./getPredefinedLandmarks", true);
     xmlhttp.send();
   }
   
@@ -171,7 +171,7 @@ var ScaffoldViewer = function()  {
     landmarks = [];
     var argumentString = "meshtype=" + currentMeshType;
     argumentString = addOptionsToURL(argumentString);
-    var finalURL = "/generator?" + argumentString;
+    var finalURL = "./generator?" + argumentString;
     console.log(argumentString);
     _this.scene.loadMetadataURL(finalURL, itemDownloadCallback, allCompletedCallback);
     meshChanged = true;
@@ -185,7 +185,7 @@ var ScaffoldViewer = function()  {
       currentLandmarks = data.landmarks;
       var argumentString = "meshtype=" + currentMeshType;
       argumentString = addOptionsToURL(argumentString);
-      var finalURL = "/generator?" + argumentString;
+      var finalURL = "./generator?" + argumentString;
       var xmlhttp = new XMLHttpRequest();
       xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -198,7 +198,7 @@ var ScaffoldViewer = function()  {
           confirmRemesh(_addOrganPartCallback(), importDataDownloadedCompletedCallback());
         }     
       }
-      var finalURL = "/checkMeshTypeOptions?" + argumentString;
+      var finalURL = "./checkMeshTypeOptions?" + argumentString;
       xmlhttp.open("GET", finalURL, true);
       xmlhttp.send();
     } 
@@ -512,8 +512,7 @@ var ScaffoldViewer = function()  {
     _this.scene = _this.zincRenderer.createScene("scaffold");
     _this.zincRenderer.setCurrentScene(_this.scene);
     _this.zincRenderer.getThreeJSRenderer().localClippingEnabled = true;
-    _this.scene.loadViewURL("/static/view.json");
-    //scene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
+    _this.scene.loadViewURL("./static/view.json");
     var directionalLight = _this.scene.directionalLight;
     directionalLight.intensity = 1.4;
     var zincCameraControl = _this.scene.getZincCameraControls();
