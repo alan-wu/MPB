@@ -4,16 +4,16 @@
 var ScaffoldDialog = function(scaffoldViewerIn) {
   (require('./BaseDialog').BaseDialog).call(this);
   var scaffoldViewer = scaffoldViewerIn;
-  var systemGuiFolder = new Array();
-  var systemPartsGuiControls = new Array();
   var modal = undefined;
   var optionsChanged = false;
   var _this = this;
   var guiControls = new function() {
     this['Mesh Types'] = "3d_heart1";
   };
+  var meshParametersGui = undefined;
+  var meshParametersGuiControls = undefined;
   var meshPartsGui = undefined;
-  var meshGuiControls = undefined;
+  var meshPartsGuiControls = undefined;
   this.getModule = function() {
     return scaffoldViewer;
   }
@@ -53,43 +53,83 @@ var ScaffoldDialog = function(scaffoldViewerIn) {
   }
 
   var addOption = function(key, value) {
-    meshPartsGui.add(meshGuiControls, key);
+    meshParametersGui.add(meshParametersGuiControls, key);
   }
 
   var addOptions = function(options) {
     for (var key in options) {
         // check if the property/key is defined in the object itself, not in parent
         if (options.hasOwnProperty(key)) {
-           meshGuiControls[key] = options[key];
+           meshParametersGuiControls[key] = options[key];
            addOption(key, options[key]);
         }
     }
   }
   
   var confirmPressed = function() {
-    for (var key in meshGuiControls) {
-      if (meshGuiControls.hasOwnProperty(key)) {
-        scaffoldViewer.updateOption(key, meshGuiControls[key]);
+    for (var key in meshParametersGuiControls) {
+      if (meshParametersGuiControls.hasOwnProperty(key)) {
+        scaffoldViewer.updateOption(key, meshParametersGuiControls[key]);
       }
     }
     scaffoldViewer.updateMesh();
   }
 
-  var updateGuiOptions = function(options) {
+  var updateParametersOptions = function(options) {
     _this.datGui.removeFolder('Parameters');
-    meshGuiControls = function() {
+    meshParametersGuiControls = function() {
     };
-    meshPartsGui = _this.datGui.addFolder('Parameters');
-    meshPartsGui.open();
+    meshParametersGui = _this.datGui.addFolder('Parameters');
     addOptions(options);
     var confirmButton = { 'Confirm':function(){ confirmPressed() }};
-    meshPartsGui.add(confirmButton, 'Confirm');
+    meshParametersGui.add(confirmButton, 'Confirm');
+  }
+  
+  var meshPartNameClickedCallback = function(groupName) {
+    return function(event) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      scaffoldViewer.setSelectedByGroupName(groupName, false);
+    } 
+  }
+  
+  var addPartGuiOptionsCallback = function() {
+    return function(zincGeometry) {
+      if (zincGeometry.groupName) {
+        var groupName = zincGeometry.groupName;
+        if (!meshPartsGuiControls.hasOwnProperty(groupName)) {
+          meshPartsGuiControls[groupName] = true;
+          var controller = meshPartsGui.add(meshPartsGuiControls, groupName);
+          var span = controller.__li.getElementsByTagName("span")[0];
+          controller.onChange(scaffoldViewer.changePartVisibilityCallback(groupName));
+          controller.__li.onmouseover = function() {scaffoldViewer.setHighlightedByGroupName(groupName, true);};
+          span.onclick = meshPartNameClickedCallback(groupName);
+        }
+      }
+    }
+  }
+  
+  var updatePartGuiOptions = function() {
+    _this.datGui.removeFolder('Regions');
+    meshPartsGuiControls = function() {
+    };
+    meshPartsGui = _this.datGui.addFolder('Regions');
+    meshPartsGui.open();
+    if (scaffoldViewer.scene) {
+      scaffoldViewer.scene.forEachGeometry(addPartGuiOptionsCallback()); 
+    }
+  }
+
+  var allPartsDownloadedCallbacks = function() {
+    return function() {
+      updatePartGuiOptions();
+    }
   }
   
   var meshUpdatedCallback = function() {
     return function(meshType, options) {
       guiControls['Mesh Types'] = meshType;
-      updateGuiOptions(options);
+      updateParametersOptions(options);
     }
   }
   
@@ -144,6 +184,7 @@ var ScaffoldDialog = function(scaffoldViewerIn) {
       scaffoldViewer.addCSGGui(_this.container.find("#csgGui")[0]);
       scaffoldViewer.addMeshUpdatedCallbacks(meshUpdatedCallback());
       scaffoldViewer.addChangedCallback(scaffoldViewerChangedCallback());
+      scaffoldViewer.addMeshAllPartsDownloadedCallbacks(allPartsDownloadedCallbacks());
       _this.onCloseCallbacks.push(_scaffoldViewerDialogClose());
     }
   }

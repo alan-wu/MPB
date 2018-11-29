@@ -15,6 +15,7 @@ var ScaffoldViewer = function()  {
   var _this = this;
   var meshTypesCallbacks = new Array();
   var meshUpdatedCallbacks = new Array();
+  var meshAllPartsDownloadedCallbacks = new Array();
   var availableMeshTypes = undefined;
   this.alertFunction = undefined;
   this.promptFunction = undefined;
@@ -155,6 +156,9 @@ var ScaffoldViewer = function()  {
           addSphereFromLandmarksData(currentLandmarks[i]);
         }
       }
+      for (var i = 0; i < meshAllPartsDownloadedCallbacks.length;i++) {
+        meshAllPartsDownloadedCallbacks[i]();
+      }
       if (csg)
         csg.updatePlane();
       settingsChanged = false;
@@ -226,7 +230,8 @@ var ScaffoldViewer = function()  {
           verifierEntered(verifier);
         }
       } else {
-        _this.alertFunction("Loading abort");
+        if (_this.alertFunction)
+          _this.alertFunction("Loading abort");
       }
     }
   } 
@@ -236,15 +241,18 @@ var ScaffoldViewer = function()  {
       if (status == true) {
         console.log(url)
         window.open(url,'_blank');
-        _this.promptFunction("Enter your verifier here", "...", verifierEnteredCallback());
+        if (_this.promptFunction)
+          _this.promptFunction("Enter your verifier here", "...", verifierEnteredCallback());
       } else {
-        _this.alertFunction("Loading abort");
+        if (_this.alertFunction)
+          _this.alertFunction("Loading abort");
       }
     }
   }
 
   var verificationCodePrompt = function(url) {
-    _this.confirmFunction("Workspace may be private, please press confirm to identify yourself.", openVerifierPagePressed(url));
+    if (_this.confirmFunction)
+      _this.confirmFunction("Workspace may be private, please press confirm to identify yourself.", openVerifierPagePressed(url));
   } 
 
   var parseWorkspaceResponse = function(options) {
@@ -293,7 +301,8 @@ var ScaffoldViewer = function()  {
           var file = currentFilename;
           if (currentFilename == null || currentFilename == "")
             file = "Please enter file name...";
-          _this.promptFunction("Please enter file name", file, finalReadWorkspacePromptCallback());
+          if (_this.promptFunction)
+            _this.promptFunction("Please enter file name", file, finalReadWorkspacePromptCallback());
         }
       } 
     }
@@ -303,7 +312,8 @@ var ScaffoldViewer = function()  {
     var url = currentWorkspaceURL;
     if (currentWorkspaceURL == null || currentWorkspaceURL == "")
       url = "Enter workspace url...";
-    _this.promptFunction("Please enter PMR workspace", url, readWorkspacePromptCallback());
+    if (_this.promptFunction)
+      _this.promptFunction("Please enter PMR workspace", url, readWorkspacePromptCallback());
 
   }
   
@@ -316,7 +326,7 @@ var ScaffoldViewer = function()  {
             var response = JSON.parse(xmlhttp.responseText);
             if (response.status == "success")
               changesCommitted = true;
-            if (response.message)
+            if (response.message && _this.alertFunction)
               _this.alertFunction(response.message);
           }     
         }
@@ -331,10 +341,12 @@ var ScaffoldViewer = function()  {
     if (meshChanged === true) {
       meshChanged = false;
       var msg = "Commit Message";
-      _this.promptFunction("Please enter commit message", msg, commitWorkspaceCallback());
+      if (_this.promptFunction)
+        _this.promptFunction("Please enter commit message", msg, commitWorkspaceCallback());
     }
     else {
-      _this.alertFunction("Everything is up-to-date");
+      if (_this.alertFunction)
+        _this.alertFunction("Everything is up-to-date");
     }
   }
     
@@ -345,7 +357,7 @@ var ScaffoldViewer = function()  {
         xmlhttp.onreadystatechange = function() {
           if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             var response = JSON.parse(xmlhttp.responseText);
-            if (response.message)
+            if (response.message && _this.alertFunction)
               _this.alertFunction(response.message);
           }     
         }
@@ -358,10 +370,14 @@ var ScaffoldViewer = function()  {
   
   this.pushWorkspace = function() {
     if (changesCommitted) {
-      if (meshChanged)
-        _this.confirmFunction("There are uncommitted changes. Are you sure you want to push the changes?", confirmPushCallback());
-      else
-        _this.confirmFunction("Are you sure you want to push the changes?", confirmPushCallback());
+      if (meshChanged) {
+        if (_this.confirmFunction)
+          _this.confirmFunction("There are uncommitted changes. Are you sure you want to push the changes?", confirmPushCallback());
+      }
+      else {
+        if (_this.confirmFunction)
+          _this.confirmFunction("Are you sure you want to push the changes?", confirmPushCallback());
+      }
     }
   }
   
@@ -416,12 +432,14 @@ var ScaffoldViewer = function()  {
         console.log(response);
         if (response.data) {
           importData(response.data);
-          _this.alertFunction(response.message);
+          if (_this.alertFunction)
+            _this.alertFunction(response.message);
         }
         else if (response.message) {
           settingsChanged = true;
           _this.updateMesh();
-          _this.alertFunction(response.message);
+          if (_this.alertFunction)
+            _this.alertFunction(response.message);
         }
       }
     }
@@ -484,6 +502,22 @@ var ScaffoldViewer = function()  {
     }
   };
   
+  /**
+   * Change visibility for parts of the current scene.
+   */
+  var changePartVisibility = function(name, value) {
+    var geometries = _this.scene.findGeometriesWithGroupName(name);
+    for (var i = 0; i < geometries.length; i ++ ) {
+      geometries[i].setVisibility(value);
+    }
+  }
+  
+  this.changePartVisibilityCallback = function(name) {
+    return function(value) {
+      changePartVisibility(name, value);
+    }
+  }
+  
   this.addMeshTypesCallback = function(callback) {
     if (typeof(callback === "function"))
       meshTypesCallbacks.push(callback);
@@ -492,6 +526,11 @@ var ScaffoldViewer = function()  {
   this.addMeshUpdatedCallbacks = function(callback) {
     if (typeof(callback === "function"))
       meshUpdatedCallbacks.push(callback);
+  }
+  
+  this.addMeshAllPartsDownloadedCallbacks = function(callback) {
+    if (typeof(callback === "function"))
+      meshAllPartsDownloadedCallbacks.push(callback);
   }
   
   this.getAvailableMeshTypes = function() {
