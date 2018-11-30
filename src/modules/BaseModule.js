@@ -19,6 +19,13 @@ BaseModule.prototype.setName = function(name) {
   }
 }
 
+BaseModule.prototype.publishChanges = function(annotations, eventType) {
+  for (var i = 0; i < this.eventNotifiers.length; i++) {
+    this.eventNotifiers[i].publish(this, eventType, annotations);
+  }
+}
+
+
 BaseModule.prototype.getName = function() {
   return this.instanceName;
 }

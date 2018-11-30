@@ -12,21 +12,15 @@ var RendererModule = function()  {
 
 RendererModule.prototype = Object.create((require('./BaseModule').BaseModule).prototype);
 
-RendererModule.prototype.publishChanges = function(objects, eventType) {
-  var annotations = [];
-  for (var i = 0; i < objects.length; i++) {
-    annotations[i] = objects[i].userData.userData[0];
-  }
-  for (var i = 0; i < this.eventNotifiers.length; i++) {
-    this.eventNotifiers[i].publish(this, eventType, annotations);
-  }
-}
-
 RendererModule.prototype.setHighlightedByObjects = function(objects, propagateChanges) {
   var changed = this.graphicsHighlight.setHighlighted(objects);
   if (changed && propagateChanges) {
     var eventType = require("../utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
-    this.publishChanges(objects, eventType);
+    var annotations = [];
+    for (var i = 0; i < objects.length; i++) {
+      annotations[i] = objects[i].userData.userData[0];
+    }
+    this.publishChanges(annotations, eventType);
   }
   return changed;
 }
@@ -35,7 +29,11 @@ RendererModule.prototype.setSelectedByObjects = function(objects, propagateChang
   var changed = this.graphicsHighlight.setSelected(objects);
   if (changed && propagateChanges) {
     var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
-    this.publishChanges(objects, eventType);
+    var annotations = [];
+    for (var i = 0; i < objects.length; i++) {
+      annotations[i] = objects[i].userData.userData[0];
+    }
+    this.publishChanges(annotations, eventType);
   }
   return changed;
 }
