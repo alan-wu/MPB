@@ -133,14 +133,29 @@ var BodyViewerDialog = function(bodyViewerIn) {
     return false;
   }
   
+  var bodyPartNameClickedCallback = function(partName) {
+    return function(event) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      bodyViewer.setSelectedByGroupName(partName, true);
+    } 
+  }
+  
+  var addPartToSystemControl = function(systemName, partName) {
+    var controller = systemGuiFolder[systemName].add(systemPartsGuiControls[systemName], partName);
+    var span = controller.__li.getElementsByTagName("span")[0];
+    controller.onChange(bodyPartsVisibilityChanged(partName, systemName));
+    controller.__li.onmouseover = function() {bodyViewer.setHighlightedByGroupName(partName, true);};
+    span.onclick = bodyPartNameClickedCallback(partName);
+  }
+  
   var addSystemPartGui = function(systemName, partName, visible) {
     if (systemName) {
       if (systemGuiFolder[systemName] !== undefined &&
         systemPartsGuiControls.hasOwnProperty(systemName)) {
         systemPartsGuiControls[systemName][partName] = visible;
         if (!systemGuiFolderHasPartControls(systemName, partName)) {
-          systemGuiFolder[systemName].add(systemPartsGuiControls[systemName], partName).onChange(
-              bodyPartsVisibilityChanged(partName, systemName));
+          addPartToSystemControl(systemName, partName);
         } else {
           updateSystemPartController(systemName, partName);
         }
