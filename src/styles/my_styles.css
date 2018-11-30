@@ -396,7 +396,6 @@ img.model {
 .portalDatGui {
 	position:absolute;
 	height: 99%;
-	overflow-y: auto;
 	pointer-events: none;
 }
 

@@ -4,6 +4,10 @@
        text-shadow: white 0 0 0;
 }
 .dg.main{
+	max-height:100%;
+	min-height:50px;
+	overflow-y: auto;
+	overflow-x: hidden;
 	pointer-events: auto;
 }
 .dg .c .slider {
@@ -155,4 +159,7 @@
        outline-style: solid;
        outline-width: 1.5px;
        background-color: #fff;
+}
+.dg.main .close-button.close-bottom {
+	position:relative;
 }
