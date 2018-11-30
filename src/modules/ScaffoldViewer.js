@@ -33,8 +33,8 @@ var ScaffoldViewer = function()  {
   var registerLandmarks = function(location, label, predefined) {
     if (!(label == null || label == "")) {
       var geometry = new THREE.SphereGeometry(0.02, 16, 16);
-      var landmarkColor = predefined ? 0xee0000 : 0x00ee00;
-      var emissiveColor = predefined ? 0x550000 : 0x005500;
+      var landmarkColor = predefined ? 0xee00ee : 0x00ee00;
+      var emissiveColor = predefined ? 0x550055 : 0x005500;
       var material = new THREE.MeshLambertMaterial({
         color : landmarkColor,
         emissive : emissiveColor
