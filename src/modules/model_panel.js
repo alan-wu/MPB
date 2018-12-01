@@ -19,7 +19,24 @@ var ModelPanel = function()  {
 	var _this = this;
 	var svgController= undefined;
 	var targetSVGPanelElement = undefined;
+	
 	 _this.typeName = "Model Panel";
+	 
+	
+	var svgElementClicked = function() {
+	  return function(element) {
+	    if (element.id == "g1701") {
+	      console.log("here")
+	      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
+	      var annotations = [];
+	      var annotation = new (require('../utilities/annotation').annotation)();
+	      annotation.data = {species:"human", system:"Cardiovascular", part:"Heart"};
+	      annotations[0] = annotation; 
+	      _this.publishChanges(annotations, eventType);
+	    }
+	  }
+	}
+	 
 	/**
 	 * Create and enable SVGController on the provided panelName, if no element with the id is found,
 	 * try after loadHTMLComplete is completed.
@@ -29,8 +46,10 @@ var ModelPanel = function()  {
 	this.enableSVGController = function(SVGPanelElement) {
 		if (svgController === undefined) {
 		  targetSVGPanelElement = SVGPanelElement;
-			if (targetSVGPanelElement != null)
+			if (targetSVGPanelElement != null) {
 				svgController = new (require('../utilities/svgController').SVGController)(targetSVGPanelElement);
+				svgController.addSVGElementClickedCallbacks(svgElementClicked());
+			}
 		}
 	}
 	
