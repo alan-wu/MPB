@@ -79,6 +79,13 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			picker: undefined,
 			associateData: undefined	
 	};
+	 ratOrgansFileMap["Digestive"] = {};
+	 ratOrgansFileMap["Digestive"]["Stomach"] = {
+	     view: "rat/digestive/stomach/rat_stomach_view.json",
+	     meta: "rat/digestive/stomach/rat_stomach_meta.json",
+	     picker: undefined,
+	     associateData: undefined  
+	  };
 	
 	//Array for storing human's models urls and its associated data.
 	var humanOrgansFileMap = {};
