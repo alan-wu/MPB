@@ -33,7 +33,18 @@ var ModelPanel = function()  {
 	      annotation.data = {species:"human", system:"Cardiovascular", part:"Heart"};
 	      annotations[0] = annotation; 
 	      _this.publishChanges(annotations, eventType);
-	    }
+	    } else if (element.id == "g1827") {
+	      var content = svgController.getSVGContent()
+        if (content) {
+          var diagram = content.getElementById("diagram_flatmap");
+          if (diagram) {
+            if (diagram.style.visibility == "hidden")
+              diagram.style.visibility = "visible";
+            else
+              diagram.style.visibility = "hidden";
+          }
+        }
+      }
 	  }
 	}
 	 

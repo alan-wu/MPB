@@ -73,9 +73,9 @@ exports.SVGController = function(SVGPanel)  {
 	
 	var onSVGScrollEvent = function(event) {
 			if (event.deltaY > 0) {
-				_this.zoomIn(0.1);
-			} else if (event.deltaY < 0) {
 				_this.zoomOut(0.1);
+			} else if (event.deltaY < 0) {
+				_this.zoomIn(0.1);
 			}
 			event.preventDefault(); 
 			event.stopPropagation();
@@ -225,9 +225,14 @@ exports.SVGController = function(SVGPanel)  {
 	var respiratoryControlLoaded = function() {
 	  
 	   var svgDocument = svgObject.contentDocument;
-	   var element = svgDocument.getElementById("g1701");
-	   element.style.cursor = "pointer";
-	   element.addEventListener('click', svgElementClicked(element));
+	   var diagram = svgDocument.getElementById("diagram_flatmap");
+	   diagram.style.visibility = "hidden";
+	   var element = svgDocument.getElementById("g1827");
+     element.addEventListener('click', svgElementClicked(element));
+     element.style.cursor = "pointer";
+	   var heartElement = svgDocument.getElementById("g1701");
+	   heartElement.style.cursor = "pointer";
+	   heartElement.addEventListener('click', svgElementClicked(heartElement));
 	}
 	
 	var genericSVGLoaded = function() {
@@ -236,6 +241,10 @@ exports.SVGController = function(SVGPanel)  {
 	  for (var i = 0; i < svgElements.length; i++) {
 	    svgElements[i].style.cursor = "pointer"; 
 	  }
+	}
+	
+	this.getSVGContent = function() {
+	  return svgObject.contentDocument;
 	}
 	
 	this.addSVGElementClickedCallbacks = function(callback) {
