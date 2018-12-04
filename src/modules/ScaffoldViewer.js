@@ -392,7 +392,8 @@ var ScaffoldViewer = function()  {
   
   this.updateOption = function(key, value) {
     if (currentOptions) {
-      if (currentOptions[key] && currentOptions[key] != value) {
+      if ((currentOptions[key] !== undefined) && 
+          (currentOptions[key] != value)) {
         currentOptions[key] = value;
         settingsChanged = true;
       }
