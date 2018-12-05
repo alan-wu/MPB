@@ -25,15 +25,8 @@ var ModelPanel = function()  {
 	
 	var svgElementClicked = function() {
 	  return function(element) {
-	    if (element.id == "g1701") {
-	      console.log("here")
-	      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
-	      var annotations = [];
-	      var annotation = new (require('../utilities/annotation').annotation)();
-	      annotation.data = {species:"human", system:"Cardiovascular", part:"Heart"};
-	      annotations[0] = annotation; 
-	      _this.publishChanges(annotations, eventType);
-	    } else if (element.id == "g1827") {
+
+	    if (element.id == "g1827") {
 	      var content = svgController.getSVGContent()
         if (content) {
           var diagram = content.getElementById("diagram_flatmap");
@@ -43,6 +36,34 @@ var ModelPanel = function()  {
             else
               diagram.style.visibility = "hidden";
           }
+        }
+      } else {
+        var organMap = {};
+        organMap['g1665'] = {species:"human", system:"Respiratory", part:"Lungs"};
+        organMap['g1683'] = {species:"human", system:"Respiratory", part:"Lungs"};
+        organMap['g1701'] = {species:"human", system:"Cardiovascular", part:"Heart"};
+        organMap['g1735'] = {species:"human", system:"Digestive", part:"Stomach"};
+        organMap['g1745'] = {species:"human", system:"Digestive", part:"Large Intestine"};
+        organMap['g1751'] = {species:"human", system:"Digestive", part:"Liver"};
+        organMap['g1757'] = {species:"human", system:"Urinary", part:"Kidneys"};
+        console.log("here")
+        var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
+        var annotations = [];
+        var annotation = new (require('../utilities/annotation').annotation)();
+        switch(element.id) {
+          case 'g1665':
+          case 'g1683':
+          case 'g1701':
+          case 'g1735':
+          case 'g1745':
+          case 'g1751':
+          case 'g1757':
+            annotation.data = organMap[element.id];
+            annotations[0] = annotation; 
+            _this.publishChanges(annotations, eventType);
+            break;
+          default:
+            break;
         }
       }
 	  }

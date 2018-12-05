@@ -227,12 +227,13 @@ exports.SVGController = function(SVGPanel)  {
 	   var svgDocument = svgObject.contentDocument;
 	   var diagram = svgDocument.getElementById("diagram_flatmap");
 	   diagram.style.visibility = "hidden";
-	   var element = svgDocument.getElementById("g1827");
-     element.addEventListener('click', svgElementClicked(element));
-     element.style.cursor = "pointer";
-	   var heartElement = svgDocument.getElementById("g1701");
-	   heartElement.style.cursor = "pointer";
-	   heartElement.addEventListener('click', svgElementClicked(heartElement));
+	   var respoonsiveIds = ['g1665', 'g1683', 'g1701', 'g1735', 'g1745',
+	     'g1751', 'g1757', 'g1827'];
+	   for (var i = 0; i < respoonsiveIds.length; i++) {
+	     var element = svgDocument.getElementById(respoonsiveIds[i]);
+	     element.addEventListener('click', svgElementClicked(element));
+	     element.style.cursor = "pointer"; 
+	   }
 	}
 	
 	var genericSVGLoaded = function() {
