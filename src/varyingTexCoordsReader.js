@@ -1,3 +1,4 @@
+var THREE = require('zincjs').THREE;
 
 exports.VaryingTexCoordsReader = function(sceneIn) {
 	
@@ -29,7 +30,7 @@ exports.VaryingTexCoordsReader = function(sceneIn) {
 		offsetRepeat: { value: new THREE.Vector4( 0, 0, 1, 1 ) },
 		time: { type: "f", value: 0.0 },
 		slide_pos: { type: "f", value: 1.0 },
-		myTex:  { value: texture  }
+		myTex: {type: 't', value: null}
 	} ] );
 
 	var addGeometryIntoBufferGeometry = function(order, geometry)
@@ -88,18 +89,18 @@ exports.VaryingTexCoordsReader = function(sceneIn) {
 	}
 	
 	var meshReady = function(bufferGeometryIn, shaderText, material){
-		console.log(shadersUniforms);
-		
 		var shaderMaterial = new THREE.RawShaderMaterial( {
 			vertexShader: shaderText[0],
 			fragmentShader: shaderText[1],
 			uniforms: shadersUniforms
 		} );
+		shaderMaterial.uniforms.myTex.value = texture;
 		shaderMaterial.side = THREE.DoubleSide;
 		shaderMaterial.depthTest = true;
 		shaderMaterial.needsUpdate = true;
+		shaderMaterial.map = texture;
 		shaderMaterial.uniforms.myTex.value.needsUpdate = true;
-		material.opacity = 1.0;
+		shaderMaterial.opacity = 1.0;
 		zincGeometry = scene.addZincGeometry(bufferGeometryIn, 30001, undefined, undefined, false, false, true, undefined, shaderMaterial);
 		zincGeometry.groupName = "varyingTexture";
 	}
@@ -123,8 +124,9 @@ exports.VaryingTexCoordsReader = function(sceneIn) {
 	}
 	
 	this.setTime = function(time) {
-		if (zincGeometry)
+		if (zincGeometry) {
 			zincGeometry.morph.material.uniforms.time.value = time;
+		}
 	}
 	
 	this.setTexture = function(textureIn) {
@@ -136,13 +138,13 @@ exports.VaryingTexCoordsReader = function(sceneIn) {
 	
 	this.loadURLsIntoBufferGeometry = function(urls, finishCallback, progressCallback, errorCallback) {
 		var loader = new THREE.JSONLoader( true );
-	    numberOfInputs = urls.length;
-	    finishCallbackFunction = finishCallback;
-		Zinc.loadExternalFiles(['shaders/varyingTexture.vs', 'shaders/varyingTexture.fs'], function (shaderText) {
-		    for (var i = 0; i < numberOfInputs; i++)
-		    	loader.load( urls[i], myLoader(i, shaderText), progressCallback, errorCallback);
-		}, function (url) {
-	  		alert('Failed to download "' + url + '"');
-		});
+    numberOfInputs = urls.length;
+    finishCallbackFunction = finishCallback;
+    var shaderText = [
+      require('./shaders/varyingTexture.vs'),
+      require('./shaders/varyingTexture.fs')
+    ];
+    for (var i = 0; i < numberOfInputs; i++)
+      loader.load( urls[i], myLoader(i, shaderText), progressCallback, errorCallback);
 	}
 }

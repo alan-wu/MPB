@@ -39,7 +39,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	var currentImgZoom = 1.0;
 	var rendererContainer = undefined;
 	var imgRightClickDown = false;
-	var comparedSceneIsOn = false;
+	var compareSceneIsOn = false;
 	var additionalSpecies = undefined;
 	var sceneData = new OrgansSceneData();
 	var timeoutID = 0;
@@ -48,6 +48,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	var timeChangedCallbacks = new Array();
 	var sceneChangedCallbacks = new Array();
 	var organPartAddedCallbacks = new Array();
+	var layoutUpdateRequiredCallbacks = new Array();
 	/** Suscriptions to changes **/
 	var suscriptions = [];
 	/**
@@ -63,9 +64,11 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	_this.typeName = "Organs Viewer";
 
 	//ZincRenderer for the primary display of model.
-	var organsRenderer = null;
+	var organsRenderer = undefined;
 	//Secondary renderer, used for comparing species models.
-	var secondaryRenderer = null;
+	var secondaryRenderer = undefined;
+	var secondaryRendererContainer = undefined;
+	var secondaryDisplayArea = undefined;
 	
 	//Array for storing different species models urls.
 	var organsFileMap = {};
@@ -243,6 +246,12 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		if (sceneData.nerveMap && sceneData.nerveMap.additionalReader)
 			sceneData.nerveMap.additionalReader.setSliderPos(value);
 	}
+	
+	 this.addLayoutUpdateRequiredCallback = function(callback) {
+	    if (typeof(callback === "function")) {
+	      layoutUpdateRequiredCallbacks.push(callback);
+	    }
+	  }
 	
 	this.addSceneChangedCallback = function(callback) {
 	  if (typeof(callback === "function")) {
@@ -508,7 +517,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			var zincCameraControl = nerveMapScene.getZincCameraControls();
 			zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
 			zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
-			sceneData.nerveMap.additionalReader = new PJP.VaryingTexCoordsReader(nerveMapScene);
+			sceneData.nerveMap.additionalReader = new (require("../varyingTexCoordsReader").VaryingTexCoordsReader)(nerveMapScene);
 			var urlsArray = [ modelsLoader.getOrgansDirectoryPrefix() + "/digestive/stomach/nerve_map/3d/xi1_time_0.json",
 			                  modelsLoader.getOrgansDirectoryPrefix() + "/digestive/stomach/nerve_map/3d/xi1_time_1.json",
 			                  modelsLoader.getOrgansDirectoryPrefix() + "/digestive/stomach/nerve_map/3d/xi0_time_0.json"];
@@ -517,23 +526,11 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		organsRenderer.setCurrentScene(nerveMapScene);
 		graphicsHighlight.reset();
 	}
-	
-	/**
-	 * Load the appropriate svg diagram to the svg viewer on the organs panel.
-	 */
-	var setupOrgansNerveSVG = function() {
-			var svgObject = dialogObject.find("#organSVG")[0];
-			if (sceneData.nerveMap["svg"]["url"]) {
-				svgObject.setAttribute('data', sceneData.nerveMap["svg"]["url"] );	
-			}
-	}
 
 	/**
-	 * Create/Get the secondary renderer and display relavant models on it. 
+	 * Use the secondary renderer and display relavant models on it. 
 	 */
-	var setupSecondaryRenderer = function(species) {
-		if (secondaryRenderer == null)
-			secondaryRenderer = PJP.setupRenderer("organsSecondaryDisplayRenderer");
+	var readSpeciesIntoSecondaryRenderer = function(species) {
 		var sceneName = sceneData.currentSpecies + "/" + sceneData.currentName;
 		secondaryScene = secondaryRenderer.getSceneByName(sceneName);
 		if (secondaryScene == undefined) {
@@ -551,7 +548,6 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
 		}
 		secondaryRenderer.setCurrentScene(secondaryScene);
-		secondaryRenderer.animate();
 	}
 	
 	var setTextureForGeometryCallback = function(texture) {
@@ -566,6 +562,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	
 	var setTextureForScene = function(targetScene, bitmap) {
 		if (targetScene) {
+		  console.log(targetScene)
 			var texture = new THREE.Texture(bitmap);
 			targetScene.forEachGeometry(setTextureForGeometryCallback(texture));
 			if (sceneData.nerveMap)
@@ -574,8 +571,10 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	}
 
 	var activateAdditionalNerveMapRenderer = function() {
-		updateLayout();
-		setupOrgansNerveSVG();
+    for (var i = 0; i < layoutUpdateRequiredCallbacks.length;i++) {
+      layoutUpdateRequiredCallbacks[i](false, true);
+    }
+		//setupOrgansNerveSVG();
 	}
 	
 	/**
@@ -603,7 +602,21 @@ var OrgansViewer = function(ModelsLoaderIn)  {
       internalRenderer.setClearColor( colour, 1 );
     }
 	}
-	
+
+	this.initialiseSecondaryRenderer = function(displayAreaIn) {
+    if (secondaryRenderer === undefined || secondaryRendererContainer === undefined) {
+      var returnedValue = (require("../utility").createRenderer)();
+      secondaryRenderer = returnedValue["renderer"];
+      secondaryRendererContainer = returnedValue["container"];
+    }
+    if (secondaryDisplayArea === undefined && displayAreaIn) {
+      secondaryDisplayArea = displayAreaIn;
+      secondaryDisplayArea.appendChild( secondaryRendererContainer );
+      secondaryRenderer.animate();
+      if (toolTip === undefined)
+        toolTip = new (require("../ui/tooltip").ToolTip)(secondaryDisplayArea);
+    } 
+  }
 	
 	/**
 	 * Initialise the drawing area.
@@ -790,15 +803,19 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	    return availableSpecies;
 	  }
 	  
-	  this.changeComparedSpecies = function(species) {
+	  this.changeCompareSpecies = function(species) {
 	    if (species == "none") {
-	      comparedSceneIsOn = false;
-	      updateLayout();
+	      compareSceneIsOn = false;
+        for (var i = 0; i < layoutUpdateRequiredCallbacks.length;i++) {
+          layoutUpdateRequiredCallbacks[i](false, false);
+        }
 	    } else{
 	      sceneData.nerveMapIsActive = false;
-	      comparedSceneIsOn = true;
-	      updateLayout();
-	      setupSecondaryRenderer(species);
+	      compareSceneIsOn = true;
+        for (var i = 0; i < layoutUpdateRequiredCallbacks.length;i++) {
+          layoutUpdateRequiredCallbacks[i](true, false);
+        }
+	      readSpeciesIntoSecondaryRenderer(species);
 	    }
 	  }
 
@@ -822,7 +839,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	        sceneData.currentSystem = systemName;
 	        sceneData.currentPart = partName;
 	        sceneData.nerveMapIsActive = false;
-	        comparedSceneIsOn = false;
+	        compareSceneIsOn = false;
 	        // This is used as title
 	        var name = speciesName + "/" + systemName + "/" + partName;
 	        //Get informations from the array
@@ -847,6 +864,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	        // Exist: Set it as current scene and update the gui.
 	        // Not: Create a new scene
 	        if (organScene == undefined) {
+	          _this.changeCompareSpecies("none");
 	          organScene = organsRenderer.createScene(name);
 	          for (var i = 0; i < sceneChangedCallbacks.length;i++) {
 	            sceneChangedCallbacks[i](sceneData);
@@ -900,6 +918,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	          organsRenderer.setCurrentScene(organScene);
 	          graphicsHighlight.reset();
 	        } else if (displayScene != organScene){
+	          _this.changeCompareSpecies("none");
 	          organsRenderer.setCurrentScene(organScene);
 	          graphicsHighlight.reset();
 	          for (var i = 0; i < sceneChangedCallbacks.length;i++) {
