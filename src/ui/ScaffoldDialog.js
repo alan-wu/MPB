@@ -49,7 +49,7 @@ var ScaffoldDialog = function(scaffoldViewerIn) {
   var createMeshTypesChooser = function(meshTypes) {
     _this.datGui.add(guiControls, 'Mesh Types', meshTypes ).onChange(function(value) {
       changeMeshTypeCallback();
-    });
+    }).listen();
   }
 
   var addOption = function(key, value) {
