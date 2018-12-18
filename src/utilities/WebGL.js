@@ -59,7 +59,7 @@ exports.WEBGL = {
 			2: window.WebGL2RenderingContext
 		};
 
-		var message = 'This module requires WebGL support but your $0 does not seem to support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" style="color:#008">$1</a>.';
+		var message = 'This module requires <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" style="color:#008">$1</a> support but your $0 does not seem to support it.';
 
 		var element = document.createElement( 'div' );
 		element.id = 'webglmessage';
