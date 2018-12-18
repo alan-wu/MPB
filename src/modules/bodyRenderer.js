@@ -22,7 +22,6 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	bodyScenes['rat'] = undefined;
 	// Flag for removing geometry from ZincScene when not visgble, thus freeing the memory. Default is false.
 	var removeWhenNotVisible = false;
-	var organsViewer = undefined;
 	var modelsLoader = ModelsLoaderIn;
 	var systemPartAddedCallbacks = new Array();
 	//Represents each physiological organ systems as folder in the dat.gui.
@@ -34,15 +33,6 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	_this.typeName = "Body Viewer";
 	
 	/**
-	 * Set the organs viewer this {@link PJP.BodyViewer} fires event to.
-	 * 
-	 * @param {PJP.OrgansViewer} OrgansViewerIn - target Organs Viewer to fire the event to.
-	 */
-	this.setOrgansViewer = function(OrgansViewerIn) {
-		organsViewer = OrgansViewerIn;
-	}
-
-	/**
 	 * This callback is triggered when a body part is clicked.
 	 * @callback
 	 */
@@ -52,20 +42,12 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			for (var i = 0; i < intersects.length; i++) {
 				if (intersects[i] !== undefined && (intersects[ i ].object.name !== undefined)) {
 					if (!intersects[ i ].object.name.includes("Body")) {
-						if (organsViewer) {
-						  var zincGeometry = intersects[ i ].object.userData;
-						  var annotation = zincGeometry.userData[0];
-						  organsViewer.loadOrgans(annotation.data.species, annotation.data.system, annotation.data.part);
-						}
 						_this.setSelectedByObjects([intersects[ i ].object], true);
 						return;
 					} else {
 						bodyClicked = true;
 					}
 				}
-			}
-			if (bodyClicked && organsViewer) {
-				organsViewer.loadOrgans(currentSpecies, "Skin (integument)", "Body");
 			}
 		}	
 	};
@@ -102,9 +84,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			
 		}
 	};
-	
 
-	
 	var removeGeometry = function(systemName, name) {
 		if (removeWhenNotVisible) {
 			var speciesMeta = systemMeta[currentSpecies];
