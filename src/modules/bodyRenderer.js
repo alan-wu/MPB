@@ -184,34 +184,38 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	 */
 	var initialise = function() {
 	  _this.initialiseRenderer(undefined);
-    _this.scene = _this.zincRenderer.createScene("human");
-    _this.zincRenderer.setCurrentScene(_this.scene);
-    _this.scene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
-    var directionalLight = _this.scene.directionalLight;
-    directionalLight.intensity = 1.4;
-    var zincCameraControl = _this.scene.getZincCameraControls();
-    zincCameraControl.enableRaycaster(_this.scene, _pickingBodyCallback(), _hoverBodyCallback());
-    zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
-    zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
+	  if (_this.zincRenderer) {
+      _this.scene = _this.zincRenderer.createScene("human");
+      _this.zincRenderer.setCurrentScene(_this.scene);
+      _this.scene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
+      var directionalLight = _this.scene.directionalLight;
+      directionalLight.intensity = 1.4;
+      var zincCameraControl = _this.scene.getZincCameraControls();
+      zincCameraControl.enableRaycaster(_this.scene, _pickingBodyCallback(), _hoverBodyCallback());
+      zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
+      zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
+	  }
 	}
 		
 	var readModel = function(systemName, partName, startup) {
-    var speciesMeta = systemMeta[currentSpecies];
-		item = speciesMeta[systemName][partName];
-		if (item["loaded"] ==  ITEM_LOADED.FALSE) {
-			var downloadPath = item["BodyURL"];
-			var scaling = false;
-			item["loaded"] =  ITEM_LOADED.DOWNLOADING;
-			if (item["FileFormat"] == "JSON") {
-				if (systemName == "Musculo-skeletal" || systemName == "Skin (integument)")
-					scaling = true;
-				_this.scene.loadMetadataURL(downloadPath, _addBodyPartCallback(systemName, partName, item, scaling, false, startup));
-			}
-			else if (item["FileFormat"] == "STL")
-			  _this.scene.loadSTL(downloadPath, partName, _addBodyPartCallback(systemName, partName, item, scaling, true, startup));
-			else if (item["FileFormat"] == "OBJ") 
-			  _this.scene.loadOBJ(downloadPath, partName, _addBodyPartCallback(systemName, partName, item, scaling, true, startup));
-		}
+	  if (_this.scene) {
+      var speciesMeta = systemMeta[currentSpecies];
+  		item = speciesMeta[systemName][partName];
+  		if (item["loaded"] ==  ITEM_LOADED.FALSE) {
+  			var downloadPath = item["BodyURL"];
+  			var scaling = false;
+  			item["loaded"] =  ITEM_LOADED.DOWNLOADING;
+  			if (item["FileFormat"] == "JSON") {
+  				if (systemName == "Musculo-skeletal" || systemName == "Skin (integument)")
+  					scaling = true;
+  				_this.scene.loadMetadataURL(downloadPath, _addBodyPartCallback(systemName, partName, item, scaling, false, startup));
+  			}
+  			else if (item["FileFormat"] == "STL")
+  			  _this.scene.loadSTL(downloadPath, partName, _addBodyPartCallback(systemName, partName, item, scaling, true, startup));
+  			else if (item["FileFormat"] == "OBJ") 
+  			  _this.scene.loadOBJ(downloadPath, partName, _addBodyPartCallback(systemName, partName, item, scaling, true, startup));
+  		}
+	  }
 	}
 	
 	var readBodyRenderModel = function(systemName, partMap) {

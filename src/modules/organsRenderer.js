@@ -908,7 +908,8 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	 var initialise = function() {
 	   //addUICallback();
 	   _this.initialiseRenderer(undefined);
-	   _this.zincRenderer.addPreRenderCallbackFunction(preRenderTimeUpdateCallback());
+	   if (_this.zincRenderer)
+	     _this.zincRenderer.addPreRenderCallbackFunction(preRenderTimeUpdateCallback());
      //createNewDialog(require("./snippets/organsViewer.html"));
   }
 	 

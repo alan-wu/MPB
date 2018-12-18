@@ -549,18 +549,20 @@ var ScaffoldViewer = function()  {
    */
   var initialise = function() {
     _this.initialiseRenderer(undefined);
-    _this.scene = _this.zincRenderer.createScene("scaffold");
-    _this.zincRenderer.setCurrentScene(_this.scene);
-    _this.zincRenderer.getThreeJSRenderer().localClippingEnabled = true;
-    _this.scene.loadViewURL("./static/view.json");
-    var directionalLight = _this.scene.directionalLight;
-    directionalLight.intensity = 1.4;
-    var zincCameraControl = _this.scene.getZincCameraControls();
-    zincCameraControl.enableRaycaster(_this.scene, _pickingCallback(), _hoverCallback());
-    zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
-    zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
-    csg = new (require('../utilities/csg').csg)(_this.scene, _this.zincRenderer);
-    prepareWorkspace();
+    if (_this.zincRenderer) {
+      _this.scene = _this.zincRenderer.createScene("scaffold");
+      _this.zincRenderer.setCurrentScene(_this.scene);
+      _this.zincRenderer.getThreeJSRenderer().localClippingEnabled = true;
+      _this.scene.loadViewURL("./static/view.json");
+      var directionalLight = _this.scene.directionalLight;
+      directionalLight.intensity = 1.4;
+      var zincCameraControl = _this.scene.getZincCameraControls();
+      zincCameraControl.enableRaycaster(_this.scene, _pickingCallback(), _hoverCallback());
+      zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
+      zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
+      csg = new (require('../utilities/csg').csg)(_this.scene, _this.zincRenderer);
+      prepareWorkspace();
+    }
   }
   
   initialise();

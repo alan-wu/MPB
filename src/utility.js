@@ -5,6 +5,7 @@ require('webpack-jquery-ui/resizable');
 require('webpack-jquery-ui/selectable');
 require('webpack-jquery-ui/sortable');
 var Zinc = require('zincjs');
+var WEBGL = require('./utilities/WebGL').WEBGL;
 
 exports.ITEM_LOADED = { FALSE: -1, DOWNLOADING: 0, TRUE: 1 };
 
@@ -47,12 +48,17 @@ exports.setupRenderer = function (elementID) {
  */
 exports.createRenderer = function () {
   var localContainer = document.createElement( 'div' );
-  localContainer.style.height = "100%"
-  var localRenderer = new Zinc.Renderer(localContainer, window);
-  Zinc.defaultMaterialColor = 0xFFFF9C;
-  localRenderer.initialiseVisualisation();
-  localRenderer.playAnimation = false;
-  
+  var localRenderer = undefined;;
+  localContainer.style.height = "100%";
+  if (WEBGL.isWebGLAvailable()) {
+    var localRenderer = new Zinc.Renderer(localContainer, window);
+    Zinc.defaultMaterialColor = 0xFFFF9C;
+    localRenderer.initialiseVisualisation();
+    localRenderer.playAnimation = false;
+  } else {
+    var warning = WEBGL.getWebGLErrorMessage();
+    localContainer.appendChild(warning);
+  }
   return {"renderer":localRenderer, "container":localContainer};
 }
 

@@ -120,9 +120,11 @@ RendererModule.prototype.initialiseRenderer = function(displayAreaIn) {
   if (displayAreaIn) {
     this.displayArea = displayAreaIn;
     this.displayArea.appendChild( this.rendererContainer );
-    this.zincRenderer.animate();
-    if (this.toolTip === undefined)
-      this.toolTip = new (require("../ui/tooltip").ToolTip)(this.displayArea);
+    if (this.zincRenderer) {
+      this.zincRenderer.animate();
+      if (this.toolTip === undefined)
+        this.toolTip = new (require("../ui/tooltip").ToolTip)(this.displayArea);
+    }
   } 
 }
 
