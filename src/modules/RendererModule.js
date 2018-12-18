@@ -79,6 +79,33 @@ RendererModule.prototype.viewAll = function() {
   if (this.zincRenderer)
     this.zincRenderer.viewAll();
 }
+
+/**
+ * Start the animation and let the renderer to processs with
+ * time progression
+ */
+RendererModule.prototype.playAnimation = function(flag) {
+  if (this.zincRenderer)
+    this.zincRenderer.playAnimation = flag;
+}
+
+/**
+* Set the speed of playback
+*/
+RendererModule.prototype.setPlayRate = function(value) {
+  if (this.zincRenderer)
+    this.zincRenderer.setPlayRate(value);
+}
+
+/**
+* Get the speed of playback
+*/
+RendererModule.prototype.getPlayRate = function(value) {
+  if (this.zincRenderer)
+    return this.zincRenderer.getPlayRate();
+  else
+    return 0.0;
+}
   
   /** Initialise everything in the renderer, including the 3D renderer,
  *  and picker for the 3D renderer.

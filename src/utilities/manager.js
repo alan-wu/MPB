@@ -252,7 +252,7 @@ exports.ModuleManager = function() {
     return function(event) {
       if (event && (event.eventType === require("./eventNotifier").EVENT_TYPE.SELECTED) && 
           event.identifiers && event.identifiers[0]) {
-        var id = event.identifiers[0]
+        var id = event.identifiers[0];
         if (id.type == "anatomical") {
           for (var i = 0; (i < managerItems.length); i++) {
             var module = managerItems[i].getModule();
