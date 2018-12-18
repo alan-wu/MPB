@@ -165,23 +165,23 @@ exports.csg = function(sceneIn, zincRendererIn) {
     controls["viewport"] = function() {
       console.log(scene.getZincCameraControls().getCurrentViewport())
     };
-    controls["Intersect"] = function() {
+    controls["intersect"] = function() {
       createCSG();
     };
-    controls["remove intersections"] = function() {
+    controls["remove cuts"] = function() {
       scene.forEachGeometry(removeCutFace(scene));
     };
     datGui.add(controls, "viewport");
-    datGui.add(controls, "remove intersections");
+    datGui.add(controls, "remove cuts");
     distanceSlider = datGui.add(guiControls, 'distance', -1.0, 1.0).step(0.01).onChange(distanceSliderChanged());
     xRotationSlider = datGui.add(guiControls, 'xRotation', -90, 90).step(1).onChange(xRotationSliderChanged());
     yRotationSlider = datGui.add(guiControls, 'yRotation', -90, 90).step(1).onChange(yRotationSliderChanged());
-    datGui.add(guiControls, 'continuous');
+    //datGui.add(guiControls, 'continuous');
     var reverseController = datGui.add(guiControls, 'reverse');
     reverseController.onChange(function(value) {
       updatePlane();
     });
-    datGui.add(controls, "Intersect");
+    datGui.add(controls, "intersect");
   };
   
   
