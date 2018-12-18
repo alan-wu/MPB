@@ -19,7 +19,7 @@ var ModelPanel = function()  {
 	var _this = this;
 	var svgController= undefined;
 	var targetSVGPanelElement = undefined;
-	
+	var svgToBeReadWhenReady = undefined;
 	 _this.typeName = "Model Panel";
 	 
 	
@@ -83,6 +83,11 @@ var ModelPanel = function()  {
 				svgController.addSVGElementClickedCallbacks(svgElementClicked());
 			}
 		}
+		if (svgController) {
+		  if (svgToBeReadWhenReady !== undefined && svgToBeReadWhenReady !== "") {
+		    _this.openModel(svgToBeReadWhenReady);
+		  }
+		}
 	}
 	
 	/**
@@ -98,6 +103,9 @@ var ModelPanel = function()  {
 			} else {
 				runModelURL = 'https://models.physiomeproject.org/workspace/4ac/rawfile/99f626ad282c900cf3665f2119ab70f61ec2ba3c/Circulation_Model.sedml';
 			}
+			svgToBeReadWhenReady = undefined;
+		} else {
+		  svgToBeReadWhenReady = svgName;
 		}
 	}
 	
@@ -106,7 +114,6 @@ var ModelPanel = function()  {
 		var opencorURL = 'opencor://openFile/' + runModelURL;
 		window.open(opencorURL, '_self');
 	}
-
 	
 	this.expandCollapseModels = function(source, portName) {
 		if (svgController !== undefined)
@@ -135,6 +142,7 @@ var ModelPanel = function()  {
    * @async
    */
   var initialise = function() {
+    _this.openModel("respiratory-control-background.svg");
   }
   
 	initialise();
