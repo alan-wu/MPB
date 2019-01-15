@@ -7,11 +7,16 @@ var BodyViewerDialog = function(bodyViewerIn) {
   var systemGuiFolder = new Array();
   var systemPartsGuiControls = new Array();
   var _myInstance = this;
-
+    
+  this.getModule = function() {
+    return bodyViewer;
+  }
+  
   //Array of settings of the body viewer gui controls.
   var bodyControl = function() {
       this.Background = [ 255, 255, 255 ]; // RGB array
   }
+  
 
   var bodyBackGroundChanged = function() {
     return function(value) {
@@ -22,13 +27,14 @@ var BodyViewerDialog = function(bodyViewerIn) {
       bodyViewer.changeBackgroundColour(backgroundColourString);
     }
   }
-
+  
   /**
    * Update the style of the system buttons
    */
   var updateSystemButtons = function(systemName, value, isPartial) {
-    var name = "#" + systemName;
+    var name = "[id='" + systemName + "']";
     var element = _myInstance.container.find(name)[0];
+    
     if (value == true)
       element.className = "w3-circle systemToggleButton systemToggleButtonOn";
     else {
@@ -119,7 +125,6 @@ var BodyViewerDialog = function(bodyViewerIn) {
   }
   
   var systemGuiFolderHasPartControls = function(systemName, partName) {
-    
     for (var i = 0; i < systemGuiFolder[systemName].__controllers.length; i++) {
       if (systemGuiFolder[systemName].__controllers[i].property == partName) {
         return true;
@@ -128,14 +133,29 @@ var BodyViewerDialog = function(bodyViewerIn) {
     return false;
   }
   
+  var bodyPartNameClickedCallback = function(partName) {
+    return function(event) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      bodyViewer.setSelectedByGroupName(partName, true);
+    } 
+  }
+  
+  var addPartToSystemControl = function(systemName, partName) {
+    var controller = systemGuiFolder[systemName].add(systemPartsGuiControls[systemName], partName);
+    var span = controller.__li.getElementsByTagName("span")[0];
+    controller.onChange(bodyPartsVisibilityChanged(partName, systemName));
+    controller.__li.onmouseover = function() {bodyViewer.setHighlightedByGroupName(partName, true);};
+    span.onclick = bodyPartNameClickedCallback(partName);
+  }
+  
   var addSystemPartGui = function(systemName, partName, visible) {
     if (systemName) {
       if (systemGuiFolder[systemName] !== undefined &&
         systemPartsGuiControls.hasOwnProperty(systemName)) {
         systemPartsGuiControls[systemName][partName] = visible;
         if (!systemGuiFolderHasPartControls(systemName, partName)) {
-          systemGuiFolder[systemName].add(systemPartsGuiControls[systemName], partName).onChange(
-              bodyPartsVisibilityChanged(partName, systemName));
+          addPartToSystemControl(systemName, partName);
         } else {
           updateSystemPartController(systemName, partName);
         }
@@ -178,6 +198,7 @@ var BodyViewerDialog = function(bodyViewerIn) {
     }
   }
   
+  
   /**
    * Add UI callbacks after html page has been loaded.
    */
@@ -198,9 +219,9 @@ var BodyViewerDialog = function(bodyViewerIn) {
     var control = new bodyControl();
     var controller = _myInstance.datGui.addColor(control, 'Background');
     controller.onChange(bodyBackGroundChanged());
-    _myInstance.container.find("#bodyGui")[0].append(_myInstance.datGui.domElement);
+    _myInstance.container.find("#bodyGui")[0].appendChild(_myInstance.datGui.domElement);
     var resetViewButton = { 'Reset View':function(){ bodyViewer.resetView() }};
-    var viewAllButton = { 'View All':function(){ organsViewer.viewAll() }};
+    var viewAllButton = { 'View All':function(){ bodyViewer.viewAll() }};
     _myInstance.datGui.add(resetViewButton, 'Reset View');
     _myInstance.datGui.add(viewAllButton, 'View All');
     addSystemFolders();
@@ -208,13 +229,33 @@ var BodyViewerDialog = function(bodyViewerIn) {
     bodyViewer.addSystemPartAddedCallback(systemPartAddedCallback());
   }
   
+  var _bodyViewerDialogClose = function() {
+    return function(myDialog) {
+      if (_myInstance.destroyModuleOnClose) {
+        bodyViewer.destroy();
+        bodyViewer = undefined;
+      }
+    }
+  }
+  
+  var bodyViewerChangedCallback = function() {
+    return function(module, change) {
+      if (change === require("../modules/BaseModule").MODULE_CHANGE.NAME_CHANGED) {
+        _myInstance.setTitle(module.getName());
+      }
+    }
+  }
+    
   var initialise = function() {
     if (bodyViewer) {
       _myInstance.create(require("../snippets/bodyViewer.html"));
-      _myInstance.setTitle("Body");
+      var name = bodyViewer.getName();
+      _myInstance.setTitle(name);
       initialiseBodyControlUI();
       var displayArea = _myInstance.container.find("#bodyDisplayArea")[0];
       bodyViewer.initialiseRenderer(displayArea);
+      bodyViewer.addChangedCallback(bodyViewerChangedCallback());
+      _myInstance.onCloseCallbacks.push(_bodyViewerDialogClose());
     }
   }
   

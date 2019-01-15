@@ -4,29 +4,71 @@ require('webpack-jquery-ui/droppable');
 require('webpack-jquery-ui/resizable');
 require('webpack-jquery-ui/selectable');
 require('webpack-jquery-ui/sortable');
-var dat = require("../dat.gui.js");
+var dat = require("./dat.gui.js");
 require("../styles/dat-gui-swec.css");
+require("../styles/jquery-ui.theme.min.css");
 
 var BaseDialog = function() {
   this.container = undefined;
   this.content = undefined;
   this.datGui = undefined;
   this.UIIsReady = false;
+  this.beforeCloseCallbacks = [];
+  this.onCloseCallbacks = [];
+  this.resizeStopCallbacks = [];
   this.title = "Default";
+}
+
+BaseDialog.prototype.close = function(myInstance) {
+  return function(event, ui) {
+    myInstance.container.dialog('destroy').remove();
+    for (var i = 0; i < myInstance.onCloseCallbacks.length; i++) {
+      myInstance.onCloseCallbacks[i]( this);
+    }
+  }
+}
+
+BaseDialog.prototype.beforeClose = function(myInstance) {
+  return function(event, ui) {
+    for (var i = 0; i < myInstance.beforeCloseCallbacks.length; i++) {
+      myInstance.beforeCloseCallbacks[i]( this );
+    }
+  }
+}
+
+BaseDialog.prototype.resizeStopCallback = function(myInstance) {
+  return function(event) {
+    for (var i = 0; i < myInstance.resizeStopCallbacks.length; i++) {
+      myInstance.resizeStopCallbacks[i]( this );
+    }
+  }
 }
 
 BaseDialog.prototype.create = function(htmlData, dataController) {
   this.container = $('<div></div>');
   this.container.attr('title', this.title);
-  this.content = $('<div class="ui-widget-content" style="position:absolute;width:100%;height:100%;"></div>');
-  this.container.append(this.content);
   this.container.dialog({
+    show: "blind",
+    hide: "blind",
     width: 600,
-    height: 500});
+    height: 500,
+    closeOnEscape: false,
+    resize: function() {
+      var heightPadding = parseInt($(this).css('padding-top'), 10) + parseInt($(this).css('padding-bottom'), 10),
+        widthPadding = parseInt($(this).css('padding-left'), 10) + parseInt($(this).css('padding-right'), 10),
+        titlebarMargin = parseInt($(this).prev('.ui-dialog-titlebar').css('margin-bottom'), 10);
+      $(this).height($(this).parent().height() - $(this).prev('.ui-dialog-titlebar').outerHeight(true) - heightPadding - titlebarMargin);
+
+      $(this).width($(this).prev('.ui-dialog-titlebar').outerWidth(true) - widthPadding);
+    },
+    resizeStop: this.resizeStopCallback(this),
+    beforeClose: this.beforeClose(this),
+    close: this.close(this)
+  });
 
   var childNodes = $.parseHTML(htmlData);
   for (i = 0; i < childNodes.length; i++) {
-    this.content[0].appendChild(childNodes[i]);
+    this.container[0].appendChild(childNodes[i]);
   }
 };
 
@@ -34,6 +76,17 @@ BaseDialog.prototype.addDatGui = function() {
   this.datGui = new dat.GUI({autoPlace: false});
   this.datGui.domElement.id = 'gui';
   this.datGui.close();
+};
+
+BaseDialog.prototype.addBeforeCloseCallback = function(callback) {
+  this.beforeCloseCallbacks.push(callback);
+};
+
+BaseDialog.prototype.removeBeforeCloseCallback = function(callback) {
+  var index = this.beforeCloseCallbacks.indexOf(callback);
+  if (index > -1) {
+    this.beforeCloseCallbacks.splice(index, 1);
+  }
 };
 
 BaseDialog.prototype.setTitle = function(titleIn) {
@@ -67,7 +120,6 @@ BaseDialog.prototype.getWidth = function() {
 };
 
 BaseDialog.prototype.setWidth = function(widthIn) {
-  console.log(widthIn);
   if (typeof(widthIn) == "string") {
     if (/^\d+(\.\d+)?%$/.test(widthIn)) {
       var value = parseFloat(widthIn) / 100.0;
@@ -84,6 +136,10 @@ BaseDialog.prototype.setWidth = function(widthIn) {
       this.container.dialog( "option", "width", actualWidth );
   }
 };
+
+BaseDialog.prototype.moveToTop = function() {
+  return this.container.dialog( "moveToTop" );
+}
 
 BaseDialog.prototype.setLeft = function(leftIn) {
   this.container[0].parentNode.style.left = leftIn;

@@ -1,6 +1,5 @@
 var EVENT_TYPE = { ALL: 0, SELECTED: 1, HIGHLIGHTED: 2 };
 
-
 var SelectionEvent = function(eventTypeIn, identifiersIn) {
   this.eventType = eventTypeIn;
   this.identifiers = identifiersIn;
@@ -56,10 +55,10 @@ exports.EventNotifier = function() {
     return undefined;
   }
   
-  this.unsuscribe = function(suscriber) {
-    for (var i = 0; i < suscribers.length;i++) {
-      if (suscriber === suscribers[i]) {
-        suscribers.splice(i, 1);
+  this.unsuscribe = function(suscription) {
+    for (var i = 0; i < suscriptions.length;i++) {
+      if (suscription === suscriptions[i]) {
+        suscriptions.splice(i, 1);
         return;
       }
     }

@@ -1,4 +1,4 @@
-var dat = require("./dat.gui.js");
+var dat = require("./ui/dat.gui.js");
 require("./styles/dat-gui-swec.css");
 
 /**
@@ -85,7 +85,7 @@ exports.CellPanel = function(DialogName)  {
 		var controller = cellGui.addColor(control, 'Background');
 		controller.onChange(cellBackGroundChanged());
 		otherCellControls = cellGui.addFolder('Others');
-		var customContainer = dialogObject.find("#cellGui")[0].append(cellGui.domElement);
+		var customContainer = dialogObject.find("#cellGui")[0].appendChild(cellGui.domElement);
 	}
 	
   var createNewDialog = function(data) {

@@ -1,0 +1,46 @@
+#tooltipcontainer {
+	position: fixed;
+	background-color: #fff;
+	pointer-events: none;
+	cursor: pointer;
+}
+
+.tooltip {
+	position: relative;
+	display: inline-block;
+	border-bottom: 1px dotted black;
+	pointer-events: none;
+}
+
+.tooltip .tooltiptext {
+		font: 500 1em "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    visibility: hidden;
+    width: 120px;
+    background-color: #deebffef;
+    color: #000;
+    text-align: center;
+    border-radius: 12px;
+    border-color: #2b7ccc;
+    border-style: groove;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 1s;
+    pointer-events: none;
+}
+
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #2b7ccc transparent transparent transparent;
+}
+

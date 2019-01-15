@@ -1,7 +1,7 @@
-var dat = require("./dat.gui.js");
+var dat = require("./ui/dat.gui.js");
 require("./styles/dat-gui-swec.css");
 require("./styles/my_styles.css");
-var THREE = require("three");
+var THREE = require('zincjs').THREE;
 
 /**
  * Used for viewing 3D tissue image stacks, it may include clickable points which
@@ -214,7 +214,7 @@ exports.TissueViewer = function(DialogName)  {
 	
 	//Setup volume renderer
 	var volumeRenderStart = function(shaderText) {
-	  toolTip = new (require("./tooltip").ToolTip)(dialogObject[0]);
+	  toolTip = new (require("./ui/tooltip").ToolTip)(dialogObject[0]);
 		guiControls = new function() {
 			this.model = 'collagen';
 			this.steps = 256.0;
@@ -364,7 +364,7 @@ exports.TissueViewer = function(DialogName)  {
 		gui = new dat.GUI({autoPlace: false});
 		gui.domElement.id = 'gui';
 		gui.close();
-		var customContainer = dialogObject.find("#tissueGui")[0].append(gui.domElement);
+		var customContainer = dialogObject.find("#tissueGui")[0].appendChild(gui.domElement);
 		var controller = gui.addColor(guiControls, 'Background');
 		controller.onChange(volumeRenderBackGroundChanged());
 		var modelSelected = gui.add(guiControls, 'model', [ 'collagen', 'crop', 'collagen_large', 'crop_large'] );

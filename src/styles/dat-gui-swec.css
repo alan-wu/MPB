@@ -1,8 +1,15 @@
 .dg {
        color: black;
-       font: 400 14px Verdana, Arial, sans-serif;
+       font: 500 15px "Lucida Sans Unicode", "Lucida Grande", sans-serif;
        text-shadow: white 0 0 0;
-} 
+}
+.dg.main{
+	max-height:100%;
+	min-height:50px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	pointer-events: auto;
+}
 .dg .c .slider {
        background: silver
 } 
@@ -50,11 +57,15 @@
        border-radius: 2px;
        box-shadow: inset 1px 0 9px 0 white;
        color: #000;
-       text-shadow: 1px 0 0 white
+       text-shadow: 1px 0 0 white;
 }
-
 .dg li.folder li.title {
 	padding-left:20%;
+}
+
+.dg li.folder li.cr {
+	margin-bottom:0px;
+	border-radius: 0px;
 }
 
 .dg li.folder .closed li.title  {
@@ -62,6 +73,8 @@
 	background-repeat: no-repeat;
 	background-position: left;
 	background-size: 10%;
+	background-color:#e3fffd;
+
 }
 
 .dg li.folder li.title  {
@@ -69,6 +82,12 @@
 	background-repeat: no-repeat;
 	background-position: left;
 	background-size: 10%;
+	background-color:#c8ffe0;
+	border-radius: 0px 25px 0px 0px;
+}
+
+.dg li.folder li.title:hover  {
+	background-color:#fff;
 }
 
 .dg .cr {
@@ -92,10 +111,16 @@
        border-right: 1px solid silver
 } 
 .dg li.cr {
-       background: #fafafa;
+       background: linear-gradient(45deg, #fcfcfc, #2b7ccc);
        border-bottom: 1px solid silver;
-       border-right: 1px solid silver
-} 
+       border-right: 1px solid silver;
+       margin-bottom: 3px;
+    	 border-radius: 0px 10px 10px 0px;
+    	 transition: all .2s ease-in;
+}
+.dg .closed li.cr {
+			margin-bottom: 0px;
+}
 .dg li.cr:hover {
        background: white;
        border-bottom: 1px solid silver;
@@ -108,7 +133,7 @@
                     color-stop(71%, #dfdfdf));
        background-color: #ededed;
        border: 1px solid #dcdcdc;
-       border-radius: 2px;
+       border-radius: 0px 10px 10px 0px;
        box-shadow: inset 1px 0 9px 0 white;
        color: #77F;
        text-shadow: 1px 0 0 white
@@ -119,11 +144,7 @@
        outline-width: 1.5px
 } 
 .dg.main .close-button {
-       background: -moz-linear-gradient(center top, #ededed 34%, #dfdfdf 71%);
-       background: -ms-linear-gradient(top, #ededed 34%, #dfdfdf 71%);
-       background: -webkit-gradient(linear, left top, left bottom, color-stop(34%, #ededed), 
-                    color-stop(71%, #dfdfdf));
-       background-color: #ededed;
+       background-color: #deebff;
        border: 1px solid #dcdcdc;
        border-radius: 2px;
        box-shadow: inset 1px 0 9px 0 white;
@@ -136,5 +157,9 @@
 .dg.main .close-button:hover {
        outline-color: lightblue;
        outline-style: solid;
-       outline-width: 1.5px
+       outline-width: 1.5px;
+       background-color: #fff;
+}
+.dg.main .close-button.close-bottom {
+	position:relative;
 }

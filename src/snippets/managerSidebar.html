@@ -1,0 +1,60 @@
+<div class="w3-sidebar w3-bar-block w3-animate-left sidebar" id="managerSidebar">
+  <button class="w3-bar-item w3-button w3-large" id="sidebarClose">Close &times;</button>
+
+  <button class="w3-bar-item w3-button" id="addManager">+ Add Manager</button>
+
+</div>
+
+<div>
+  <button id="sidebarOpen" class="w3-button w3-white w3-xxlarge" style="z-index:20000000;opacity:0.9;display:block;'">&#9776;</button>
+</div>
+
+<div id="rename-form" title="Rename Module">
+  <p style="border: 1px solid transparent; padding: 0.3em;">Please enter new name</p>
+  <form>
+    <fieldset>
+      <label for="name">Name</label>
+      <input type="text" name="name" id="new_name" value="New Name" class="text ui-widget-content ui-corner-all">
+      <!-- Allow form submission with keyboard without duplicating the dialog button -->
+      <input type="confirm" tabindex="-1" style="position:absolute; top:-1000px">
+    </fieldset>
+  </form>
+</div>
+
+<div id="add-manager-form" title="Add Manager">
+  <p style="border: 1px solid transparent; padding: 0.3em;">Choose a name for the manager</p>
+  <form>
+    <fieldset>
+    	<p>
+	      <label for="manager_name">Manager Name: </label>
+	      <input type="text" name="manager_name" id="manager_name" class="text ui-widget-content ui-corner-all">
+	      <!-- Allow form submission with keyboard without duplicating the dialog button -->
+      </p>
+      <input type="confirm" tabindex="-1" style="position:absolute; top:-1000px">
+    </fieldset>
+  </form>
+</div>
+
+<div id="add-dialog-form" title="Add Dialog">
+  <p style="border: 1px solid transparent; padding: 0.3em;">Select a module type and enter a name for the dialog</p>
+  <form>
+    <fieldset>
+    	<p>
+	      <label for="dialog_selection">Select a dialog type: </label>
+		    <select name="dialog_selection" id="dialog_selection">
+		    	<option disabled selected>Please pick one</option>
+		    </select>
+    	</p>
+    	<p>
+	      <label for="dialog_name">Dialog Name: </label>
+	      <input type="text" name="dialog_name" id="dialog_name" class="text ui-widget-content ui-corner-all">
+	      <!-- Allow form submission with keyboard without duplicating the dialog button -->
+      </p>
+      <input type="confirm" tabindex="-1" style="position:absolute; top:-1000px">
+    </fieldset>
+  </form>
+</div>
+
+<div id="message-dialog" title=Message>
+  <p style="border: 1px solid transparent; padding: 0.3em;" id >Please select a dialog type and enter a new name.</p>
+</div>

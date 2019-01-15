@@ -1,7 +1,7 @@
 var CellPanelDialog = function() {
   (require('./BaseDialog').BaseDialog).call(this);
   var otherCellControls = undefined;
-  _this = this;
+  var _this = this;
 
   var cellBackGroundChanged = function() {
     return function(value) {
@@ -9,7 +9,7 @@ var CellPanelDialog = function() {
       var greenValue = parseInt(value[1]);
       var blueValue = parseInt(value[2]);
       var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-      content[0].style.backgroundColor = backgroundColourString;
+      this.container[0].style.backgroundColor = backgroundColourString;
     }
   }
   
@@ -25,7 +25,7 @@ var CellPanelDialog = function() {
     var controller = datGui.addColor(control, 'Background');
     console.log(container)
     controller.onChange(cellBackGroundChanged());
-    container.find("#cellGui")[0].append(datGui.domElement);
+    container.find("#cellGui")[0].appendChild(datGui.domElement);
     otherCellControls = datGui.addFolder('Others');
   }
   

@@ -1,20 +1,27 @@
-
 //require("./styles/bootstrap.min.css");
 require("./styles/w3.css");
-require("./styles/jquery-ui.min.css");
+require("./styles/sidebar.css");
 require('./styles/bootstrap.min.css');
 
-exports.BodyViewer = require("./bodyRenderer").BodyViewer;
+exports.BodyViewer = require("./modules/bodyRenderer").BodyViewer;
+exports.RendererModule = require("./modules/RendererModule").RendererModule;
 exports.CellPanel = require("./cell_panel").CellPanel;
 exports.ModelsLoader = require("./modelsLoader").ModelsLoader;
-exports.ModelPanel = require("./model_panel").ModelPanel;
-exports.OrgansViewer = require("./organsRenderer").OrgansViewer;
-exports.TissueViewer = require("./tissueRenderer").TissueViewer;
+exports.ModelPanel = require("./modules/model_panel").ModelPanel;
+exports.ModelViewerDialog = require("./ui/ModelViewerDialog").ModelViewerDialog;
+exports.OrgansViewer = require("./modules/organsRenderer").OrgansViewer;
+exports.ScaffoldViewer = require("./modules/ScaffoldViewer").ScaffoldViewer;
 exports.TissueViewer = require("./tissueRenderer").TissueViewer;
 exports.BaseDialog = require("./ui/BaseDialog").BaseDialog;
 exports.OrgansViewerDialog = require("./ui/OrgansViewerDialog").OrgansViewerDialog;
+exports.ScaffoldDialog = require("./ui/ScaffoldDialog").ScaffoldDialog;
+exports.BodyViewerDialog = require("./ui/BodyViewerDialog").BodyViewerDialog;
 exports.EVENT_TYPE = require("./utilities/eventNotifier").EVENT_TYPE;
 exports.EventNotifier = require("./utilities/eventNotifier").EventNotifier;
+exports.ManagerSidebar = require("./ui/ManagerSidebar").ManagerSidebar;
+exports.ModuleManager = require("./utilities/manager").ModuleManager;
+exports.MANAGER_ITEM_CHANGE = require("./utilities/managerItem").MANAGER_ITEM_CHANGE;
+exports.MODULE_CHANGE = require("./modules/BaseModule").MODULE_CHANGE;
+//exports.ChartDialog = require("./ui/ChartDialog").ChartDialog;
 //exports.CellPanelDialog = require("./ui/CellPanelDialog").CellPanelDialog;
 exports.VERSION = '0.2.0';
-

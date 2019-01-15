@@ -1,4 +1,4 @@
-var THREE = require("three");
+var THREE = require('zincjs').THREE;
 
 exports.GraphicsHighlight = function() {
   var currentHighlightedObjects = [];
@@ -81,7 +81,8 @@ exports.GraphicsHighlight = function() {
     // Selected object cannot be highlighted
     var array = getUnmatchingObjects(objects, currentSelectedObjects);
     for (var i = 0; i < array.length; i++) {
-      array[i].material.emissive.setHex(_this.highlightColour);
+      if (array[i] && array[i].material)
+        array[i].material.emissive.setHex(_this.highlightColour);
     }
     currentHighlightedObjects = array;
     return isDifferent(currentHighlightedObjects, previousHighlightedObjects);

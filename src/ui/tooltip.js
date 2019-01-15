@@ -1,4 +1,4 @@
-require("./styles/my_styles.css");
+require("../styles/tooltip.css");
 
 exports.ToolTip = function(container) {
   var tooltipcontainerElement = undefined;
@@ -47,7 +47,7 @@ exports.ToolTip = function(container) {
     tooltipcontainerElement = parent[0];
     tipElement = parent.find("#tip")[0];
     tiptextElement = parent.find("#tiptext")[0];
-    container.append(parent[0]);
+    container.appendChild(parent[0]);
   }
   
   setupToolTipContainer();
