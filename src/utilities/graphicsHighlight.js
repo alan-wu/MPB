@@ -1,5 +1,11 @@
 var THREE = require('zincjs').THREE;
 
+/**
+ * This module manages highlighted and selected objects in 3D modules. 
+ * 
+ * @class
+ * @returns {exports.GraphicsHighlight}
+ */
 exports.GraphicsHighlight = function() {
   var currentHighlightedObjects = [];
   var currentSelectedObjects = [];

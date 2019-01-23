@@ -2,8 +2,18 @@ var Zinc = require('zincjs');
 var dat = require('../ui/dat.gui');
 var THREE = Zinc.THREE;
 
+/**
+ * This module provides quick access to constructive solid geometries (CSG) and surfaces cutting on said
+ * geometries. 
+ * 
+ * @class
+ * @param {Zinc.Scene} sceneIn - scene containing geometries for conversion, once intersected
+ * surfaces are created they are drawn on this scene.
+ * @param {Zinc.Renderer} zincRendererIn - renderer.
+ * @author Alan Wu
+ * @returns {exports.csg}
+ */
 exports.csg = function(sceneIn, zincRendererIn) {
-
   var datGui = undefined;
   var scene = sceneIn;
   var csgScene  = zincRendererIn.createScene("csg");
@@ -123,7 +133,6 @@ exports.csg = function(sceneIn, zincRendererIn) {
         scene.removeZincGeometry(zincGeometry);
     }
   }
-
 
   var createCube = function(width, height, depth) {
     var tempGeometry = new THREE.BoxGeometry(width, height, depth);
