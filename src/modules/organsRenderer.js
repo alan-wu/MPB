@@ -44,8 +44,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	var sceneChangedCallbacks = new Array();
 	var organPartAddedCallbacks = new Array();
 	var layoutUpdateRequiredCallbacks = new Array();
-	/** Suscriptions to changes **/
-	var suscriptions = [];
+
 	/**
 	 * {ImageCombiner}.
 	 */
