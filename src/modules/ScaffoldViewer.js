@@ -3,7 +3,7 @@ var THREE = require('zincjs').THREE;
 var ITEM_LOADED = require("../utility").ITEM_LOADED;
 
 /**
- * Provides rendering of the 3D-scaffold data created from ScaffikdNjaer,
+ * Provides rendering of the 3D-scaffold data created from Scaffoldmaker,
  * @class
  * 
  * @author Alan Wu

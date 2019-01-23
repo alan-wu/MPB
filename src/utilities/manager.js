@@ -49,7 +49,7 @@ exports.ModuleManager = function() {
   var renameCallbacks = [];
   var managerItems = [];
   var eventNotifier = new (require("./eventNotifier").EventNotifier)();
-  var suscription = undefined;
+  var subscription = undefined;
   var _this = this;
 
   this.getAllManagerItems = function() {
@@ -265,8 +265,8 @@ exports.ModuleManager = function() {
   }
   
   this.destroy = function() {
-    if (eventNotifier && suscription)
-      eventNotifier.unsuscribe(suscription);
+    if (eventNotifier && subscription)
+      eventNotifier.unsubscribe(subscription);
   }
 
   this.isReady = function() {
@@ -283,7 +283,7 @@ exports.ModuleManager = function() {
     modelsLoader = new (require("../modelsLoader").ModelsLoader)();
     modelsLoader.addSystemMetaIsReadyCallback(systemMetaReadyCallback());
     modelsLoader.initialiseLoading();
-    suscription = eventNotifier.suscribe(_this, eventNotifierCallback(), undefined);
+    subscription = eventNotifier.subscribe(_this, eventNotifierCallback(), undefined);
   }
 
   initialise();
