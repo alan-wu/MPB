@@ -33,7 +33,7 @@ exports.csg = function(sceneIn, zincRendererIn) {
   var plane = undefined;
   var planeHelper = undefined;
   var guiControls = new function() {
-    this.distance = 0.0;
+    this.distance = 1.0;
     this.continuous = false;
     this.xRotation = 0.0;
     this.yRotation = 0.0;
@@ -50,7 +50,7 @@ exports.csg = function(sceneIn, zincRendererIn) {
       meshCenter = currentGeometry.boundingSphere.center;
       meshRadius = currentGeometry.boundingSphere.radius;
       var origin = new THREE.Vector3(0, 0, 0);
-      meshDistance = origin.distanceTo(meshCenter);;
+      meshDistance = origin.distanceTo(meshCenter);
       if (meshCenter.z < 0.0)
         meshDistance = -meshDistance;
     }
@@ -171,16 +171,12 @@ exports.csg = function(sceneIn, zincRendererIn) {
     datGui = new dat.GUI({autoPlace: false});
     datGui.domElement.id = 'csgGui';
     parent.appendChild(datGui.domElement);
-    controls["viewport"] = function() {
-      console.log(scene.getZincCameraControls().getCurrentViewport())
-    };
     controls["intersect"] = function() {
       createCSG();
     };
     controls["remove cuts"] = function() {
       scene.forEachGeometry(removeCutFace(scene));
     };
-    datGui.add(controls, "viewport");
     datGui.add(controls, "remove cuts");
     distanceSlider = datGui.add(guiControls, 'distance', -1.0, 1.0).step(0.01).onChange(distanceSliderChanged());
     xRotationSlider = datGui.add(guiControls, 'xRotation', -90, 90).step(1).onChange(xRotationSliderChanged());

@@ -143,12 +143,10 @@ var ScaffoldDialog = function(scaffoldViewerIn) {
     _this.addDatGui();
     _this.container.find("#meshGui")[0].appendChild(_this.datGui.domElement);
     var viewAllButton = { 'View All':function(){ scaffoldViewer.viewAll() }};
-    var resetButton = { 'Reset':function(){ scaffoldViewer.resetView() }};
     var readButton = { 'Read':function(){ scaffoldViewer.readWorkspacePrompt() }};
     var commitButton = {'Commit':function() { scaffoldViewer.commitWorkspace() }};
     var pushButton = {'Push':function() { scaffoldViewer.pushWorkspace() }};
     _this.datGui.add(viewAllButton, 'View All');
-    _this.datGui.add(resetButton, 'Reset');
     _this.datGui.add(readButton, 'Read');
     _this.datGui.add(commitButton, 'Commit');
     _this.datGui.add(pushButton, 'Push');
