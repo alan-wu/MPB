@@ -159,8 +159,10 @@ var ScaffoldViewer = function()  {
       for (var i = 0; i < meshAllPartsDownloadedCallbacks.length;i++) {
         meshAllPartsDownloadedCallbacks[i]();
       }
-      if (csg)
+      if (csg) {
+    	csg.allDownloadsCompletedCallback();
         csg.updatePlane();
+      }
       settingsChanged = false;
     }
   }
