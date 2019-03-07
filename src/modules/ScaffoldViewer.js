@@ -9,7 +9,7 @@ var ITEM_LOADED = require("../utility").ITEM_LOADED;
  * @author Alan Wu
  * @returns {PJP.ScaffoldViewer}
  */
-var ScaffoldViewer = function()  {
+var ScaffoldViewer = function(typeAtStartUp)  {
   (require('./RendererModule').RendererModule).call(this);
   var csg = undefined;
   var _this = this;
@@ -21,6 +21,8 @@ var ScaffoldViewer = function()  {
   this.promptFunction = undefined;
   this.confirmFunction = undefined;
   var currentMeshType = "3d_heart1";
+  if ((typeAtStartUp !== undefined) && (typeof typeAtStartUp === 'string' || typeAtStartUp instanceof String))
+    currentMeshType = typeAtStartUp;
   var currentOptions = undefined;
   var currentLandmarks = undefined;
   var currentWorkspaceURL = undefined;
