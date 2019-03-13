@@ -1,5 +1,6 @@
-var OrgansViewerDialog = function(organsViewerIn) {
+var OrgansViewerDialog = function(organsViewerIn, parentIn) {
   (require('./BaseDialog').BaseDialog).call(this);
+  this.parent = parentIn;
   var sceneData = undefined;
   var organsViewer = organsViewerIn;
   var organPartsGui = undefined;

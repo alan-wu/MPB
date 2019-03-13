@@ -21,7 +21,6 @@ exports.csg = function(sceneIn, zincRendererIn) {
   var currentBoundingBox = undefined;
   var currentMaterial = undefined;
   var boxGeometry = undefined;
-  var boxGeometry2 = undefined;
   var zincCSG = undefined;
   var glyphsetCSG = undefined;
   var intersect = undefined;
@@ -116,9 +115,7 @@ exports.csg = function(sceneIn, zincRendererIn) {
     var radY = THREE.Math.degToRad(guiControls.yRotation);
     var radZ = THREE.Math.degToRad(guiControls.zRotation);
     boxGeometry.morph.rotation.x = radX;
-    boxGeometry2.morph.rotation.x = radX;
     boxGeometry.morph.rotation.y = radY;
-    boxGeometry2.morph.rotation.y = radY;
     var euler = new THREE.Euler(radX, radY, radZ);
     boxGeometry.morph.position.set(0, 0, 0);
     console.log(plane.constant);
@@ -192,8 +189,6 @@ exports.csg = function(sceneIn, zincRendererIn) {
   var createCube = function(width, height, depth) {
     var tempGeometry = new THREE.BoxGeometry(width, height, depth);
     boxGeometry = scene.addZincGeometry(tempGeometry, 40001, 0xdddddd, 1.0, false, false, true);
-    if (boxGeometry2 === undefined)
-      boxGeometry2 = csgScene.addZincGeometry(tempGeometry, 40001, 0xdddddd, 1.0, false, false, true);
     boxGeometry.morph.matrixAutoUpdate = false;
     boxGeometry.morph.visible = false;
     if (plane === undefined) {
@@ -233,9 +228,6 @@ exports.csg = function(sceneIn, zincRendererIn) {
 		  if (boxGeometry && boxGeometry.geometry) {
 			  boxGeometry.geometry.scale(dimension, dimension, 1.0);
 		  }
-		  if (boxGeometry2 && boxGeometry2.geometry) {
-			  boxGeometry2.geometry.scale(dimension, dimension, 1.0);
-		  }
 		  if (planeHelper) {
 			  planeHelper.geometry.scale(dimension, dimension, 1.0);
 		  }
@@ -251,7 +243,6 @@ exports.csg = function(sceneIn, zincRendererIn) {
 	    csgScene.clearAll();
 	    zincCSG = undefined;
 	    boxGeometry = undefined;
-	    boxGeometry2 = undefined;
 	    currentGeometry = undefined;
 	    createCube(1, 1, 0.0005);
 	  }

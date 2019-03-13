@@ -1,8 +1,9 @@
 /**
  * A customised dialog for body viewer.
  */
-var ScaffoldDialog = function(scaffoldViewerIn) {
+var ScaffoldDialog = function(scaffoldViewerIn, parentIn) {
   (require('./BaseDialog').BaseDialog).call(this);
+  this.parent = parentIn;
   var scaffoldViewer = scaffoldViewerIn;
   var modal = undefined;
   var optionsChanged = false;

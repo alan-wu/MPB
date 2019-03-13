@@ -12,8 +12,8 @@ exports.ModuleManager = function() {
       module.readSystemMeta();
       return module; 
     }
-    this["Body Viewer"].dialog = function(module) {
-      var dialog = new (require("../ui/BodyViewerDialog").BodyViewerDialog)(module);
+    this["Body Viewer"].dialog = function(module, parent) {
+      var dialog = new (require("../ui/BodyViewerDialog").BodyViewerDialog)(module, parent);
       return dialog; 
     }
     this["Organs Viewer"] = [];
@@ -21,8 +21,8 @@ exports.ModuleManager = function() {
       var module = new (require("../modules/organsRenderer").OrgansViewer)(modelsLoader);
       return module; 
     }
-    this["Organs Viewer"].dialog=  function(module) {
-      var dialog = new (require("../ui/OrgansViewerDialog").OrgansViewerDialog)(module);
+    this["Organs Viewer"].dialog=  function(module, parent) {
+      var dialog = new (require("../ui/OrgansViewerDialog").OrgansViewerDialog)(module, parent);
       return dialog; 
     }
     this["Model Panel"] = [];
@@ -30,8 +30,8 @@ exports.ModuleManager = function() {
       var module = new (require("../modules/model_panel").ModelPanel)();
       return module; 
     }
-    this["Model Panel"].dialog=  function(module) {
-      var dialog = new (require("../ui/ModelViewerDialog").ModelViewerDialog)(module);
+    this["Model Panel"].dialog=  function(module, parent) {
+      var dialog = new (require("../ui/ModelViewerDialog").ModelViewerDialog)(module, parent);
       return dialog; 
     }
     this["Scaffold Viewer"] = [];
@@ -39,8 +39,8 @@ exports.ModuleManager = function() {
       var module = new (require("../modules/ScaffoldViewer").ScaffoldViewer)();
       return module; 
     }
-    this["Scaffold Viewer"].dialog = function(module) {
-      var dialog = new (require("../ui/ScaffoldDialog").ScaffoldDialog)(module);
+    this["Scaffold Viewer"].dialog = function(module, parent) {
+      var dialog = new (require("../ui/ScaffoldDialog").ScaffoldDialog)(module, parent);
       return dialog; 
     }
   };
@@ -204,10 +204,10 @@ exports.ModuleManager = function() {
       itemChangedCallbacks.push(callback);
   }
   
-  this.createDialog = function(module) {
+  this.createDialog = function(module, parent) {
     if (module && ready) {
       if (constructors[module.typeName]) {
-        var dialog = constructors[module.typeName].dialog(module);
+        var dialog = constructors[module.typeName].dialog(module, parent);
         _this.manageDialog(dialog);
         return dialog;
       }

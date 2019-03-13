@@ -61,6 +61,8 @@
 	opacity:0.9;
 	color: #fff;
 	background-color:#00357d;
+	height: 100%;
+	position:relative!important;
 }
 
 #addManager {

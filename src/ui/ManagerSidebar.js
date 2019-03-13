@@ -1,5 +1,5 @@
 var SidebarItemArray = function() {
-  var array = new Object();;
+  var array = new Object();
   var _this = this;
 
   this.push = function(name, managerItem, element) {
@@ -238,7 +238,7 @@ var ManagerSidebar = function(parentIn) {
     if ((dialogName !== "Please pick one") && name !== "") {
       var module = moduleManager.createModule(dialogName);
       module.setName(name);
-      var dialog = moduleManager.createDialog(module);
+      var dialog = moduleManager.createDialog(module, parent);
       dialog.destroyModuleOnClose = true;
       moduleManager.manageDialog(dialog);
       addDialog.dialog("close");
@@ -285,6 +285,7 @@ var ManagerSidebar = function(parentIn) {
     sidebarEle = jelem.find("#managerSidebar")[0];
     var renameElem = jelem.find("#rename-form");
     renameDialog = renameElem.dialog({
+      appendTo: parent,
       autoOpen : false,
       height : 300,
       width : 400,
@@ -300,9 +301,13 @@ var ManagerSidebar = function(parentIn) {
         renameDialog.dialog("close");
       }
     });
+    renameElem.parent().draggable({
+    	  containment: parent
+      });
     
     var addManagerDialogElem = jelem.find("#add-manager-form");
     addManagerDialog = addManagerDialogElem.dialog({
+      appendTo: parent,
       autoOpen : false,
       width : 400,
       resizable : false,
@@ -317,9 +322,13 @@ var ManagerSidebar = function(parentIn) {
         addManagerDialog.dialog("close");
       }
     });
+    addManagerDialogElem.parent().draggable({
+  	  containment: parent
+    });
    
     var addDialogElem = jelem.find("#add-dialog-form");
     addDialog = addDialogElem.dialog({
+      appendTo: parent,
       autoOpen : false,
       height : 300,
       width : 400,
@@ -335,12 +344,19 @@ var ManagerSidebar = function(parentIn) {
         addDialog.dialog("close");
       }
     });
+    addDialogElem.parent().draggable({
+    	  containment: parent
+      });
     
     var messageDialogElem = jelem.find("#message-dialog");
     messageDialog = messageDialogElem.dialog({
+      appendTo: parent,
       autoOpen : false,
       resizable : false,
       modal : true
+    });
+    messageDialogElem.parent().draggable({
+  	  containment: parent
     });
     
     addUICallback();

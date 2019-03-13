@@ -474,7 +474,6 @@ var ScaffoldViewer = function(typeAtStartUp)  {
       for (var i = 0; i < intersects.length; i++) {
         if (intersects[i].object.userData && (false == Array.isArray(intersects[i].object.userData))) {
           if (intersects[i].object.userData.groupName === "intersect") {
-            console.log(intersects[i])
             return createMarker(intersects[i].point, null);
           }
         }
