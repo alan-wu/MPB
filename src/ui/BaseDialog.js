@@ -57,6 +57,7 @@ BaseDialog.prototype.create = function(htmlData) {
     width: 600,
     height: 500,
     closeOnEscape: false,
+    position: { my: "left top", at: "left top", of: this.parent},
     resize: function() {
       var heightPadding = parseInt($(this).css('padding-top'), 10) + parseInt($(this).css('padding-bottom'), 10),
         widthPadding = parseInt($(this).css('padding-left'), 10) + parseInt($(this).css('padding-right'), 10),
@@ -152,6 +153,41 @@ BaseDialog.prototype.setWidth = function(widthIn) {
 BaseDialog.prototype.moveToTop = function() {
   return this.container.dialog( "moveToTop" );
 }
+
+BaseDialog.prototype.setPosition = function(leftIn, topIn) {
+	var leftString = "";
+	var topString = "";
+	if (typeof(leftIn) == "number") {
+		if (leftIn >= 0)
+			leftString = "+" + String(leftIn);
+		else
+			leftString = String(leftIn);
+	} else if (typeof(leftIn) == "string") {
+		if (/^\d+(\.\d+)?%$/.test(leftIn)) {
+			leftString = "+" + leftIn;
+		} else if (/^-\d+(\.\d+)?%$/.test(leftIn)) {
+			leftString = leftIn;
+		}
+	}
+	if (typeof(topIn) == "number") {
+		if (topIn >= 0)
+			topString = "+" + String(topIn);
+		else
+			topString = String(topIn);
+	} else if (typeof(topIn) == "string") {
+		if (/^\d+(\.\d+)?%$/.test(topIn)) {
+			topString = "+" + topIn;
+		} else if (/^-\d+(\.\d+)?%$/.test(topIn)) {
+			topString = topIn;
+		}
+	}
+	var atString = "left" + leftString + " top" + topString;
+	this.container.dialog('option', 'position',
+		{	my: "left top",
+			at: atString,
+			of: this.parent});
+};
+
 
 BaseDialog.prototype.setLeft = function(leftIn) {
   this.container[0].parentNode.style.left = leftIn;

@@ -290,6 +290,7 @@ var ManagerSidebar = function(parentIn) {
       height : 300,
       width : 400,
       resizable : false,
+      position: { my: "center", at: "center", of: parent},
       modal : true,
       buttons : {
         "Rename" : renameDialogCallback,
@@ -311,6 +312,7 @@ var ManagerSidebar = function(parentIn) {
       autoOpen : false,
       width : 400,
       resizable : false,
+      position: { my: "center", at: "center", of: parent},
       modal : true,
       buttons : {
         "Confirm" : addManagerDialogCallback,
@@ -333,6 +335,7 @@ var ManagerSidebar = function(parentIn) {
       height : 300,
       width : 400,
       resizable : false,
+      position: { my: "center", at: "center", of: parent},
       modal : true,
       buttons : {
         "Confirm" : addDialogCallback,
@@ -353,6 +356,7 @@ var ManagerSidebar = function(parentIn) {
       appendTo: parent,
       autoOpen : false,
       resizable : false,
+      position: { my: "center", at: "center", of: parent},
       modal : true
     });
     messageDialogElem.parent().draggable({
