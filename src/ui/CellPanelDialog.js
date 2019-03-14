@@ -1,5 +1,6 @@
-var CellPanelDialog = function() {
+var CellPanelDialog = function(parentIn) {
   (require('./BaseDialog').BaseDialog).call(this);
+  this.parent = parentIn;
   var otherCellControls = undefined;
   var _this = this;
 

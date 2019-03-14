@@ -30,22 +30,6 @@ exports.createDialogContainer = function (DialogNameIn, data) {
  * @param {String} elementID - id of the target dom element.
  * @returns {Zinc.Renderer}
  */
-exports.setupRenderer = function (elementID) {
-	var localContainer = document.createElement( 'div' );
-	document.getElementById(elementID).appendChild( localContainer );
-	localContainer.style.height = "100%"
-	var localRenderer = new Zinc.Renderer(localContainer, window);
-	Zinc.defaultMaterialColor = 0xFFFF9C;
-	localRenderer.initialiseVisualisation();
-	localRenderer.playAnimation = false;	
-	return localRenderer;
-}
-
-/**
- * Create a {@link Zinc.Renderer} on the dom element with corresponding elementID.
- * @param {String} elementID - id of the target dom element.
- * @returns {Zinc.Renderer}
- */
 exports.createRenderer = function () {
   var localContainer = document.createElement( 'div' );
   var localRenderer = undefined;;
@@ -76,4 +60,36 @@ exports.findCSSRule = function(selectorText) {
 				return cssRules[n];
 		}
 	}
+}
+
+exports.getSelector = function(element) {
+    var path, node = $(element);
+    while (node.length) {
+        var realNode = node[0];
+        var name = realNode.localName;
+        if (!name)
+        	break;
+        name = name.toLowerCase();
+        if (realNode.id) {
+            // As soon as an id is found, there's no need to specify more.
+            name +=  '#' + realNode.id;
+        } else if (realNode.className) {
+            name += '.' + realNode.className.split(/\s+/).join('.');
+        }
+        var parent = node.parent();
+
+        var sameTagSiblings = parent.children(name);
+        if (sameTagSiblings.length > 1) { 
+            var allSiblings = parent.children();
+            var index = allSiblings.index(realNode) + 1;
+            if (index > 1) {
+                name += ':nth-child(' + index + ')';
+            }
+        }
+
+        path = name + (path ? '>' + path : '');
+        node = parent;
+    }
+
+    return path;
 }

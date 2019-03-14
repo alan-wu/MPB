@@ -1,8 +1,9 @@
 /**
  * A customised dialog for model panel.
  */
-var ModelViewerDialog = function(modelPanelIn) {
+var ModelViewerDialog = function(modelPanelIn, parentIn) {
   (require('./BaseDialog').BaseDialog).call(this);
+  this.parent = parentIn;
   var modelPanel = modelPanelIn;
   var otherModelControls = undefined;
   var modelControl = function() {

@@ -9,7 +9,7 @@ var ITEM_LOADED = require("../utility").ITEM_LOADED;
  * @author Alan Wu
  * @returns {PJP.ScaffoldViewer}
  */
-var ScaffoldViewer = function()  {
+var ScaffoldViewer = function(typeAtStartUp)  {
   (require('./RendererModule').RendererModule).call(this);
   var csg = undefined;
   var _this = this;
@@ -21,6 +21,8 @@ var ScaffoldViewer = function()  {
   this.promptFunction = undefined;
   this.confirmFunction = undefined;
   var currentMeshType = "3d_heart1";
+  if ((typeAtStartUp !== undefined) && (typeof typeAtStartUp === 'string' || typeAtStartUp instanceof String))
+    currentMeshType = typeAtStartUp;
   var currentOptions = undefined;
   var currentLandmarks = undefined;
   var currentWorkspaceURL = undefined;
@@ -159,8 +161,10 @@ var ScaffoldViewer = function()  {
       for (var i = 0; i < meshAllPartsDownloadedCallbacks.length;i++) {
         meshAllPartsDownloadedCallbacks[i]();
       }
-      if (csg)
+      if (csg) {
+    	csg.allDownloadsCompletedCallback();
         csg.updatePlane();
+      }
       settingsChanged = false;
     }
   }
@@ -470,7 +474,6 @@ var ScaffoldViewer = function()  {
       for (var i = 0; i < intersects.length; i++) {
         if (intersects[i].object.userData && (false == Array.isArray(intersects[i].object.userData))) {
           if (intersects[i].object.userData.groupName === "intersect") {
-            console.log(intersects[i])
             return createMarker(intersects[i].point, null);
           }
         }

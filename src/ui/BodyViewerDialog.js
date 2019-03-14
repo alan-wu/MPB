@@ -1,8 +1,9 @@
 /**
  * A customised dialog for body viewer.
  */
-var BodyViewerDialog = function(bodyViewerIn) {
+var BodyViewerDialog = function(bodyViewerIn, parentIn) {
   (require('./BaseDialog').BaseDialog).call(this);
+  this.parent = parentIn;
   var bodyViewer = bodyViewerIn;
   var systemGuiFolder = new Array();
   var systemPartsGuiControls = new Array();
@@ -17,7 +18,6 @@ var BodyViewerDialog = function(bodyViewerIn) {
       this.Background = [ 255, 255, 255 ]; // RGB array
   }
   
-
   var bodyBackGroundChanged = function() {
     return function(value) {
       var redValue = parseInt(value[0]);
