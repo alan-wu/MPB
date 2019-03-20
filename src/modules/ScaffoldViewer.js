@@ -161,10 +161,27 @@ var ScaffoldViewer = function(typeAtStartUp)  {
       for (var i = 0; i < meshAllPartsDownloadedCallbacks.length;i++) {
         meshAllPartsDownloadedCallbacks[i]();
       }
-      if (csg) {
-    	csg.allDownloadsCompletedCallback();
-        csg.updatePlane();
+
+      var xmlhttp = new XMLHttpRequest();
+      xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4) {
+          if (xmlhttp.status == 200) {
+            var data = JSON.parse(xmlhttp.responseText);
+            if (csg)
+        	  csg.enablePathCutting(data);
+          } else {
+        	if (csg)
+        		csg.enableStandardCutting();
+          }
+          if (csg) {
+        	csg.allDownloadsCompletedCallback();
+            csg.updatePlane();
+          }
+        }
       }
+      var finalURL = "./getCentralLine";
+      xmlhttp.open("GET", finalURL, true);
+      xmlhttp.send();
       settingsChanged = false;
     }
   }
@@ -180,7 +197,6 @@ var ScaffoldViewer = function(typeAtStartUp)  {
     var argumentString = "meshtype=" + currentMeshType;
     argumentString = addOptionsToURL(argumentString);
     var finalURL = "./generator?" + argumentString;
-    console.log(argumentString);
     _this.scene.loadMetadataURL(finalURL, itemDownloadCallback, allCompletedCallback);
     meshChanged = true;
   }

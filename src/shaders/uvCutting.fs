@@ -1,56 +1,37 @@
+varying vec3 colorValue; 
 varying vec3 vViewPosition;
 varying vec3 vNormal;
-uniform vec3 diffuse;
+varying vec2 vUv;
+uniform float progress;
 uniform vec3 ambient;
 uniform vec3 emissive;
 uniform vec3 specular;
+uniform vec3 diffuse;
 uniform float shininess;
 uniform vec3 ambientLightColor;
 uniform	vec3 directionalLightColor;
 uniform	vec3 directionalLightDirection;
-uniform float surfaceAlpha;
-uniform float min_x;
-uniform float max_x;
-uniform float min_y;
-uniform float max_y;
-uniform float min_z;
-uniform float max_z;
-varying vec3 modelPosition;
+uniform int reverse;
 
 void main(void) {
-	if (modelPosition.x > max_x)
-	{
-		discard;
-	}
-	if (modelPosition.x < min_x)
-	{
-		discard;
-	}
-	if (modelPosition.y > max_y)
-	{
-		discard;
-	}
-	if (modelPosition.y < min_y)				
-	{
-		discard;
-	}	
-	if (modelPosition.z > max_z)
-	{
-		discard;
-	}
-	if (modelPosition.z < min_z)
-	{
-		discard;
-	}	
-
-	vec3 adjustDiffuse = diffuse;
 #ifdef ALPHATEST
 	if ( gl_FragColor.a < ALPHATEST ) discard;
 #endif
+	float pxielTimeStep = vUv.x;
+	if (reverse == 1)
+	{	
+			if (pxielTimeStep > progress)
+				discard;
+	}
+	else
+	{
+			if (pxielTimeStep < progress)
+				discard;
+	}
 
-	vec3 normalScaling = vec3(1.0, 1.0, 1.0);
 	float specularStrength = 1.0;
 	vec3 normal = normalize( vNormal );
+
 	
 	if (!gl_FrontFacing)
 		normal.z = -normal.z;
@@ -71,7 +52,7 @@ void main(void) {
 	#else
 		float dirDiffuseWeight = max( dotProduct, 0.0 );
 	#endif
-	dirDiffuse += adjustDiffuse * directionalLightColor * dirDiffuseWeight;
+	dirDiffuse += diffuse * directionalLightColor * dirDiffuseWeight;
 	vec3 dirHalfVector = normalize( dirVector + viewPosition );
 	float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );
 	float dirSpecularWeight = specularStrength * max( pow( dirDotNormalHalf, shininess ), 0.0 );
@@ -86,10 +67,6 @@ vec3 totalSpecular = vec3( 0.0 );
 	totalDiffuse += dirDiffuse;
 	totalSpecular += dirSpecular;
 #endif
-	gl_FragColor = vec4(dirDiffuse, 1.0);
-	gl_FragColor.xyz = gl_FragColor.xyz * ( emissive + totalDiffuse + ambientLightColor * ambient ) + totalSpecular;
- 	gl_FragColor.xyz = gl_FragColor.xyz;
- 	if (gl_FragColor.y > gl_FragColor.x)
- 		gl_FragColor.x = gl_FragColor.y;
- 	gl_FragColor.a = surfaceAlpha;
+	gl_FragColor.xyz = totalDiffuse;
 }
+

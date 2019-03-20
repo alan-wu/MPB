@@ -1,6 +1,8 @@
 var Zinc = require('zincjs');
 var dat = require('../ui/dat.gui');
 var THREE = Zinc.THREE;
+var cuttingVS = require('../shaders/uvCutting.vs');
+var cuttingFS = require('../shaders/uvCutting.fs');
 
 /**
  * This module provides quick access to constructive solid geometries (CSG) and surfaces cutting on said
@@ -14,9 +16,12 @@ var THREE = Zinc.THREE;
  * @returns {exports.csg}
  */
 exports.csg = function(sceneIn, zincRendererIn) {
+  var ClippingModes = Object.freeze({"STANDARD":1, "PATH":2});
   var datGui = undefined;
+  var currentClippingMode = ClippingModes.STANDARD;
   var scene = sceneIn;
-  var csgScene  = zincRendererIn.createScene("csg");
+  var csgScene = zincRendererIn.createScene("csg");
+  var csgSceneCamera = csgScene.getZincCameraControls();
   var controls = {};
   var currentBoundingBox = undefined;
   var currentMaterial = undefined;
@@ -30,6 +35,7 @@ exports.csg = function(sceneIn, zincRendererIn) {
   var distanceSlider = undefined;
   var xRotationSlider = undefined;
   var yRotationSlider = undefined;
+  var reverseController = undefined;
   var plane = undefined;
   var planeHelper = undefined;
   var guiControls = new function() {
@@ -109,28 +115,71 @@ exports.csg = function(sceneIn, zincRendererIn) {
       updatePlane();
     }
   }
+  
+  var updateUniforms = function() {
+    return function(zincObject) {
+  	  if (zincObject.isGeometry) {
+  		if (zincObject.morph.material.uniforms) {
+  		  zincObject.morph.material.uniforms["progress"].value = guiControls.distance;
+  		  if (guiControls.reverse)
+  		    zincObject.morph.material.uniforms["reverse"] = 1;
+  		  else
+  		    zincObject.morph.material.uniforms["reverse"] = 0;
+  	    }
+  	  }
+  	}
+  }
 
+  var boxTransformedWithPath = function() {
+	if (currentClippingMode == ClippingModes.PATH) {
+		csgSceneCamera.playPath();
+		csgSceneCamera.setTime(guiControls.distance*3000.0);
+		csgSceneCamera.calculatePathNow();
+		csgSceneCamera.stopPath();
+		csgScene.camera.updateProjectionMatrix();
+		var normal = csgScene.camera.target.clone().sub(csgScene.camera.position).normalize();
+		plane.normal.set(normal.x, normal.y, normal.z);
+		planeHelper.updateMatrix();
+		boxGeometry.morph.setRotationFromEuler(planeHelper.rotation);
+		boxGeometry.morph.updateMatrix();
+		var centre = csgScene.camera.position.clone();
+		boxGeometry.morph.position.copy(centre);
+		boxGeometry.morph.updateMatrix();
+	}
+  }
+  
   var updatePlane = function() {
-    var radX = THREE.Math.degToRad(guiControls.xRotation);
-    var radY = THREE.Math.degToRad(guiControls.yRotation);
-    var radZ = THREE.Math.degToRad(guiControls.zRotation);
-    boxGeometry.morph.rotation.x = radX;
-    boxGeometry.morph.rotation.y = radY;
-    var euler = new THREE.Euler(radX, radY, radZ);
-    boxGeometry.morph.position.set(0, 0, 0);
-    console.log(plane.constant);
-    plane.constant = meshDistance + guiControls.distance;
-    if (guiControls.reverse == false) {
-      plane.normal.set(0, 0, -1);
-      boxGeometry.morph.translateZ(plane.constant);
-    }
-    else {
-      plane.constant = -plane.constant;
-      plane.normal.set(0, 0, 1);
-      boxGeometry.morph.translateZ(-plane.constant);
-    }
-    plane.normal.applyEuler(euler).normalize();
-    boxGeometry.morph.updateMatrix();
+	  if (currentClippingMode == ClippingModes.STANDARD) {
+		  var radX = THREE.Math.degToRad(guiControls.xRotation);
+		  var radY = THREE.Math.degToRad(guiControls.yRotation);
+		  var radZ = THREE.Math.degToRad(guiControls.zRotation);
+		  boxGeometry.morph.rotation.x = radX;
+		  boxGeometry.morph.rotation.y = radY;
+		  var euler = new THREE.Euler(radX, radY, radZ);
+		  boxGeometry.morph.position.set(0, 0, 0);
+		  plane.constant = meshDistance + guiControls.distance;
+		  if (guiControls.reverse == false) {
+			  plane.normal.set(0, 0, -1);
+			  boxGeometry.morph.translateZ(plane.constant);
+		  } else {
+			  plane.constant = -plane.constant;
+			  plane.normal.set(0, 0, 1);
+			  boxGeometry.morph.translateZ(-plane.constant);
+		  }
+		  plane.normal.applyEuler(euler).normalize();
+		  boxGeometry.morph.updateMatrix();
+	  } else if (currentClippingMode == ClippingModes.PATH) {
+		  boxTransformedWithPath();
+		  scene.forEachGeometry(updateUniforms(scene));
+	  }
+  }
+
+  var updateUniforms = function() {
+	myUniforms["progress"].value = pathSceneCamera.getTime() / 3000.0;
+	var directionalLight = scene.directionalLight;
+	myUniforms["directionalLightDirection"].value.set(directionalLight.position.x,
+	  directionalLight.position.y,
+	  directionalLight.position.z);
   }
 
   var createCSG = function() {
@@ -221,20 +270,96 @@ exports.csg = function(sceneIn, zincRendererIn) {
 	    }
   }
   
+  var setShaderMaterial = function(scene) {
+    return function(zincObject) {
+	  if (zincObject.isGeometry) {
+		  var originalMaterial = zincObject.morph.material;
+		  var dirLight = scene.directionalLight;
+		  var myUniforms= THREE.UniformsUtils.merge( [
+			  {
+				  "ambient"  : { type: "c", value: new THREE.Color( 0xffffff  ) },
+				  "emissive" : { type: "c", value: new THREE.Color( originalMaterial.emissive ) },
+				  "specular" : { type: "c", value: new THREE.Color( originalMaterial.specular ) },
+				  "diffuse" : { type: "c", value: new THREE.Color( originalMaterial.color ) },
+				  "shininess": { type: "f", value: originalMaterial.shininess },
+				  "ambientLightColor": { type: "c", value: new THREE.Color( 0x444444 ) },
+				  "directionalLightColor": { type: "c", value: new THREE.Color( 0x888888 ) },
+				  "directionalLightDirection": { type: "v3", value: new THREE.Vector3(
+					 dirLight.position.x, dirLight.position.y, dirLight.position.z )  },
+				  "progress": { type: "f", value: 0.0 },
+				  "reverse": { type: "i", value: 0 },
+			  }
+		  ] ); 
+		  var shaderMaterial = new THREE.ShaderMaterial( {
+			vertexShader: cuttingVS,
+			fragmentShader: cuttingFS,
+			uniforms: myUniforms
+		  } );
+		  shaderMaterial.side = THREE.DoubleSide;
+		  shaderMaterial.depthTest = true;
+		  shaderMaterial.vertexColors = THREE.VertexColors;
+		  zincObject.morph.material = shaderMaterial;
+	  }
+    }
+  }
+  
   this.allDownloadsCompletedCallback = function() {
-	  getCentroid();
-	  if (meshRadius > 0) {
-		  var dimension = meshRadius * 2.0 *1.1 + meshCenter.length();
-		  if (boxGeometry && boxGeometry.geometry) {
-			  boxGeometry.geometry.scale(dimension, dimension, 1.0);
+	  if (currentClippingMode == ClippingModes.STANDARD) {
+		  getCentroid();
+		  if (meshRadius > 0) {
+			  var dimension = meshRadius * 2.0 *1.1 + meshCenter.length();
+			  if (boxGeometry && boxGeometry.geometry) {
+				  boxGeometry.geometry.scale(dimension, dimension, 1.0);
+			  }
+			  if (planeHelper) {
+				  planeHelper.geometry.scale(dimension, dimension, 1.0);
+			  }
+			  if (distanceSlider) {
+				  distanceSlider.__min = -Math.ceil(meshRadius);
+				  distanceSlider.__max = Math.ceil(meshRadius);
+				  guiControls.distance =  Math.ceil(meshRadius);;
+				  distanceSlider.updateDisplay();
+			  }
+			  if (xRotationSlider) {
+				  xRotationSlider.__li.style.display = "";
+			  }
+			  if (yRotationSlider) {
+				  yRotationSlider.__li.style.display = "";
+			  }
 		  }
-		  if (planeHelper) {
-			  planeHelper.geometry.scale(dimension, dimension, 1.0);
-		  }
+	  } else if (currentClippingMode == ClippingModes.PATH) {
+		  scene.forEachGeometry(setShaderMaterial(scene));
 		  if (distanceSlider) {
-			  distanceSlider.__min = -Math.ceil(meshRadius);
-			  distanceSlider.__max = Math.ceil(meshRadius);
+			  distanceSlider.__min = 0.0;
+			  distanceSlider.__max = 1.0;
+			  guiControls.distance = Math.ceil(0.0);
+			  csgSceneCamera.setTime(0.0);
 			  distanceSlider.updateDisplay();
+		  }
+		  if (xRotationSlider) {
+			  xRotationSlider.__li.style.display = "none";
+		  }
+		  if (yRotationSlider) {
+			  yRotationSlider.__li.style.display = "none";
+		  }
+	  }
+	  if (reverseController) {
+		  guiControls.reverse = false;
+		  reverseController.updateDisplay();
+	  }
+  }
+  
+  this.enableStandardCutting = function() {
+	  if (currentClippingMode != ClippingModes.STANDARD) {
+		  currentClippingMode = ClippingModes.STANDARD;
+	  }
+  }
+  
+  this.enablePathCutting = function(path) {
+	  if (path && path.CameraPath && path.NumberOfPoints) {
+		  if (currentClippingMode != ClippingModes.PATH) {
+			  currentClippingMode = ClippingModes.PATH;
+			  csgSceneCamera.loadPath(path);
 		  }
 	  }
   }
@@ -245,7 +370,7 @@ exports.csg = function(sceneIn, zincRendererIn) {
 	    boxGeometry = undefined;
 	    currentGeometry = undefined;
 	    createCube(1, 1, 0.0005);
-	  }
+  }
   
   this.updatePlane = function() {
     updatePlane();
@@ -267,7 +392,7 @@ exports.csg = function(sceneIn, zincRendererIn) {
     xRotationSlider = datGui.add(guiControls, 'xRotation', -90, 90).step(1).onChange(xRotationSliderChanged());
     yRotationSlider = datGui.add(guiControls, 'yRotation', -90, 90).step(1).onChange(yRotationSliderChanged());
     //datGui.add(guiControls, 'continuous');
-    var reverseController = datGui.add(guiControls, 'reverse');
+    reverseController = datGui.add(guiControls, 'reverse');
     reverseController.onChange(function(value) {
       updatePlane();
     });
