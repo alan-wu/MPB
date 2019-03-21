@@ -7,6 +7,7 @@ require('webpack-jquery-ui/sortable');
 var dat = require("./dat.gui.js");
 require("../styles/dat-gui-swec.css");
 require("../styles/jquery-ui.theme.min.css");
+require("../styles/dialog.css");
 
 var BaseDialog = function() {
   this.container = undefined;
@@ -39,6 +40,11 @@ BaseDialog.prototype.beforeClose = function(myInstance) {
 
 BaseDialog.prototype.resizeStopCallback = function(myInstance) {
   return function(event) {
+    var heightPadding = parseInt($(this).css('padding-top'), 10) + parseInt($(this).css('padding-bottom'), 10),
+    widthPadding = parseInt($(this).css('padding-left'), 10) + parseInt($(this).css('padding-right'), 10),
+    titlebarMargin = parseInt($(this).prev('.ui-dialog-titlebar').css('margin-bottom'), 10);
+
+    $(this).width($(this).parent().width() - widthPadding);
     for (var i = 0; i < myInstance.resizeStopCallbacks.length; i++) {
       myInstance.resizeStopCallbacks[i]( this );
     }
@@ -63,8 +69,7 @@ BaseDialog.prototype.create = function(htmlData) {
         widthPadding = parseInt($(this).css('padding-left'), 10) + parseInt($(this).css('padding-right'), 10),
         titlebarMargin = parseInt($(this).prev('.ui-dialog-titlebar').css('margin-bottom'), 10);
       $(this).height($(this).parent().height() - $(this).prev('.ui-dialog-titlebar').outerHeight(true) - heightPadding - titlebarMargin);
-
-      $(this).width($(this).prev('.ui-dialog-titlebar').outerWidth(true) - widthPadding);
+      $(this).width($(this).parent().width() - widthPadding);
     },
     resizeStop: this.resizeStopCallback(this),
     beforeClose: this.beforeClose(this),
@@ -188,6 +193,16 @@ BaseDialog.prototype.setPosition = function(leftIn, topIn) {
 			of: this.parent});
 };
 
+BaseDialog.prototype.hideCloseButton = function() {
+  this.container.dialog("option",
+	"classes.ui-dialog-titlebar-close", "displayNone");
+
+};
+
+BaseDialog.prototype.hideTitlebar = function() {
+	  this.container.dialog("option",
+		"classes.ui-dialog-titlebar", "displayNone");
+};
 
 BaseDialog.prototype.setLeft = function(leftIn) {
   this.container[0].parentNode.style.left = leftIn;
