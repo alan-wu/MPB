@@ -53,6 +53,8 @@ exports.csg = function(sceneIn, zincRendererIn) {
   if (zincRendererIn)
 	  zincRendererIn.getThreeJSRenderer().localClippingEnabled = true;
   var originalGlyphs = undefined;
+  var zincRenderer = zincRendererIn;
+  var preRenderCallbackId = -1;
 
   var getCentroid = function() {
     if (currentGeometry) {
@@ -118,19 +120,19 @@ exports.csg = function(sceneIn, zincRendererIn) {
   
   var updateUniforms = function() {
     return function(zincObject) {
-  	  if (zincObject.isGeometry) {
+  	  if (zincObject.isGeometry && zincObject.groupName) {
   		if (zincObject.morph.material.uniforms) {
   		  zincObject.morph.material.uniforms["progress"].value = guiControls.distance;
-  		  if (guiControls.reverse)
-  		    zincObject.morph.material.uniforms["reverse"] = 1;
+  		  if (guiControls.reverse == false)
+  		    zincObject.morph.material.uniforms["reverse"].value = 0;
   		  else
-  		    zincObject.morph.material.uniforms["reverse"] = 0;
+  		    zincObject.morph.material.uniforms["reverse"].value = 1;
   	    }
   	  }
   	}
   }
 
-  var boxTransformedWithPath = function() {
+  var transformeBoxWithPath = function() {
 	if (currentClippingMode == ClippingModes.PATH) {
 		csgSceneCamera.playPath();
 		csgSceneCamera.setTime(guiControls.distance*3000.0);
@@ -138,7 +140,7 @@ exports.csg = function(sceneIn, zincRendererIn) {
 		csgSceneCamera.stopPath();
 		csgScene.camera.updateProjectionMatrix();
 		var normal = csgScene.camera.target.clone().sub(csgScene.camera.position).normalize();
-		plane.normal.set(normal.x, normal.y, normal.z);
+		plane.setFromNormalAndCoplanarPoint(normal, csgScene.camera.position.clone());
 		planeHelper.updateMatrix();
 		boxGeometry.morph.setRotationFromEuler(planeHelper.rotation);
 		boxGeometry.morph.updateMatrix();
@@ -169,17 +171,9 @@ exports.csg = function(sceneIn, zincRendererIn) {
 		  plane.normal.applyEuler(euler).normalize();
 		  boxGeometry.morph.updateMatrix();
 	  } else if (currentClippingMode == ClippingModes.PATH) {
-		  boxTransformedWithPath();
-		  scene.forEachGeometry(updateUniforms(scene));
+		  transformeBoxWithPath();
+		  scene.forEachGeometry(updateUniforms());
 	  }
-  }
-
-  var updateUniforms = function() {
-	myUniforms["progress"].value = pathSceneCamera.getTime() / 3000.0;
-	var directionalLight = scene.directionalLight;
-	myUniforms["directionalLightDirection"].value.set(directionalLight.position.x,
-	  directionalLight.position.y,
-	  directionalLight.position.z);
   }
 
   var createCSG = function() {
@@ -272,20 +266,17 @@ exports.csg = function(sceneIn, zincRendererIn) {
   
   var setShaderMaterial = function(scene) {
     return function(zincObject) {
-	  if (zincObject.isGeometry) {
+	  if (zincObject.isGeometry  && zincObject.groupName) {
 		  var originalMaterial = zincObject.morph.material;
-		  var dirLight = scene.directionalLight;
 		  var myUniforms= THREE.UniformsUtils.merge( [
 			  {
-				  "ambient"  : { type: "c", value: new THREE.Color( 0xffffff  ) },
-				  "emissive" : { type: "c", value: new THREE.Color( originalMaterial.emissive ) },
-				  "specular" : { type: "c", value: new THREE.Color( originalMaterial.specular ) },
-				  "diffuse" : { type: "c", value: new THREE.Color( originalMaterial.color ) },
+				  "emissive" : { type: "c", value: originalMaterial.emissive },
+				  "specular" : { type: "c", value: originalMaterial.specular },
+				  "diffuse" : { type: "c", value: originalMaterial.color },
 				  "shininess": { type: "f", value: originalMaterial.shininess },
-				  "ambientLightColor": { type: "c", value: new THREE.Color( 0x444444 ) },
-				  "directionalLightColor": { type: "c", value: new THREE.Color( 0x888888 ) },
-				  "directionalLightDirection": { type: "v3", value: new THREE.Vector3(
-					 dirLight.position.x, dirLight.position.y, dirLight.position.z )  },
+				  "ambientLightColor": { type: "c", value: scene.ambient.color },
+				  "directionalLightColor": { type: "c", value: scene.directionalLight.color },
+				  "directionalLightDirection": { type: "v3", value: scene.directionalLight.position },
 				  "progress": { type: "f", value: 0.0 },
 				  "reverse": { type: "i", value: 0 },
 			  }
@@ -303,8 +294,32 @@ exports.csg = function(sceneIn, zincRendererIn) {
     }
   }
   
+  
+  var updateLightDirectionUniforms = function() {
+    return function(zincObject) {
+  	  if (zincObject.isGeometry && zincObject.groupName) {
+  		if (zincObject.morph.material.uniforms) {
+  			var directionalLight = scene.directionalLight;
+  		    zincObject.morph.material.uniforms["directionalLightDirection"].value.set(directionalLight.position.x,
+  					directionalLight.position.y,
+  					directionalLight.position.z);
+  	    }
+  	  }
+  	}
+  }
+  
+	var updateLightDirection = function() {
+	  scene.forEachGeometry(updateLightDirectionUniforms());
+  }
+  
   this.allDownloadsCompletedCallback = function() {
+	  if (preRenderCallbackId > 0) {
+		  zincRenderer.removePreRenderCallbackFunction(preRenderCallbackId);
+		  preRenderCallbackId = -1;
+	  }
 	  if (currentClippingMode == ClippingModes.STANDARD) {
+		  boxGeometry.morph.visible = false;
+		  planeHelper.visible = true;
 		  getCentroid();
 		  if (meshRadius > 0) {
 			  var dimension = meshRadius * 2.0 *1.1 + meshCenter.length();
@@ -328,7 +343,14 @@ exports.csg = function(sceneIn, zincRendererIn) {
 			  }
 		  }
 	  } else if (currentClippingMode == ClippingModes.PATH) {
+		  preRenderCallbackId = zincRenderer.addPreRenderCallbackFunction(updateLightDirection);
 		  scene.forEachGeometry(setShaderMaterial(scene));
+		  boxGeometry.morph.visible = true;
+		  boxGeometry.morph.material.side = THREE.DoubleSide;
+		  planeHelper.visible = false;
+		  if (boxGeometry && boxGeometry.geometry) {
+			  boxGeometry.geometry.scale(3.3, 3.3, 1.0);
+		  }
 		  if (distanceSlider) {
 			  distanceSlider.__min = 0.0;
 			  distanceSlider.__max = 1.0;
@@ -347,6 +369,7 @@ exports.csg = function(sceneIn, zincRendererIn) {
 		  guiControls.reverse = false;
 		  reverseController.updateDisplay();
 	  }
+	  updatePlane();
   }
   
   this.enableStandardCutting = function() {
@@ -388,10 +411,9 @@ exports.csg = function(sceneIn, zincRendererIn) {
       scene.forEachGlyphset(removeCutFace(scene));
     };
     datGui.add(controls, "remove cuts");
-    distanceSlider = datGui.add(guiControls, 'distance', -1.0, 1.0).step(0.01).onChange(distanceSliderChanged());
+    distanceSlider = datGui.add(guiControls, 'distance', -1.0, 1.0).step(0.001).onChange(distanceSliderChanged());
     xRotationSlider = datGui.add(guiControls, 'xRotation', -90, 90).step(1).onChange(xRotationSliderChanged());
     yRotationSlider = datGui.add(guiControls, 'yRotation', -90, 90).step(1).onChange(yRotationSliderChanged());
-    //datGui.add(guiControls, 'continuous');
     reverseController = datGui.add(guiControls, 'reverse');
     reverseController.onChange(function(value) {
       updatePlane();

@@ -167,19 +167,22 @@ var ScaffoldViewer = function(typeAtStartUp)  {
         if (xmlhttp.readyState == 4) {
           if (xmlhttp.status == 200) {
             var data = JSON.parse(xmlhttp.responseText);
-            if (csg)
-        	  csg.enablePathCutting(data);
+            if (csg) {
+              if (data != null)
+            	  csg.enablePathCutting(data);
+              else
+            	  csg.enableStandardCutting();
+            }
           } else {
         	if (csg)
         		csg.enableStandardCutting();
           }
           if (csg) {
         	csg.allDownloadsCompletedCallback();
-            csg.updatePlane();
           }
         }
       }
-      var finalURL = "./getCentralLine";
+      var finalURL = "./getCenterLine";
       xmlhttp.open("GET", finalURL, true);
       xmlhttp.send();
       settingsChanged = false;

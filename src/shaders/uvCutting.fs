@@ -3,7 +3,6 @@ varying vec3 vViewPosition;
 varying vec3 vNormal;
 varying vec2 vUv;
 uniform float progress;
-uniform vec3 ambient;
 uniform vec3 emissive;
 uniform vec3 specular;
 uniform vec3 diffuse;
@@ -17,7 +16,7 @@ void main(void) {
 #ifdef ALPHATEST
 	if ( gl_FragColor.a < ALPHATEST ) discard;
 #endif
-	float pxielTimeStep = vUv.x;
+	float pxielTimeStep = vUv.y;
 	if (reverse == 1)
 	{	
 			if (pxielTimeStep > progress)
@@ -67,6 +66,6 @@ vec3 totalSpecular = vec3( 0.0 );
 	totalDiffuse += dirDiffuse;
 	totalSpecular += dirSpecular;
 #endif
-	gl_FragColor.xyz = totalDiffuse;
+	gl_FragColor.xyz = totalDiffuse + totalSpecular + ambientLightColor;
 }
 
