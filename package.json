@@ -1,6 +1,6 @@
 {
   "name": "physiomeportal",
-  "version": "0.3.3alpha",
+  "version": "0.3.4alpha",
   "description": "Physiome Portal",
   "main": "build/physiomeportal.js",
   "files": [
@@ -44,10 +44,11 @@
     "url-loader": "^1.0.1",
     "webpack": "^4.6.0",
     "webpack-cli": "^2.1.2",
-    "webpack-jquery-ui": "^1.0.0"
+    "webpack-jquery-ui": "^1.0.0",
+    "lodash": ">=4.17.11"
   },
   "dependencies": {
-    "zincjs": "^0.29.6",
+    "zincjs": "^0.29.7",
     "dialog-polyfill": "^0.4.10"
   }
 }
