@@ -11,6 +11,7 @@ require("../styles/dialog.css");
 
 var BaseDialog = function() {
   this.container = undefined;
+  this.module = undefined;
   this.parent = undefined;
   this.content = undefined;
   this.datGui = undefined;
@@ -21,11 +22,19 @@ var BaseDialog = function() {
   this.title = "Default";
 }
 
+BaseDialog.prototype.getModule = function() {
+	return this.module;
+}
+
 BaseDialog.prototype.close = function(myInstance) {
   return function(event, ui) {
     myInstance.container.dialog('destroy').remove();
     for (var i = 0; i < myInstance.onCloseCallbacks.length; i++) {
       myInstance.onCloseCallbacks[i]( this);
+    }
+    if (myInstance.destroyModuleOnClose) {
+      myInstance.module.destroy();
+      myInstance.module = undefined;
     }
   }
 }

@@ -4,14 +4,10 @@
 var BodyViewerDialog = function(bodyViewerIn, parentIn) {
   (require('./BaseDialog').BaseDialog).call(this);
   this.parent = parentIn;
-  var bodyViewer = bodyViewerIn;
+  this.module = bodyViewerIn;
   var systemGuiFolder = new Array();
   var systemPartsGuiControls = new Array();
   var _myInstance = this;
-    
-  this.getModule = function() {
-    return bodyViewer;
-  }
   
   //Array of settings of the body viewer gui controls.
   var bodyControl = function() {
@@ -24,7 +20,7 @@ var BodyViewerDialog = function(bodyViewerIn, parentIn) {
       var greenValue = parseInt(value[1]);
       var blueValue = parseInt(value[2]);
       var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-      bodyViewer.changeBackgroundColour(backgroundColourString);
+      _myInstance.module.changeBackgroundColour(backgroundColourString);
     }
   }
   
@@ -54,7 +50,7 @@ var BodyViewerDialog = function(bodyViewerIn, parentIn) {
       if (partName != "All" && systemPartsGuiControls[systemName].hasOwnProperty(partName)) {
         if (systemPartsGuiControls[systemName][partName] != value) {
           systemPartsGuiControls[systemName][partName] = value;
-          bodyViewer.changeBodyPartsVisibility(partName, systemName, value);
+          _myInstance.module.changeBodyPartsVisibility(partName, systemName, value);
         }
       }
     }
@@ -84,7 +80,7 @@ var BodyViewerDialog = function(bodyViewerIn, parentIn) {
   
   var bodyPartsVisibilityChanged = function(name, systemName) {
     return function(value) {
-      bodyViewer.changeBodyPartsVisibility(name, systemName, value);
+      _myInstance.module.changeBodyPartsVisibility(name, systemName, value);
       var isPartial = false;
       if (value == false) {
         systemPartsGuiControls[systemName].All = false;
@@ -137,7 +133,7 @@ var BodyViewerDialog = function(bodyViewerIn, parentIn) {
     return function(event) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      bodyViewer.setSelectedByGroupName(partName, true);
+      _myInstance.module.setSelectedByGroupName(partName, true);
     } 
   }
   
@@ -145,7 +141,7 @@ var BodyViewerDialog = function(bodyViewerIn, parentIn) {
     var controller = systemGuiFolder[systemName].add(systemPartsGuiControls[systemName], partName);
     var span = controller.__li.getElementsByTagName("span")[0];
     controller.onChange(bodyPartsVisibilityChanged(partName, systemName));
-    controller.__li.onmouseover = function() {bodyViewer.setHighlightedByGroupName(partName, true);};
+    controller.__li.onmouseover = function() {_myInstance.module.setHighlightedByGroupName(partName, true);};
     span.onclick = bodyPartNameClickedCallback(partName);
   }
   
@@ -186,7 +182,7 @@ var BodyViewerDialog = function(bodyViewerIn, parentIn) {
    * This method add all system folders to the dat.gui user interface.
    */
   var addSystemFolders = function() {
-    var systemList = bodyViewer.getSystemList();
+    var systemList = _myInstance.module.getSystemList();
     for (var i = 0; i < systemList.length; i++) {
       var currentSystem = systemList[i];
       systemGuiFolder[currentSystem] = _myInstance.datGui.addFolder(currentSystem);
@@ -210,7 +206,7 @@ var BodyViewerDialog = function(bodyViewerIn, parentIn) {
       inputs[i].onclick = systemButtonPressCallback(inputs[i]); 
     }
     var speciesSelected = _myInstance.container.find("#bodySpeciesSelect")[0];
-    speciesSelected.onchange = function() { bodyViewer.changeSpecies(speciesSelected.value) };
+    speciesSelected.onchange = function() { _myInstance.module.changeSpecies(speciesSelected.value) };
   }
   
   var initialiseBodyControlUI = function() {
@@ -220,22 +216,13 @@ var BodyViewerDialog = function(bodyViewerIn, parentIn) {
     var controller = _myInstance.datGui.addColor(control, 'Background');
     controller.onChange(bodyBackGroundChanged());
     _myInstance.container.find("#bodyGui")[0].appendChild(_myInstance.datGui.domElement);
-    var resetViewButton = { 'Reset View':function(){ bodyViewer.resetView() }};
-    var viewAllButton = { 'View All':function(){ bodyViewer.viewAll() }};
+    var resetViewButton = { 'Reset View':function(){ _myInstance.module.resetView() }};
+    var viewAllButton = { 'View All':function(){ _myInstance.module.viewAll() }};
     _myInstance.datGui.add(resetViewButton, 'Reset View');
     _myInstance.datGui.add(viewAllButton, 'View All');
     addSystemFolders();
-    bodyViewer.forEachPartInBody(systemPartAddedCallback());
-    bodyViewer.addSystemPartAddedCallback(systemPartAddedCallback());
-  }
-  
-  var _bodyViewerDialogClose = function() {
-    return function(myDialog) {
-      if (_myInstance.destroyModuleOnClose) {
-        bodyViewer.destroy();
-        bodyViewer = undefined;
-      }
-    }
+    _myInstance.module.forEachPartInBody(systemPartAddedCallback());
+    _myInstance.module.addSystemPartAddedCallback(systemPartAddedCallback());
   }
   
   var bodyViewerChangedCallback = function() {
@@ -247,15 +234,14 @@ var BodyViewerDialog = function(bodyViewerIn, parentIn) {
   }
     
   var initialise = function() {
-    if (bodyViewer) {
+    if (_myInstance.module) {
       _myInstance.create(require("../snippets/bodyViewer.html"));
-      var name = bodyViewer.getName();
+      var name = _myInstance.module.getName();
       _myInstance.setTitle(name);
       initialiseBodyControlUI();
       var displayArea = _myInstance.container.find("#bodyDisplayArea")[0];
-      bodyViewer.initialiseRenderer(displayArea);
-      bodyViewer.addChangedCallback(bodyViewerChangedCallback());
-      _myInstance.onCloseCallbacks.push(_bodyViewerDialogClose());
+      _myInstance.module.initialiseRenderer(displayArea);
+      _myInstance.module.addChangedCallback(bodyViewerChangedCallback());
     }
   }
   

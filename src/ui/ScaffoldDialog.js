@@ -4,7 +4,7 @@
 var ScaffoldDialog = function(scaffoldViewerIn, parentIn) {
   (require('./BaseDialog').BaseDialog).call(this);
   this.parent = parentIn;
-  var scaffoldViewer = scaffoldViewerIn;
+  this.module = scaffoldViewerIn;
   var modal = undefined;
   var optionsChanged = false;
   var _this = this;
@@ -15,9 +15,6 @@ var ScaffoldDialog = function(scaffoldViewerIn, parentIn) {
   var meshParametersGuiControls = undefined;
   var meshPartsGui = undefined;
   var meshPartsGuiControls = undefined;
-  this.getModule = function() {
-    return scaffoldViewer;
-  }
   
   //Array of settings of the body viewer gui controls.
   var scaffoldControl = function() {
@@ -30,7 +27,7 @@ var ScaffoldDialog = function(scaffoldViewerIn, parentIn) {
       var greenValue = parseInt(value[1]);
       var blueValue = parseInt(value[2]);
       var backgroundColourString = 'rgb(' + redValue + ',' + greenValue + ',' + blueValue + ')';
-      scaffoldViewer.changeBackgroundColour(backgroundColourString);
+      _myInstance.module.changeBackgroundColour(backgroundColourString);
     }
   }
     
@@ -43,8 +40,8 @@ var ScaffoldDialog = function(scaffoldViewerIn, parentIn) {
   }
   
   var changeMeshTypeCallback = function() {
-    scaffoldViewer.setMeshType(guiControls['Mesh Types']);
-    scaffoldViewer.updateMesh();
+    _myInstance.module.setMeshType(guiControls['Mesh Types']);
+    _myInstance.module.updateMesh();
   }
   
   var createMeshTypesChooser = function(meshTypes) {
@@ -70,10 +67,10 @@ var ScaffoldDialog = function(scaffoldViewerIn, parentIn) {
   var confirmPressed = function() {
     for (var key in meshParametersGuiControls) {
       if (meshParametersGuiControls.hasOwnProperty(key)) {
-        scaffoldViewer.updateOption(key, meshParametersGuiControls[key]);
+        _myInstance.module.updateOption(key, meshParametersGuiControls[key]);
       }
     }
-    scaffoldViewer.updateMesh();
+    _myInstance.module.updateMesh();
   }
 
   var updateParametersOptions = function(options) {
@@ -90,7 +87,7 @@ var ScaffoldDialog = function(scaffoldViewerIn, parentIn) {
     return function(event) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      scaffoldViewer.setSelectedByGroupName(groupName, false);
+      _myInstance.module.setSelectedByGroupName(groupName, false);
     } 
   }
   
@@ -102,8 +99,8 @@ var ScaffoldDialog = function(scaffoldViewerIn, parentIn) {
           meshPartsGuiControls[groupName] = true;
           var controller = meshPartsGui.add(meshPartsGuiControls, groupName);
           var span = controller.__li.getElementsByTagName("span")[0];
-          controller.onChange(scaffoldViewer.changePartVisibilityCallback(groupName));
-          controller.__li.onmouseover = function() {scaffoldViewer.setHighlightedByGroupName(groupName, true);};
+          controller.onChange(_myInstance.module.changePartVisibilityCallback(groupName));
+          controller.__li.onmouseover = function() {_myInstance.module.setHighlightedByGroupName(groupName, true);};
           span.onclick = meshPartNameClickedCallback(groupName);
         }
       }
@@ -116,8 +113,8 @@ var ScaffoldDialog = function(scaffoldViewerIn, parentIn) {
     };
     meshPartsGui = _this.datGui.addFolder('Regions');
     meshPartsGui.open();
-    if (scaffoldViewer.scene) {
-      scaffoldViewer.scene.forEachGeometry(addPartGuiOptionsCallback()); 
+    if (_myInstance.module.scene) {
+      _myInstance.module.scene.forEachGeometry(addPartGuiOptionsCallback()); 
     }
   }
 
@@ -143,48 +140,38 @@ var ScaffoldDialog = function(scaffoldViewerIn, parentIn) {
   var initialiseScaffoldControlUI = function() {
     _this.addDatGui();
     _this.container.find("#meshGui")[0].appendChild(_this.datGui.domElement);
-    var viewAllButton = { 'View All':function(){ scaffoldViewer.viewAll() }};
-    var readButton = { 'Read':function(){ scaffoldViewer.readWorkspacePrompt() }};
-    var commitButton = {'Commit':function() { scaffoldViewer.commitWorkspace() }};
-    var pushButton = {'Push':function() { scaffoldViewer.pushWorkspace() }};
+    var viewAllButton = { 'View All':function(){ _myInstance.module.viewAll() }};
+    var readButton = { 'Read':function(){ _myInstance.module.readWorkspacePrompt() }};
+    var commitButton = {'Commit':function() { _myInstance.module.commitWorkspace() }};
+    var pushButton = {'Push':function() { _myInstance.module.pushWorkspace() }};
     _this.datGui.add(viewAllButton, 'View All');
     _this.datGui.add(readButton, 'Read');
     _this.datGui.add(commitButton, 'Commit');
     _this.datGui.add(pushButton, 'Push');
   }
-  
-  var _scaffoldViewerDialogClose = function() {
-    return function(myDialog) {
-      if (_this.destroyModuleOnClose) {
-        scaffoldViewer.destroy();
-        scaffoldViewer = undefined;
-      }
-    }
-  }
-    
+
   var initialise = function() {
-    if (scaffoldViewer) {
+    if (_myInstance.module) {
       _this.create(require("../snippets/ScaffoldDialog.html"));
       modal = new (require('./Modal').PortalModal)(
       _this.container.find(".portalmodal")[0]);
-      var name = scaffoldViewer.getName();
+      var name = _myInstance.module.getName();
       _this.setTitle(name);
       var displayArea = _this.container.find("#scaffoldDisplayArea")[0];
-      scaffoldViewer.initialiseRenderer(displayArea);
+      _myInstance.module.initialiseRenderer(displayArea);
       initialiseScaffoldControlUI();
-      scaffoldViewer.alertFunction = modal.alert;
-      scaffoldViewer.promptFunction = modal.prompt;
-      scaffoldViewer.confirmFunction = modal.confirm;
-      var meshTypes = scaffoldViewer.getAvailableMeshTypes();
+      _myInstance.module.alertFunction = modal.alert;
+      _myInstance.module.promptFunction = modal.prompt;
+      _myInstance.module.confirmFunction = modal.confirm;
+      var meshTypes = _myInstance.module.getAvailableMeshTypes();
       if (meshTypes)
         createMeshTypesChooser(meshTypes);
       else
-        scaffoldViewer.addMeshTypesCallback(meshTypesResponseCallback());
-      scaffoldViewer.addCSGGui(_this.container.find("#csgGui")[0]);
-      scaffoldViewer.addMeshUpdatedCallbacks(meshUpdatedCallback());
-      scaffoldViewer.addChangedCallback(scaffoldViewerChangedCallback());
-      scaffoldViewer.addMeshAllPartsDownloadedCallbacks(allPartsDownloadedCallbacks());
-      _this.onCloseCallbacks.push(_scaffoldViewerDialogClose());
+        _myInstance.module.addMeshTypesCallback(meshTypesResponseCallback());
+      _myInstance.module.addCSGGui(_this.container.find("#csgGui")[0]);
+      _myInstance.module.addMeshUpdatedCallbacks(meshUpdatedCallback());
+      _myInstance.module.addChangedCallback(scaffoldViewerChangedCallback());
+      _myInstance.module.addMeshAllPartsDownloadedCallbacks(allPartsDownloadedCallbacks());
     }
   }
   
