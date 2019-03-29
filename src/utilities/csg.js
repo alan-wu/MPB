@@ -236,6 +236,8 @@ exports.csg = function(sceneIn, zincRendererIn) {
     boxGeometry.morph.visible = false;
     if (plane === undefined) {
       plane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+    }
+    if (planeHelper === undefined) {
       planeHelper = new THREE.PlaneHelper(plane, 1, 0xff0000);
       scene.addObject(planeHelper);
     }
@@ -392,6 +394,9 @@ exports.csg = function(sceneIn, zincRendererIn) {
 	    zincCSG = undefined;
 	    boxGeometry = undefined;
 	    currentGeometry = undefined;
+	    if (scene)
+	    	scene.removeObject(planeHelper);
+	    planeHelper = undefined;
 	    createCube(1, 1, 0.0005);
   }
   
