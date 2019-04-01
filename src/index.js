@@ -3,6 +3,7 @@ require("./styles/w3.css");
 require("./styles/sidebar.css");
 require('./styles/bootstrap.min.css');
 
+exports.BaseModule = require("./modules/BaseModule").BaseModule;
 exports.BodyViewer = require("./modules/bodyRenderer").BodyViewer;
 exports.RendererModule = require("./modules/RendererModule").RendererModule;
 exports.CellPanel = require("./cell_panel").CellPanel;
