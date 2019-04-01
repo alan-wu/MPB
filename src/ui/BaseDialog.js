@@ -33,8 +33,10 @@ BaseDialog.prototype.close = function(myInstance) {
       myInstance.onCloseCallbacks[i]( this);
     }
     if (myInstance.destroyModuleOnClose) {
-      myInstance.module.destroy();
-      myInstance.module = undefined;
+      if (myInstance.module) {
+        myInstance.module.destroy();
+        myInstance.module = undefined;
+      }
     }
   }
 }

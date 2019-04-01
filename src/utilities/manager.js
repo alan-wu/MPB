@@ -17,16 +17,16 @@ exports.ModuleManager = function() {
       return dialog; 
     }
     this["Organs Viewer"] = [];
-    this["Organs Viewer"].module =  function() {
+    this["Organs Viewer"].module = function() {
       var module = new (require("../modules/organsRenderer").OrgansViewer)(modelsLoader);
       return module; 
     }
-    this["Organs Viewer"].dialog=  function(module, parent) {
+    this["Organs Viewer"].dialog = function(module, parent) {
       var dialog = new (require("../ui/OrgansViewerDialog").OrgansViewerDialog)(module, parent);
       return dialog; 
     }
     this["Model Panel"] = [];
-    this["Model Panel"].module =  function() {
+    this["Model Panel"].module = function() {
       var module = new (require("../modules/model_panel").ModelPanel)();
       return module; 
     }
@@ -51,6 +51,21 @@ exports.ModuleManager = function() {
   var eventNotifier = new (require("./eventNotifier").EventNotifier)();
   var subscription = undefined;
   var _this = this;
+
+  this.addConstructor = function(name, moduleConstructor, dialogConstructor) {
+	  if(!constructors.hasOwnProperty(name)) {
+		constructors[name] = [];
+		constructors[name].module = function() {
+		  var module = new moduleConstructor();
+		  console.log(module);
+		  return module;
+		}
+		constructors[name].dialog = function(module, parent) {
+		  var dialog = new dialogConstructor(module, parent);
+		  return dialog;
+		}
+	  }
+  }
 
   this.getAllManagerItems = function() {
     return managerItems.slice();
@@ -90,6 +105,16 @@ exports.ModuleManager = function() {
     }
     return undefined;
   }
+  
+  var findManagerItemWithDialog = function(dialogIn) {
+	for (var i = 0; i < managerItems.length; i++) {
+	  var dialog = managerItems[i].getDialog();
+	  if (dialog === dialogIn) {
+	    return managerItems[i];
+	  }
+	}
+	return undefined;
+  }
 
   var pad = function(number, width) {
     var n = number + '';
@@ -112,30 +137,44 @@ exports.ModuleManager = function() {
   this.manageDialog = function(dialogIn) {
     if (dialogIn) {
       var moduleIn = dialogIn.getModule();
-      var item = findManagerItemWithModule(moduleIn);
-      if (item) {
-        if (item.getDialog() === undefined) {
-          item.setDialog(dialogIn);
-          dialogIn.addBeforeCloseCallback(dialogDestroyCallback());
-        }
-        return item;
-      }
-      //item not found, add a new entry
       if (moduleIn) {
-        var managerItem = new ManagerItem();
-        managerItem.setDialog(dialogIn);
-        dialogIn.addBeforeCloseCallback(dialogDestroyCallback());
-        moduleIn.addChangedCallback(moduleChangedCallback());
-        managerItems.push(managerItem);
-        for (var i = 0; i < itemChangedCallbacks.length; i++)
-          itemChangedCallbacks[i](managerItem, MANAGER_ITEM_CHANGE.ADDED)
-        return managerItem;
+	    var item = findManagerItemWithModule(moduleIn);
+	    if (item) {
+	      if (item.getDialog() === undefined) {
+	        item.setDialog(dialogIn);
+	        dialogIn.addBeforeCloseCallback(dialogDestroyCallback());
+	      }
+	      return item;
+	    } else {
+	      var managerItem = new ManagerItem();
+	      managerItem.setDialog(dialogIn);
+	      dialogIn.addBeforeCloseCallback(dialogDestroyCallback());
+	      moduleIn.addChangedCallback(moduleChangedCallback());
+	      managerItems.push(managerItem);
+	      for (var i = 0; i < itemChangedCallbacks.length; i++)
+	        itemChangedCallbacks[i](managerItem, MANAGER_ITEM_CHANGE.ADDED)
+	      return managerItem;
+	    }
+      } else {
+    	var item = findManagerItemWithDialog(dialogIn);
+    	if (item === undefined) {
+  	      var managerItem = new ManagerItem();
+	      managerItem.setDialog(dialogIn);
+	      dialogIn.addBeforeCloseCallback(dialogDestroyCallback());
+	      managerItems.push(managerItem);
+	      for (var i = 0; i < itemChangedCallbacks.length; i++)
+	        itemChangedCallbacks[i](managerItem, MANAGER_ITEM_CHANGE.ADDED)
+	      return managerItem;
+    	}
+    	return item;
       }
     }
   }
 
   this.removeDialog = function(dialogIn) {
     if (dialogIn) {
+      var managerItems = findManagerItemWithDialog(dialogIn)
+      
       for (var i = 0; i < managerItems.length; i++) {
         var dialog = managerItems[i].getDialog();
         if (dialog === dialogIn) {
@@ -238,10 +277,12 @@ exports.ModuleManager = function() {
   this.createModule = function(moduleName) {
     if (modelsLoader && ready) {
       var module = constructors[moduleName].module();
-      moduleCounter = moduleCounter + 1;
-      var name = pad(moduleCounter, 4);
-      module.setName(name);
-      _this.manageModule(module);
+      if (module) {
+	      moduleCounter = moduleCounter + 1;
+	      var name = pad(moduleCounter, 4);
+	      module.setName(name);
+	      _this.manageModule(module);
+      }
       return module;
     }
     return;

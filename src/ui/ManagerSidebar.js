@@ -237,7 +237,8 @@ var ManagerSidebar = function(parentIn) {
     var moduleManager = addDialog.data("manager");
     if ((dialogName !== "Please pick one") && name !== "") {
       var module = moduleManager.createModule(dialogName);
-      module.setName(name);
+      if (module)
+    	  module.setName(name);
       var dialog = moduleManager.createDialog(module, parent);
       dialog.destroyModuleOnClose = true;
       moduleManager.manageDialog(dialog);
@@ -349,7 +350,7 @@ var ManagerSidebar = function(parentIn) {
     });
     addDialogElem.parent().draggable({
     	  containment: parent
-      });
+    });
     
     var messageDialogElem = jelem.find("#message-dialog");
     messageDialog = messageDialogElem.dialog({
