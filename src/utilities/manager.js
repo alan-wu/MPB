@@ -173,14 +173,9 @@ exports.ModuleManager = function() {
 
   this.removeDialog = function(dialogIn) {
     if (dialogIn) {
-      var managerItems = findManagerItemWithDialog(dialogIn)
-      
-      for (var i = 0; i < managerItems.length; i++) {
-        var dialog = managerItems[i].getDialog();
-        if (dialog === dialogIn) {
-          managerItems[i].setDialog(undefined);
-          return;
-        }
+      var item = findManagerItemWithDialog(dialogIn);
+      if (item) {
+    	  item.setDialog(undefined);
       }
     }
   }
