@@ -2,7 +2,7 @@
   "name": "physiomeportal",
   "version": "0.3.4alpha",
   "description": "Physiome Portal",
-  "main": "build/physiomeportal.js",
+  "main": "build/physiomeportal.min.js",
   "files": [
     "package.json",
     "LICENSE.txt",
@@ -45,10 +45,9 @@
     "webpack": "^4.6.0",
     "webpack-cli": "^2.1.2",
     "webpack-jquery-ui": "^1.0.0",
-    "lodash": ">=4.17.11"
-  },
-  "dependencies": {
-    "zincjs": "^0.29.7",
+    "lodash": ">=4.17.11",
+    "zincjs": "^0.29.8",
     "dialog-polyfill": "^0.4.10"
-  }
+  },
+  "dependencies": {}
 }
