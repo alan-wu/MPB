@@ -92,7 +92,6 @@ exports.CellPanel = function(DialogName)  {
     dialogObject = require("./utility").createDialogContainer(localDialogName, data);
     initialiseCellPanel();
     UIIsReady = true;
-    delete link;
   }
 	
 	 var initialise = function() {
