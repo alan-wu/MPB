@@ -31,19 +31,18 @@ exports.createDialogContainer = function (DialogNameIn, data) {
  * @returns {Zinc.Renderer}
  */
 exports.createRenderer = function () {
-  var localContainer = document.createElement( 'div' );
+  var canvas = document.createElement( 'canvas' );
   var localRenderer = undefined;;
-  localContainer.style.height = "100%";
   if (WEBGL.isWebGLAvailable()) {
-    var localRenderer = new Zinc.Renderer(localContainer, window);
+    var localRenderer = new Zinc.Renderer(undefined, window);
     Zinc.defaultMaterialColor = 0xFFFF9C;
-    localRenderer.initialiseVisualisation();
+    localRenderer.initialiseVisualisation({'canvas':canvas});
     localRenderer.playAnimation = false;
   } else {
-    var warning = WEBGL.getWebGLErrorMessage();
-    localContainer.appendChild(warning);
+    canvas = WEBGL.getWebGLErrorMessage();
+    console.log(canvas)
   }
-  return {"renderer":localRenderer, "container":localContainer};
+  return {"renderer":localRenderer, 'canvas':canvas};
 }
 
 /**

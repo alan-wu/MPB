@@ -57,7 +57,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	_this.typeName = "Organs Viewer";
 	//Secondary renderer, used for comparing species models.
 	var secondaryRenderer = undefined;
-	var secondaryRendererContainer = undefined;
+	var secondaryRendererCanvas = undefined;
 	var secondaryDisplayArea = undefined;
 	
 	//Array for storing different species models urls.
@@ -549,14 +549,14 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	}
 
 	this.initialiseSecondaryRenderer = function(displayAreaIn) {
-    if (secondaryRenderer === undefined || secondaryRendererContainer === undefined) {
+    if (secondaryRenderer === undefined || secondaryRendererCanvas === undefined) {
       var returnedValue = (require("../utility").createRenderer)();
       secondaryRenderer = returnedValue["renderer"];
-      secondaryRendererContainer = returnedValue["container"];
+      secondaryRendererCanvas = returnedValue["canvas"];
     }
     if (secondaryDisplayArea === undefined && displayAreaIn) {
       secondaryDisplayArea = displayAreaIn;
-      secondaryDisplayArea.appendChild( secondaryRendererContainer );
+      secondaryDisplayArea.appendChild( secondaryRendererCanvas );
       secondaryRenderer.animate();
     } 
   }

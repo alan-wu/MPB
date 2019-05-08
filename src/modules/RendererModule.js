@@ -4,7 +4,7 @@ var RendererModule = function()  {
   (require('./BaseModule').BaseModule).call(this);
   this.scene = undefined;
   this.toolTip = undefined;
-  this.rendererContainer = undefined;
+  this.rendererCanvas = undefined;
   this.displayArea = undefined;
   this.graphicsHighlight = new (require("../utilities/graphicsHighlight").GraphicsHighlight)();
   this.zincRenderer = null;
@@ -112,14 +112,14 @@ RendererModule.prototype.getPlayRate = function(value) {
  * 
  */
 RendererModule.prototype.initialiseRenderer = function(displayAreaIn) {
-  if (this.zincRenderer === undefined || this.rendererContainer === undefined) {
+  if (this.zincRenderer === undefined || this.rendererCanvas === undefined) {
     var returnedValue = (require("../utility").createRenderer)();
     this.zincRenderer = returnedValue["renderer"];
-    this.rendererContainer = returnedValue["container"];
+    this.rendererCanvas = returnedValue["canvas"];
   }
   if (displayAreaIn) {
     this.displayArea = displayAreaIn;
-    this.displayArea.appendChild( this.rendererContainer );
+    this.displayArea.appendChild( this.rendererCanvas );
     if (this.zincRenderer) {
       this.zincRenderer.animate();
       if (this.toolTip === undefined)
