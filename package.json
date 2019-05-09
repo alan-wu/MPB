@@ -51,7 +51,7 @@
     "webpack": "^4.6.0",
     "webpack-cli": "^2.1.2",
     "webpack-jquery-ui": "^1.0.0",
-    "zincjs": "^0.29.9"
+    "zincjs": "^0.29.10"
   },
   "dependencies": {}
 }

@@ -190,31 +190,44 @@ exports.csg = function(sceneIn, zincRendererIn) {
 	    if (mergedGlyphGeometry === undefined && currentGlyphs) {
 	  	  mergedGlyphGeometry = csgScene.addZincGeometry(currentGlyphs, 45121, 0xffffff, 1.0);
 	    }
-	    var intersect = undefined;
-	    var csg1 = zincCSG.intersect(boxGeometry);
-	    if (glyphsetCSG) {
-	  	  var newGeometry = csg1.getGeometry();
-	  	  intersect = glyphsetCSG.intersect(newGeometry).getGlyphset();
-	    } else {
-	  	  intersect = csg1.getGeometry();
-	    }
-	    if (intersect) {
-	      if (intersect.isGeometry) {
-	    	  intersect.morph.material.color.set(0xff00ff);
-	    	  intersect.groupName = "intersect";
-	    	  scene.addGeometry(intersect);
-	      } else if (intersect.isGlyphset) {
-	    	  console.log(intersect.getGroup());
-	    	  intersect.groupName = "intersect";
-	    	  scene.addGlyphset(intersect); 
-	      }
-	    }
-	    if (glyphsetCSG && mergedGlyphGeometry) {
-	      var intersect2 = csg1.subtract(mergedGlyphGeometry).getGeometry();
-	      intersect2.morph.material.color.set(0xffffff);
-	      intersect2.groupName = "intersect";
-	      scene.addGeometry(intersect2);
-	    }
+	    zincCSG.intersect(boxGeometry).then((csg1) => {
+	    	var intersect = undefined;
+		    if (glyphsetCSG) {
+			  var newGeometry = csg1.getGeometry();
+			  intersect = glyphsetCSG.intersect(newGeometry).getGlyphset();
+			} else {
+			  intersect = csg1.getGeometry();
+			}
+			if (intersect) {
+			  if (intersect.isGeometry) {
+			    intersect.morph.material.color.set(0xff00ff);
+			    intersect.groupName = "intersect";
+			    scene.addGeometry(intersect);
+			  } else if (intersect.isGlyphset) {
+			    console.log(intersect.getGroup());
+			    intersect.groupName = "intersect";
+			    scene.addGlyphset(intersect); 
+			  }
+			}
+			if (glyphsetCSG && mergedGlyphGeometry) {
+			  csg1.subtract(mergedGlyphGeometry).then((resultCSG) => { 
+			    var intersect2 = resultCSG.getGeometry();
+			    intersect2.morph.material.color.set(0xffffff);
+				intersect2.groupName = "intersect";
+				scene.addGeometry(intersect2);
+				resultCSG.terminateWorker();
+			  }).catch(
+	    	    (reason) => {
+	      		  console.log(reason);
+	      	    }	  
+			  );
+			}
+			csg1.terminateWorker();
+        }).catch(
+    	  (reason) => {
+    		console.log(reason);
+    	  }	  
+        );
 	  }
 	}
 
@@ -391,6 +404,8 @@ exports.csg = function(sceneIn, zincRendererIn) {
   
   this.reset = function() {
 	    csgScene.clearAll();
+	    if (zincCSG)
+	    	zincCSG.terminateWorker();
 	    zincCSG = undefined;
 	    boxGeometry = undefined;
 	    currentGeometry = undefined;
