@@ -65,8 +65,8 @@
 	position:relative!important;
 }
 
-#addManager {
+.sidebar-topbutton {
 	border-radius: 5px;
 }
 
-#addManager:hover {background-color: #b2d8ff  !important;}
+.sidebar-topbutton:hover {background-color: #b2d8ff  !important;}

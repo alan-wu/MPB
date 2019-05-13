@@ -201,6 +201,7 @@ var ManagerSidebar = function(parentIn) {
   var addManagerDialog = undefined;
   var messageDialog = undefined;
   var ManagerElementArray = [];
+  var feedbackCallback = undefined;
   var _this = this;
 
   this.open = function() {
@@ -228,6 +229,8 @@ var ManagerSidebar = function(parentIn) {
     };
     element = jelem.find("#addManager")[0];
     element.onclick = addManagerClicked();
+    element = jelem.find("#Feedback")[0];
+    element.onclick = feedbackClicked();
   }
   
   var addDialogCallback = function() {
@@ -269,6 +272,20 @@ var ManagerSidebar = function(parentIn) {
       }
     }
   }
+  
+  this.setFeedbackClickedCallback = function(callback) {
+	  feedbackCallback = callback;
+  }
+  
+  var feedbackClicked = function() {
+    return function(event) {
+      event.stopPropagation();
+      if (feedbackCallback) {
+    	  feedbackCallback();
+      }
+    }
+  }
+	  
   
   var renameDialogCallback = function() {
     var nameElem = renameDialog.find("#new_name")[0];
