@@ -201,7 +201,8 @@ BaseDialog.prototype.setPosition = function(leftIn, topIn) {
 	this.container.dialog('option', 'position',
 		{	my: "left top",
 			at: atString,
-			of: this.parent});
+			of: this.parent,
+			collision:  "none"});
 };
 
 BaseDialog.prototype.hideCloseButton = function() {
