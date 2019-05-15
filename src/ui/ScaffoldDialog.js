@@ -161,7 +161,7 @@ var ScaffoldDialog = function(scaffoldViewerIn, parentIn) {
       var displayArea = _myInstance.container.find("#scaffoldDisplayArea")[0];
       _myInstance.module.initialiseRenderer(displayArea);
       initialiseScaffoldControlUI();
-      _myInstance.module.setAlertFunction(snackbar.showMessage);
+      _myInstance.module.setMessageFunction(snackbar.showMessage);
       _myInstance.module.promptFunction = modal.prompt;
       _myInstance.module.confirmFunction = modal.confirm;
       var meshTypes = _myInstance.module.getAvailableMeshTypes();

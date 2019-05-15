@@ -339,6 +339,8 @@ var OrgansViewerDialog = function(organsViewerIn, parentIn) {
       _myInstance.module.addOrganPartAddedCallback(organPartAddedCallback());
       _myInstance.module.addChangedCallback(organsViewerChangedCallback());
       _myInstance.module.addLayoutUpdateRequiredCallback(layoutUpdateRequiredCallback());
+      var snackbar = _myInstance.getSnackbar();
+      _myInstance.module.setMessageFunction(snackbar.showMessage);
     }
   }
   

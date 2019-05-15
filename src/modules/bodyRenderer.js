@@ -30,13 +30,8 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	  "Endocrine", "Female Reproductive", "Male Reproductive", "Special sense organs"];
 	var systemMeta = undefined;
 	var _this = this;
-	var alertFunction = undefined;
 	_this.typeName = "Body Viewer";
 	
-	this.setAlertFunction = function(alertFunctionIn) {
-		alertFunction = alertFunctionIn;
-	}
-		
 	/**
 	 * This callback is triggered when a body part is clicked.
 	 * @callback
@@ -48,8 +43,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
 				if (intersects[i] !== undefined && (intersects[ i ].object.name !== undefined)) {
 					if (!intersects[ i ].object.name.includes("Body")) {
 						_this.setSelectedByObjects([intersects[ i ].object], true);
-						if (alertFunction)
-							alertFunction(intersects[ i ].object.name + " selected.");
+						_this.displayMessage(intersects[ i ].object.name + " selected.");
 						return;
 					} else {
 						bodyClicked = true;
@@ -143,12 +137,10 @@ var BodyViewer = function(ModelsLoaderIn)  {
 				geometry.setAlpha(0.5);
 				geometry.morph.material.side = THREE.FrontSide;
 			}
-			if (alertFunction) {
-				if (partName)
-					alertFunction(partName + " loaded.");
-				else 
-					alertFunction("Resource loaded.");
-			}
+			if (partName)
+				_this.displayMessage(partName + " loaded.");
+			else 
+				_this.displayMessage("Resource loaded.");
 			var annotation = new (require('../utilities/annotation').annotation)();
 			annotation.data = {species:currentSpecies, system:systemName, part:partName};
 			geometry.userData = [annotation];
@@ -218,8 +210,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
   			var downloadPath = item["BodyURL"];
   			var scaling = false;
   			item["loaded"] =  ITEM_LOADED.DOWNLOADING;
-			if (alertFunction)
-				alertFunction("Downloading data.");
+			_this.displayMessage("Downloading data.");
   			if (item["FileFormat"] == "JSON") {
   				if (systemName == "Musculo-skeletal" || systemName == "Skin (integument)")
   					scaling = true;

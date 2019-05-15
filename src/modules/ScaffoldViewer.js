@@ -17,7 +17,6 @@ var ScaffoldViewer = function(typeAtStartUp)  {
   var meshUpdatedCallbacks = new Array();
   var meshAllPartsDownloadedCallbacks = new Array();
   var availableMeshTypes = undefined;
-  this.alertFunction = undefined;
   this.promptFunction = undefined;
   this.confirmFunction = undefined;
   var currentMeshType = "3d_heart1";
@@ -101,7 +100,7 @@ var ScaffoldViewer = function(typeAtStartUp)  {
             registerLandmarks(coords, datapoint.name, true);
           }
         } else {
-          _this.alertFunction(returnedObject['error']);
+          _this.displayMessage(returnedObject['error']);
         }
         
       }
@@ -207,7 +206,7 @@ var ScaffoldViewer = function(typeAtStartUp)  {
   //Data include meshtype, options and landmark
   var importData = function(data) {
     if (data && data.meshtype && data.options) {
-      _this.alertFunction("Importing data");
+      _this.displayMessage("Importing data");
       currentMeshType = data.meshtype;
       currentOptions = data.options;
       currentLandmarks = data.landmarks;
@@ -254,8 +253,8 @@ var ScaffoldViewer = function(typeAtStartUp)  {
           verifierEntered(verifier);
         }
       } else {
-        if (_this.alertFunction)
-          _this.alertFunction("Loading abort");
+        if (_this.displayMessage)
+        	_this.displayMessage("Loading abort");
       }
     }
   } 
@@ -268,8 +267,7 @@ var ScaffoldViewer = function(typeAtStartUp)  {
         if (_this.promptFunction)
           _this.promptFunction("Enter your verifier here", "...", verifierEnteredCallback());
       } else {
-        if (_this.alertFunction)
-          _this.alertFunction("Loading abort");
+          _this.displayMessage("Loading abort");
       }
     }
   }
@@ -281,7 +279,7 @@ var ScaffoldViewer = function(typeAtStartUp)  {
 
   var parseWorkspaceResponse = function(options) {
     if (options.status === 'error')
-      _this.alertFunction(options.message);
+      _this.displayMessage(options.message);
     else if (options.status === 'success') {
       if (options.VerifyURL)
         verificationCodePrompt(options.VerifyURL);
@@ -299,7 +297,7 @@ var ScaffoldViewer = function(typeAtStartUp)  {
 	          var options = JSON.parse(xmlhttp.responseText);
 	          parseWorkspaceResponse(options);
         	} else {
-        	  _this.alertFunction("Error reading workspace");
+        	  _this.displayMessage("Error reading workspace");
         	}
         }     
       }
@@ -354,8 +352,8 @@ var ScaffoldViewer = function(typeAtStartUp)  {
             var response = JSON.parse(xmlhttp.responseText);
             if (response.status == "success")
               changesCommitted = true;
-            if (response.message && _this.alertFunction)
-              _this.alertFunction(response.message);
+            if (response.message)
+              _this.displayMessage(response.message);
           }     
         }
         var requestString = "./commitWorkspaceChanges" + "?msg=" + msg;
@@ -373,8 +371,7 @@ var ScaffoldViewer = function(typeAtStartUp)  {
         _this.promptFunction("Please enter commit message", msg, commitWorkspaceCallback());
     }
     else {
-      if (_this.alertFunction)
-        _this.alertFunction("Everything is up-to-date");
+    	_this.displayMessage("Everything is up-to-date");
     }
   }
     
@@ -385,8 +382,8 @@ var ScaffoldViewer = function(typeAtStartUp)  {
         xmlhttp.onreadystatechange = function() {
           if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             var response = JSON.parse(xmlhttp.responseText);
-            if (response.message && _this.alertFunction)
-              _this.alertFunction(response.message);
+            if (response.message)
+              _this.displayMessage(response.message);
           }     
         }
         var requestString = "./pushWorkspace";
@@ -461,14 +458,12 @@ var ScaffoldViewer = function(typeAtStartUp)  {
         console.log(response);
         if (response.data) {
           importData(response.data);
-          if (_this.alertFunction)
-            _this.alertFunction(response.message);
+          _this.displayMessage(response.message);
         }
         else if (response.message) {
           settingsChanged = true;
           _this.updateMesh();
-          if (_this.alertFunction)
-            _this.alertFunction(response.message);
+          _this.displayMessage(response.message);
         }
       }
     }
@@ -570,10 +565,10 @@ var ScaffoldViewer = function(typeAtStartUp)  {
       csg.addDatGui(parent);
   }
   
-  this.setAlertFunction = function(alertFunction) {
-	  this.alertFunction = alertFunction;
+  this.setMessageFunction = function(functionIn) {
+	  (require('./BaseModule').BaseModule).prototype.setMessageFunction.call( _this, functionIn );
 	  if (csg)
-		  csg.setAlertFunction(alertFunction);
+		  csg.setMessageFunction(functionIn);
   }
   
   /**

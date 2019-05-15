@@ -675,6 +675,10 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	          _this.scene.resetView();
 	        }
 	        var annotation = new (require('../utilities/annotation').annotation)();
+			if (partName)
+				_this.displayMessage(partName + " loaded.");
+			else 
+				_this.displayMessage("Resource loaded.");
 	        annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName};
 	        geometry.userData = [annotation];
         }
@@ -788,6 +792,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	        // Exist: Set it as current scene and update the gui.
 	        // Not: Create a new scene
 	        if (organScene == undefined) {
+	          _this.displayMessage("Loading " + name);
 	          _this.changeCompareSpecies("none");
 	          organScene = _this.zincRenderer.createScene(name);
 	          for (var i = 0; i < sceneChangedCallbacks.length;i++) {

@@ -5,6 +5,7 @@ var BaseModule = function() {
   this.typeName = "Base Module";
   this.instanceName = "default";
   this.onChangedCallbacks = [];
+  this.messageFunction = undefined;
   /**  Notifier handle for informing other modules of any changes **/
   this.eventNotifiers = [];
 }
@@ -25,6 +26,14 @@ BaseModule.prototype.publishChanges = function(annotations, eventType) {
   }
 }
 
+BaseModule.prototype.setMessageFunction = function(functionIn) {
+   this.messageFunction = functionIn;
+}
+
+BaseModule.prototype.displayMessage = function(message) {
+   if (this.messageFunction)
+	   this.messageFunction(message);
+}
 
 BaseModule.prototype.getName = function() {
   return this.instanceName;
