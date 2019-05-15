@@ -154,13 +154,14 @@ var ScaffoldDialog = function(scaffoldViewerIn, parentIn) {
     if (_myInstance.module) {
       _myInstance.create(require("../snippets/ScaffoldDialog.html"));
       modal = new (require('./Modal').PortalModal)(
-      _myInstance.container.find(".portalmodal")[0]);
+    		  _myInstance.container.find(".portalmodal")[0]);
+      var snackbar = _myInstance.getSnackbar();
       var name = _myInstance.module.getName();
       _myInstance.setTitle(name);
       var displayArea = _myInstance.container.find("#scaffoldDisplayArea")[0];
       _myInstance.module.initialiseRenderer(displayArea);
       initialiseScaffoldControlUI();
-      _myInstance.module.alertFunction = modal.alert;
+      _myInstance.module.setAlertFunction(snackbar.showMessage);
       _myInstance.module.promptFunction = modal.prompt;
       _myInstance.module.confirmFunction = modal.confirm;
       var meshTypes = _myInstance.module.getAvailableMeshTypes();

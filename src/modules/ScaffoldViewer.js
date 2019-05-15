@@ -207,6 +207,7 @@ var ScaffoldViewer = function(typeAtStartUp)  {
   //Data include meshtype, options and landmark
   var importData = function(data) {
     if (data && data.meshtype && data.options) {
+      _this.alertFunction("Importing data");
       currentMeshType = data.meshtype;
       currentOptions = data.options;
       currentLandmarks = data.landmarks;
@@ -280,7 +281,7 @@ var ScaffoldViewer = function(typeAtStartUp)  {
 
   var parseWorkspaceResponse = function(options) {
     if (options.status === 'error')
-      modal.alert(options.message);
+      _this.alertFunction(options.message);
     else if (options.status === 'success') {
       if (options.VerifyURL)
         verificationCodePrompt(options.VerifyURL);
@@ -294,8 +295,12 @@ var ScaffoldViewer = function(typeAtStartUp)  {
       var xmlhttp = new XMLHttpRequest();
       xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-          var options = JSON.parse(xmlhttp.responseText);
-          parseWorkspaceResponse(options);
+        	if (xmlhttp.status == 200) {
+	          var options = JSON.parse(xmlhttp.responseText);
+	          parseWorkspaceResponse(options);
+        	} else {
+        	  _this.alertFunction("Error reading workspace");
+        	}
         }     
       }
       var requestString = "./getWorkspaceResponse" + "?url=" + url + "&filename="+filename;
@@ -563,6 +568,12 @@ var ScaffoldViewer = function(typeAtStartUp)  {
   this.addCSGGui = function(parent) {
     if (csg)
       csg.addDatGui(parent);
+  }
+  
+  this.setAlertFunction = function(alertFunction) {
+	  this.alertFunction = alertFunction;
+	  if (csg)
+		  csg.setAlertFunction(alertFunction);
   }
   
   /**

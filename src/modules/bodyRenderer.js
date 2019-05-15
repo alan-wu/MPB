@@ -30,8 +30,13 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	  "Endocrine", "Female Reproductive", "Male Reproductive", "Special sense organs"];
 	var systemMeta = undefined;
 	var _this = this;
+	var alertFunction = undefined;
 	_this.typeName = "Body Viewer";
 	
+	this.setAlertFunction = function(alertFunctionIn) {
+		alertFunction = alertFunctionIn;
+	}
+		
 	/**
 	 * This callback is triggered when a body part is clicked.
 	 * @callback
@@ -43,6 +48,8 @@ var BodyViewer = function(ModelsLoaderIn)  {
 				if (intersects[i] !== undefined && (intersects[ i ].object.name !== undefined)) {
 					if (!intersects[ i ].object.name.includes("Body")) {
 						_this.setSelectedByObjects([intersects[ i ].object], true);
+						if (alertFunction)
+							alertFunction(intersects[ i ].object.name + " selected.");
 						return;
 					} else {
 						bodyClicked = true;
@@ -65,7 +72,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
 					  _this.displayArea.style.cursor = "pointer";
 					  _this.toolTip.setText(intersects[ i ].object.name);
 					  _this.toolTip.show(window_x, window_y);
-				    _this.setHighlightedByObjects([intersects[ i ].object], true);
+				      _this.setHighlightedByObjects([intersects[ i ].object], true);
 						return;
 					} else {
 						bodyHovered = true;
@@ -102,7 +109,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	 * @callback
 	 */
 	this.changeBodyPartsVisibility = function(name, systemName, value) {
-    var speciesMeta = systemMeta[currentSpecies];
+		var speciesMeta = systemMeta[currentSpecies];
 		if (speciesMeta[systemName].hasOwnProperty(name) && speciesMeta[systemName][name].geometry) {
 		  speciesMeta[systemName][name].geometry.setVisibility(value);
 		}
@@ -118,10 +125,10 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			item["loaded"] = ITEM_LOADED.TRUE;
 			item.geometry = geometry;
 			if (startup) {
-        for (var i = 0; i < systemPartAddedCallbacks.length;i++) {
-          systemPartAddedCallbacks[i](systemName, partName,
-            (item["loaded"] == ITEM_LOADED.TRUE));
-        }
+				for (var i = 0; i < systemPartAddedCallbacks.length;i++) {
+					systemPartAddedCallbacks[i](systemName, partName,
+							(item["loaded"] == ITEM_LOADED.TRUE));
+				}
 			}
 			if (scaling == true) {
 				geometry.morph.scale.x = 1.00;
@@ -135,6 +142,12 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			if (partName == "Body") {
 				geometry.setAlpha(0.5);
 				geometry.morph.material.side = THREE.FrontSide;
+			}
+			if (alertFunction) {
+				if (partName)
+					alertFunction(partName + " loaded.");
+				else 
+					alertFunction("Resource loaded.");
 			}
 			var annotation = new (require('../utilities/annotation').annotation)();
 			annotation.data = {species:currentSpecies, system:systemName, part:partName};
@@ -162,20 +175,20 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	}
 	
 	this.forEachPartInBody = function(callback) {
-    var speciesMeta = systemMeta[currentSpecies];
-    for (var systemName  in speciesMeta) {
-      var partMap = speciesMeta[systemName];
-      for (var partName in partMap) {
-        if (partMap.hasOwnProperty(partName)) {
-          var item = partMap[partName];
-          var visibility = false;
-          if (item && (item["loaded"] === ITEM_LOADED.TRUE) && item.geometry) {
-            visibility = item.geometry.morph.visible;
-          }
-          callback(systemName, partName, visibility);
-        }
-      }
-    }
+	    var speciesMeta = systemMeta[currentSpecies];
+	    for (var systemName  in speciesMeta) {
+	      var partMap = speciesMeta[systemName];
+	      for (var partName in partMap) {
+	        if (partMap.hasOwnProperty(partName)) {
+	          var item = partMap[partName];
+	          var visibility = false;
+	          if (item && (item["loaded"] === ITEM_LOADED.TRUE) && item.geometry) {
+	            visibility = item.geometry.morph.visible;
+	          }
+	          callback(systemName, partName, visibility);
+	        }
+	      }
+	    }
 	}
 	 
 	/**
@@ -205,6 +218,8 @@ var BodyViewer = function(ModelsLoaderIn)  {
   			var downloadPath = item["BodyURL"];
   			var scaling = false;
   			item["loaded"] =  ITEM_LOADED.DOWNLOADING;
+			if (alertFunction)
+				alertFunction("Downloading data.");
   			if (item["FileFormat"] == "JSON") {
   				if (systemName == "Musculo-skeletal" || systemName == "Skin (integument)")
   					scaling = true;
@@ -226,9 +241,9 @@ var BodyViewer = function(ModelsLoaderIn)  {
 				if (item["loadAtStartup"] == true) {
 					readModel(systemName, partName, true);
 				} else {
-	        for (var i = 0; i < systemPartAddedCallbacks.length;i++) {
-	          systemPartAddedCallbacks[i](systemName, partName, false);
-	        }
+					for (var i = 0; i < systemPartAddedCallbacks.length;i++) {
+						systemPartAddedCallbacks[i](systemName, partName, false);
+					}
 				}
 			}
 		}

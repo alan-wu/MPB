@@ -38,6 +38,7 @@ exports.csg = function(sceneIn, zincRendererIn) {
   var reverseController = undefined;
   var plane = undefined;
   var planeHelper = undefined;
+  var alertFunction = undefined;
   var guiControls = new function() {
     this.distance = 1.0;
     this.continuous = false;
@@ -190,6 +191,8 @@ exports.csg = function(sceneIn, zincRendererIn) {
 	    if (mergedGlyphGeometry === undefined && currentGlyphs) {
 	  	  mergedGlyphGeometry = csgScene.addZincGeometry(currentGlyphs, 45121, 0xffffff, 1.0);
 	    }
+    	if (alertFunction)
+    		alertFunction("Cutting the surfaces. This may take a few seconds.");
 	    zincCSG.intersect(boxGeometry).then((csg1) => {
 	    	var intersect = undefined;
 		    if (glyphsetCSG) {
@@ -218,14 +221,16 @@ exports.csg = function(sceneIn, zincRendererIn) {
 				resultCSG.terminateWorker();
 			  }).catch(
 	    	    (reason) => {
-	      		  console.log(reason);
+	    	    	if (alertFunction)
+	    	    		alertFunction(reason);
 	      	    }	  
 			  );
 			}
 			csg1.terminateWorker();
         }).catch(
     	  (reason) => {
-    		console.log(reason);
+  	    	if (alertFunction)
+	    		alertFunction(reason);
     	  }	  
         );
 	  }
@@ -418,6 +423,11 @@ exports.csg = function(sceneIn, zincRendererIn) {
   this.updatePlane = function() {
     updatePlane();
   }
+  
+  this.setAlertFunction = function(alertFunctionIn) {
+	  alertFunction = alertFunctionIn;
+  }
+  
 
   this.addDatGui = function(parent) {
     datGui = new dat.GUI({autoPlace: false});

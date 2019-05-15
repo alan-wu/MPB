@@ -19,6 +19,7 @@ var BaseDialog = function() {
   this.beforeCloseCallbacks = [];
   this.onCloseCallbacks = [];
   this.resizeStopCallbacks = [];
+  this.snackbar = undefined;
   this.title = "Default";
 }
 
@@ -123,6 +124,12 @@ BaseDialog.prototype.setTitle = function(titleIn) {
 BaseDialog.prototype.getHeight = function() {
   return this.container.dialog( "option", "height" );
 };
+
+BaseDialog.prototype.getSnackbar = function() {
+	if (this.snackbar === undefined)
+		this.snackbar = new (require("./Snackbar").Snackbar)(this.container[0]);
+	return this.snackbar;
+}
 
 BaseDialog.prototype.setHeight = function(heightIn) {
   if (typeof(heightIn) == "string") {

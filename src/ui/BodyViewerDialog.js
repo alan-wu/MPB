@@ -242,6 +242,8 @@ var BodyViewerDialog = function(bodyViewerIn, parentIn) {
       var displayArea = _myInstance.container.find("#bodyDisplayArea")[0];
       _myInstance.module.initialiseRenderer(displayArea);
       _myInstance.module.addChangedCallback(bodyViewerChangedCallback());
+      var snackbar = _myInstance.getSnackbar();
+      _myInstance.module.setAlertFunction(snackbar.showMessage);
     }
   }
   
