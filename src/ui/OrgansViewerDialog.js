@@ -1,3 +1,5 @@
+require("../styles/my_styles.css");
+
 var OrgansViewerDialog = function(organsViewerIn, parentIn) {
   (require('./BaseDialog').BaseDialog).call(this);
   this.parent = parentIn;

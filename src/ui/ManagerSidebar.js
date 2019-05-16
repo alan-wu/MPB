@@ -1,3 +1,5 @@
+require("../styles/sidebar.css");
+
 var SidebarItemArray = function() {
   var array = new Object();
   var _this = this;

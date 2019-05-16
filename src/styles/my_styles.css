@@ -1,67 +1,3 @@
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 140px;
-  height: 25px;
-  left:10%;
-}
-
-.switch input {display:none;}
-
-.switch_text {
-	position: absolute;
-	left: 50px;
-	padding-left:10%;
-	font-size: 1.2em;
-}
-
-.switchSlider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 50px;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.switchSlider:before {
-  position: absolute;
-  content: "";
-  height: 19px;
-  width: 19px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked + .switchSlider {
-  background-color: #2196F3;
-}
-
-input:focus + .switchSlider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .switchSlider:before {
-  -webkit-transform: translateX(19px);
-  -ms-transform: translateX(19px);
-  transform: translateX(19px);
-}
-
-/* Rounded switchSliders */
-.switchSlider.round {
-  border-radius: 25px;
-}
-
-.switchSlider.round:before {
-  border-radius: 50%;
-}
 
 .play {
   width:48px;
@@ -83,37 +19,6 @@ input:checked + .switchSlider:before {
 
 .pause:hover {
   background-image: url(./images/pause_hover_small.png);
-}
-
-.switchSlider_style {
-	position: absolute;
-	width:50%;
-	left:25%;
-	background-color: #FFF;
-	opacity: 1.0;
-}
-
-.screenButton {
-    position:absolute;
-    right: 1%;
-    z-index:2;
-}
-
-.bodyDisplayPortCollapse {
-	position:absolute;
-	height:100%;
-	width:25%;
-	left:0%;
-	border-right: 2px solid #000000;
-}
-
-.organsDisplayPortCollapse {
-	position:absolute;
-	height:100%;
-	width:25%;
-	left:25%;
-	border-right: 2px solid #000000;
-	display: block;
 }
 
 .tissueDisplayPortCollapse {
@@ -143,22 +48,6 @@ input:checked + .switchSlider:before {
 	display: block;
 }
 
-.apinatomyDisplayPortCollapse {
-	position:absolute;
-	height:30%;
-	width:100%;
-	top:70%;
-	border-top: 1px solid black;
-	display: block;
-}
-
-.fullPortDisplay {
-	position:relative;
-	height:100%;
-	width:100%;
-	left:0%;
-	display: block;
-}
 
 #bodyGui, #organGui, #tissueGui, #modelGui, #cellGui {
 	position: absolute;
@@ -231,16 +120,7 @@ img.model {
 	width:100%;
 }
 
-.fullPortDisplay .svgContainer {
-	height:90%;
-	width:100%;
-}
-
 #ZoomControl{
-	visibility: visible;
-}
-
-.fullPortDisplay #ZoomControl{
 	visibility: visible;
 }
 
@@ -295,11 +175,6 @@ img.model {
 	margin-top:5%;
 }
 
-.fullPortDisplay .modelButton{
-	margin-top:0%;
-	margin-left:40%;
-}
-
 #modelsController {
 	position:relative;
 	text-align:center;
@@ -309,33 +184,6 @@ img.model {
     position:absolute;
     left: 1%;
     z-index:2;
-}
-
-.fullPortDisplay #modelsController{
-	display:flex;
-}
-
-.hideApinatomyButton {
-    position:absolute;
-    left: 1%;
-    z-index:2;
-}
-
-.showApinatomyButton {
-    position:absolute;
-    left: 1%;
-    bottom: 1%;
-    z-index:2;
-    visibility:hidden;
-}
-	
-
-.topPanelExpand {
-	height:100%;
-}
-
-.topPanelCollapse {
-	height:70%;
 }
 
 .organsImg {

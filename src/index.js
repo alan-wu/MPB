@@ -1,18 +1,17 @@
 //require("./styles/bootstrap.min.css");
 require("./styles/w3.css");
-require("./styles/sidebar.css");
 require('./styles/bootstrap.min.css');
 
 exports.BaseModule = require("./modules/BaseModule").BaseModule;
 exports.BodyViewer = require("./modules/bodyRenderer").BodyViewer;
 exports.RendererModule = require("./modules/RendererModule").RendererModule;
-exports.CellPanel = require("./cell_panel").CellPanel;
+//exports.CellPanel = require("./cell_panel").CellPanel;
 exports.ModelsLoader = require("./modelsLoader").ModelsLoader;
-exports.ModelPanel = require("./modules/model_panel").ModelPanel;
-exports.ModelViewerDialog = require("./ui/ModelViewerDialog").ModelViewerDialog;
+//exports.ModelPanel = require("./modules/model_panel").ModelPanel;
+//exports.ModelViewerDialog = require("./ui/ModelViewerDialog").ModelViewerDialog;
 exports.OrgansViewer = require("./modules/organsRenderer").OrgansViewer;
 exports.ScaffoldViewer = require("./modules/ScaffoldViewer").ScaffoldViewer;
-exports.TissueViewer = require("./tissueRenderer").TissueViewer;
+//exports.TissueViewer = require("./tissueRenderer").TissueViewer;
 exports.BaseDialog = require("./ui/BaseDialog").BaseDialog;
 exports.OrgansViewerDialog = require("./ui/OrgansViewerDialog").OrgansViewerDialog;
 exports.ScaffoldDialog = require("./ui/ScaffoldDialog").ScaffoldDialog;
