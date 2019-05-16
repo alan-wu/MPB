@@ -107,3 +107,34 @@
   to {left: -30px; opacity: 0;visibility: hidden;height:0%}
 }
 
+
+select.profile {
+   background-image: url(./images/SelectArrow.png), -webkit-linear-gradient(#FAFAFA, #F4F4F4 40%, #E5E5E5);
+   -webkit-appearance: button;
+   border-radius: 10px;
+   -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+   -webkit-padding-end: 20px;
+   -webkit-padding-start: 2px;
+   -webkit-user-select: none;
+   background-position: 97% center;
+   background-repeat: no-repeat;
+   border: 1px solid #AAA;
+   color: #555;
+   font-size: inherit;
+   margin: 20px;
+   overflow: hidden;
+   padding: 5px 10px;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+   width: 80%;
+   left:10%;
+   cursor: pointer;
+}
+
+select.green {
+   background-image: url(./images/SelectArrow.png), -webkit-linear-gradient(#207978, #207978 40%, #207978);
+   color: #fff;
+   background-color: #207978;
+   padding-left: 10px;
+}
+

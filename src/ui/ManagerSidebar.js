@@ -216,6 +216,10 @@ var ManagerSidebar = function(parentIn) {
     jelem.find("#sidebarOpen")[0].style.display = "block";
   }
   
+  this.showProfileSelect = function() {
+	  jelem.find("#profileSelect")[0].style.display = "block";
+  }
+  
   this.setWidth = function(widthIn) {
     sidebarEle.style.width  = widthIn;
   }
@@ -384,6 +388,7 @@ var ManagerSidebar = function(parentIn) {
     });
     
     addUICallback();
+
   }
   
   this.addManager = function(manager) {
