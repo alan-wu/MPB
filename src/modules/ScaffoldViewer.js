@@ -571,6 +571,12 @@ var ScaffoldViewer = function(typeAtStartUp)  {
 		  csg.setMessageFunction(functionIn);
   }
   
+  this.destroy = function() {
+	if (csg)
+	  csg.clear();
+    (require('./RendererModule').RendererModule).prototype.destroy.call( _this );
+  }
+  
   /**
    * Initialise the {@link PJP.BodyViewer}, it will create a detached renderer until
    * a display area is passed in as an argument on intialiseRenderer.

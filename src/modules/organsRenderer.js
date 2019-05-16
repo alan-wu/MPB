@@ -883,16 +883,11 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	  }
 	  
 	  this.destroy = function() {
-	    if (_this.zincRenderer) {
-	      _this.zincRenderer.dispose();
-	      _this.zincRenderer.getThreeJSRenderer().dispose();
-	      _this.zincRenderer = undefined;
-	    }
 	    if (secondaryRenderer) {
 	      secondaryRenderer.dispose();
 	      secondaryRenderer = null;
 	    }
-	    (require('./BaseModule').BaseModule).prototype.destroy.call( _this );
+	    (require('./RendererModule').RendererModule).prototype.destroy.call( _this );
 	  }
 
 	/**

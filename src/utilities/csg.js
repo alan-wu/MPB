@@ -56,6 +56,7 @@ exports.csg = function(sceneIn, zincRendererIn) {
   var originalGlyphs = undefined;
   var zincRenderer = zincRendererIn;
   var preRenderCallbackId = -1;
+  var _this = this;
 
   var getCentroid = function() {
     if (currentGeometry) {
@@ -404,17 +405,21 @@ exports.csg = function(sceneIn, zincRendererIn) {
 	  }
   }
   
+  this.clear = function() {
+    csgScene.clearAll();
+    if (zincCSG)
+    	zincCSG.terminateWorker();
+    zincCSG = undefined;
+    boxGeometry = undefined;
+    currentGeometry = undefined;
+    if (scene)
+    	scene.removeObject(planeHelper);
+    planeHelper = undefined;
+  }
+  
   this.reset = function() {
-	    csgScene.clearAll();
-	    if (zincCSG)
-	    	zincCSG.terminateWorker();
-	    zincCSG = undefined;
-	    boxGeometry = undefined;
-	    currentGeometry = undefined;
-	    if (scene)
-	    	scene.removeObject(planeHelper);
-	    planeHelper = undefined;
-	    createCube(1, 1, 0.0005);
+    _this.clear();
+    createCube(1, 1, 0.0005);
   }
   
   this.updatePlane = function() {
