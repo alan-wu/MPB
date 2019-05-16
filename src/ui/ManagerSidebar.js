@@ -205,12 +205,14 @@ var ManagerSidebar = function(parentIn) {
   var _this = this;
 
   this.open = function() {
-    sidebarEle.style.display = "block";
+    //sidebarEle.style.display = "block";
+    sidebarEle.className = sidebarEle.className.replace(" leftHide", " leftShow");
     jelem.find("#sidebarOpen")[0].style.display = "none";
   }
 
   this.close = function() {
-    sidebarEle.style.display = "none";
+    //sidebarEle.style.display = "none";
+	sidebarEle.className = sidebarEle.className.replace(" leftShow", " leftHide");
     jelem.find("#sidebarOpen")[0].style.display = "block";
   }
   

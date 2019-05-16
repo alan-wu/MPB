@@ -56,13 +56,13 @@
 .sidebar-module:hover {background-color: #b2d8ff  !important;}
 
 .sidebar {
-	display:none;
 	z-index:20000000;
-	opacity:0.9;
 	color: #fff;
 	background-color:#00357d;
-	height: 100%;
 	position:relative!important;
+	opacity: 0;
+  	visibility: hidden; /* Show the snackbar */
+  	overflow: auto;
 }
 
 .sidebar-topbutton {
@@ -70,3 +70,40 @@
 }
 
 .sidebar-topbutton:hover {background-color: #b2d8ff  !important;}
+
+.sidebar.leftShow {
+  opacity: 0.9;
+  visibility: visible;
+  display:block;
+  -webkit-animation: leftin 0.5s;
+  animation: leftin 0.5s;
+  height:100%;
+}
+
+.sidebar.leftHide {
+  -webkit-animation: leftout 0.5s;
+  animation: leftout 0.5s;
+  height:0%;
+}
+
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes leftin {
+  from {left: -30px; opacity: 0;height:0%;} 
+  to {left: 0px; opacity: 0.9;height:100%;}
+}
+
+@keyframes leftin {
+  from {left: -30px; opacity: 0;height:0%;}
+  to {left: 0px; opacity: 0.9;height:100%;}
+}
+
+@-webkit-keyframes leftout {
+  from {left: 0px; opacity: 0.9;height:100%;visibility:visible;} 
+  to {left: -30px; opacity: 0;height:0%;visibility:hidden;}
+}
+
+@keyframes leftout {
+  from {left: 0px; opacity: 0.9;visibility: visible;height:100%}
+  to {left: -30px; opacity: 0;visibility: hidden;height:0%}
+}
+
