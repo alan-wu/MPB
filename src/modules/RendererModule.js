@@ -38,6 +38,12 @@ RendererModule.prototype.setSelectedByObjects = function(objects, propagateChang
   return changed;
 }
 
+var addGlyphToArray = function(objects) {
+    return function(glyph) {
+      objects.push(glyph.getMesh());
+    }
+  }
+
 RendererModule.prototype.findObjectsByGroupName = function(groupName) {
   var geometries = this.scene.findGeometriesWithGroupName(groupName);
   var objects = [];

@@ -233,12 +233,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
       organPartAddedCallbacks.push(callback);
   }
  
-  var addGlyphToArray = function(objects) {
-    return function(glyph) {
-      objects.push(glyph.getMesh());
-    }
-  }
-  
+ 
   var publishChanges = function(objects, eventType) {
     var ids = [];
     for (var i = 0; i < objects.length; i++) {
@@ -746,6 +741,30 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	      readSpeciesIntoSecondaryRenderer(species);
 	    }
 	  }
+	  
+	  var setSceneData = function(speciesName, systemName, partName, organsDetails) {
+	        sceneData.nerveMapIsActive = false;
+	        sceneData.associateData = undefined;
+	        sceneData.dataFields = undefined;
+	        sceneData.externalOrganLink = undefined;
+	        sceneData.nerveMap = undefined; 
+	        sceneData.currentSpecies = speciesName;
+	        sceneData.currentSystem = systemName;
+	        sceneData.currentPart = partName;
+	        // This is used as title
+	        var name = speciesName + "/" + systemName + "/" + partName;
+	        //Get informations from the array
+	        if (organsDetails !== undefined) {
+	        	if (organsDetails.sceneName !== undefined)
+	        		name = speciesName + "/" + organsDetails.sceneName;
+		        sceneData.associateData = organsDetails.associateData;
+		        if (organsDetails.fields)
+		        	sceneData.dataFields = organsDetails.fields;
+		        sceneData.externalOrganLink = organsDetails.externalLink;
+		        sceneData.nerveMap = organsDetails.nerveMap;
+		    }
+	        var name = sceneData.currentName;
+	  }
 
 	  /**
 	   * Load organ(s) with the provided species, system and part. This will update
@@ -763,30 +782,10 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	    if (_this.zincRenderer) {
 	      if (speciesName && systemName && partName) {
 	        resetZoom();
-	        sceneData.currentSpecies = speciesName;
-	        sceneData.currentSystem = systemName;
-	        sceneData.currentPart = partName;
-	        sceneData.nerveMapIsActive = false;
+	        var organsDetails = getOrganDetails(speciesName, systemName, partName);
+	        setSceneData(speciesName, systemName, partName, organsDetails);
 	        compareSceneIsOn = false;
-	        // This is used as title
-	        var name = speciesName + "/" + systemName + "/" + partName;
-	        //Get informations from the array
-	        var organsDetails = getOrganDetails(sceneData.currentSpecies, systemName, partName);
-	        sceneData.associateData = undefined;
-	        sceneData.dataFields = undefined;
-	        sceneData.externalOrganLink = undefined;
-	        sceneData.nerveMap = undefined;
-	        if (organsDetails !== undefined){
-	          if (organsDetails.sceneName !== undefined)
-	            name = speciesName + "/" + organsDetails.sceneName;
-	          sceneData.associateData = organsDetails.associateData;
-	          if (organsDetails.fields)
-	            sceneData.dataFields = organsDetails.fields;
-	          sceneData.externalOrganLink = organsDetails.externalLink;
-	          sceneData.nerveMap = organsDetails.nerveMap;
-	        }
-	        sceneData.currentName = name;
-
+	        var name = sceneData.currentName;
 	        var organScene = _this.zincRenderer.getSceneByName(name);
 	        // Check if organ scene exist,
 	        // Exist: Set it as current scene and update the gui.
