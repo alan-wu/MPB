@@ -63,6 +63,7 @@
 	opacity: 0;
   	visibility: hidden; /* Show the snackbar */
   	overflow: auto;
+  	width: 12%;
 }
 
 .sidebar-topbutton {
