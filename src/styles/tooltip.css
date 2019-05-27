@@ -3,6 +3,7 @@
 	background-color: #fff;
 	pointer-events: none;
 	cursor: pointer;
+	user-select: none;
 }
 
 .tooltip {
