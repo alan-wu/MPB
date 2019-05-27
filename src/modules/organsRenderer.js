@@ -227,37 +227,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
     if (typeof(callback === "function"))
       organPartAddedCallbacks.push(callback);
   }
- 
-	/*
-  var publishChanges = function(objects, eventType) {
-    var ids = [];
-    for (var i = 0; i < objects.length; i++) {
-      ids[i] = objects[i].name;
-    }
-    for (var i = 0; i < _this.eventNotifiers.length; i++) {
-      _this.eventNotifiers[i].publish(_this, eventType, ids);
-    }
-  }
-	
-  this.setHighlightedByObjects = function(objects, propagateChanges) {
-    var changed = _this.graphicsHighlight.setHighlighted(objects);
-    if (changed && propagateChanges) {
-      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
-      publishChanges(objects, eventType);
-    }
-    return changed;
-  }
-  
-  this.setSelectedByObjects = function(objects, propagateChanges) {
-    var changed = _this.graphicsHighlight.setSelected(objects);
-    if (changed && propagateChanges) {
-      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
-      publishChanges(objects, eventType);
-    }
-    return changed;
-  }
-  */
-
+	 
 	/** 
 	 * Callback function when a pickable object has been picked. It will then call functions in tissueViewer
 	 * and cellPanel to show corresponding informations.
@@ -266,23 +236,24 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	 */
 	var _pickingCallback = function() {
 		return function(intersects, window_x, window_y) {
-			if (intersects[0] !== undefined) {
+			var intersected = _this.getIntersectedObject(intersects);
+			if (intersected !== undefined) {
 				if (_this.scene.sceneName == "human/Cardiovascular/Heart") {
-					var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
-					intersects[ 0 ].object.name = id.toString();
+					var id = Math.round(intersected.object.material.color.b * 255) ;
+					intersected.object.name = id.toString();
 					if (_this.toolTip !== undefined) {
 						_this.toolTip.setText("Node " + id);
 						_this.toolTip.show(window_x, window_y);
 					}
-					_this.displayMessage(intersects[ 0 ].object.name + " selected.");
-					_this.setSelectedByObjects([intersects[ 0 ].object], true);
-				} else if (intersects[ 0 ].object.name) {
+					_this.displayMessage(intersected.object.name + " selected.");
+					_this.setSelectedByObjects([intersected.object], true);
+				} else if (intersected.object.name) {
 					if (_this.toolTip !== undefined) {
-						_this.toolTip.setText(intersects[ 0 ].object.name);
+						_this.toolTip.setText(intersected.object.name);
 						_this.toolTip.show(window_x, window_y);
 					}
-					_this.displayMessage(intersects[ 0 ].object.name + " selected.");
-					_this.setSelectedByObjects([intersects[ 0 ].object], true);
+					_this.displayMessage(intersected.object.name + " selected.");
+					_this.setSelectedByObjects([intersected.object], true);
 				}
 			} else {
 				if (_this.toolTip !== undefined) {
@@ -301,25 +272,26 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	 */
 	var _hoverCallback = function() {
 		return function(intersects, window_x, window_y) {
-			if (intersects[0] !== undefined) {
+			var intersected = _this.getIntersectedObject(intersects);
+			if (intersected !== undefined) {
 				if (_this.scene.sceneName == "human/Cardiovascular/Heart") {
-					var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
+					var id = Math.round(intersected.object.material.color.b * 255) ;
 					//a temporary hack to put id into object name, this will be done differently
-					intersects[ 0 ].object.name = id.toString();
+					intersected.object.name = id.toString();
 					_this.displayArea.style.cursor = "pointer";
 					if (_this.toolTip !== undefined) {
 						_this.toolTip.setText("Node " + id);
 						_this.toolTip.show(window_x, window_y);
 					}
-					_this.setHighlightedByObjects([intersects[ 0 ].object], true);
+					_this.setHighlightedByObjects([intersected.object], true);
 					return;
-				} else if (intersects[ 0 ].object.name) {
+				} else if (intersected.object.name) {
 				  _this.displayArea.style.cursor = "pointer";
 				  if (_this.toolTip !== undefined) {
-  					_this.toolTip.setText(intersects[ 0 ].object.name);
+  					_this.toolTip.setText(intersected.object.name);
   					_this.toolTip.show(window_x, window_y);
 				  }
-				  _this.setHighlightedByObjects([intersects[ 0 ].object], true);
+				  _this.setHighlightedByObjects([intersected.object], true);
 				  return;
 				}
 			} else {
@@ -911,115 +883,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
   }
 	 
 	initialise();
-	
-	if (0) {
-    require([
-             "dojo/ready",
-             "dojo/dom",
-             "cbtree/Tree",                     // Checkbox tree
-             "cbtree/model/TreeStoreModel",   // Object Store Forest Model
-             "cbtree/store/ObjectStore"         // Object Store with Hierarchy
-             ], function( ready, dom, Tree, ObjectStoreModel, ObjectStore) {
 
-               var store = new ObjectStore( { url:"models/organsViewerModels/digestive/stomach/store/neuritemap.json", idProperty:"id"});
-               var model = new ObjectStoreModel( { store: store,
-                                                    query: {name: "Root"},
-                                                    rootLabel: "All",
-                                                    checkedRoot: true
-                                                  });
-               var imgEle = {};
-               var imgPrefix = "models/organsViewerModels/digestive/stomach/nerve_map/texture/";
-               var tree = undefined;
-               var imageUpdated = false;
-            	   
-               function modelItemChanged(item, propertyName, newValue, oldValue) {
-            	  if (item.img) {
-            		  if (propertyName == "checked") {
-            			  var elem = imgEle[item.id];
-            			  if (newValue == false) {
-            				  elem.style.display = "none";
-                			  imageCombiner.removeElement(elem);
-            			  } else {
-            				  elem.style.display = "inline";
-            				  imageCombiner.addElement(elem);
-            			  }
-            			  imageUpdated = true;
-            		  }
-            	  }
-               }
-               
-               function checkBoxClicked(item, node, event) {
-            	   if (imageUpdated) {
-            		   var bitmap = imageCombiner.getCombinedImage();
-            		   setTextureForScene(nerveMapScene, bitmap);
-            		   imageUpdated = false;
-            	   }
-               }
-               
-               function forEachChildrenCreateImageElements(container) {
-            	   return function (childrenArray) {
-            		   for (var i = 0; i < childrenArray.length; i++) {
-            			  var currentItem = childrenArray[i];
-            			  if (currentItem.img) {
-            				  var imgURL = imgPrefix + currentItem.img;
-            				  var elem = document.createElement("img");
-            				  elem.className = "organsImg";
-            				  elem.src = imgURL; 
-            				  elem.style.display = "none";
-            				  container.appendChild(elem);
-            				  imgEle[currentItem.id] = elem;
-            				  if (currentItem.checked == true) {
-            					  elem.style.display = "inline";
-            					  imageCombiner.addElement(elem);
-            				  }
-            			  }
-            			  if (currentItem.colour) {
-            				  if (tree._itemNodesMap[currentItem.id]) {
-            					  var nodeElem = tree._itemNodesMap[currentItem.id][0].labelNode;
-            					  if (nodeElem) {
-            						  nodeElem.style.color = "#" + currentItem.colour;
-            					  }	  
-            				  }
-            			  }
-            			  model.getChildren(currentItem, forEachChildrenCreateImageElements(container));
-            		   }
-            	   }
-               }
-				
-           	/**
-           	 * Setup the tree for toggling parts of the nerve map texture/image.
-           	 * Uses dojo tree and checkbox for the UI and ImageCombiner for image composition.
-           	 */
-               function rootIsReady() {
-                 return function(root) {
-                   var height = dialogObject.find("#organsRootImage")[0].height;
-                   var width = dialogObject.find("#organsRootImage")[0].width;
-                   imageCombiner = new ImageCombiner();
-                   imageCombiner.setSize(width, height);
-                   imageCombiner.addElement(dialogObject.find("#organsRootImage")[0]);
-                   var container = dom.byId("organsImgContainer");
-                   model.getChildren(root, forEachChildrenCreateImageElements(container));
-                   var bitmap = imageCombiner.getCombinedImage();
-                   setTextureForScene(nerveMapScene, bitmap);
-                 }
-               }
-
-               ready( function () {
-                 tree = new Tree( { model: model,
-                   autoExpand:true,
-                   branchIcons:false,
-                   leafIcons: false,
-                 } );
-                 tree.domNode.style.height = "100%";
-                 tree.domNode.style.fontSize = "70%";
-                 model.getRoot(rootIsReady());
-                 model.on("change", modelItemChanged);
-                 tree.on("checkBoxClick", checkBoxClicked);
-                 tree.placeAt( "CheckboxTree" );
-                 tree.startup();
-               });
-    });
-	}
 }
 
 OrgansViewer.prototype = Object.create((require('./RendererModule').RendererModule).prototype);

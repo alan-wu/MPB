@@ -12,6 +12,31 @@ var RendererModule = function()  {
 
 RendererModule.prototype = Object.create((require('./BaseModule').BaseModule).prototype);
 
+/**
+ * This function will get the the first intersected object with name or
+ * the first glyph object with name.
+ */
+RendererModule.prototype.getIntersectedObject = function(intersects) {
+	if (intersects) {
+		var intersected = undefined;
+		for (var i = 0; i < intersects.length; i++) {
+			if (intersects[i] !== undefined) {
+				if (intersects[i].object && intersects[i].object.name) {					
+					if (intersected === undefined)
+						intersected = intersects[i];
+					if (intersects[i].object.userData && 
+					  (intersects[i].object.userData.isGlyph !== undefined)) {
+						return intersects[i];
+					}
+				} 
+				
+			}
+		}
+		return intersected;
+	}
+	return undefined;
+}
+
 RendererModule.prototype.setHighlightedByObjects = function(objects, propagateChanges) {
   var changed = this.graphicsHighlight.setHighlighted(objects);
   if (changed && propagateChanges) {
