@@ -31,7 +31,13 @@ RendererModule.prototype.setSelectedByObjects = function(objects, propagateChang
     var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
     var annotations = [];
     for (var i = 0; i < objects.length; i++) {
-      annotations[i] = objects[i].userData.userData[0];
+    	if (objects[i].userData.userData[0] !== undefined)
+    		annotations[i] = objects[i].userData.userData[0];
+    	else if (objects[i].name !== undefined) {
+	        var annotation = new (require('../utilities/annotation').annotation)();
+	        annotation.data = {species:undefined, system:undefined, part:objects[i].name};
+	        annotations[i] = annotation;
+    	}
     }
     this.publishChanges(annotations, eventType);
   }

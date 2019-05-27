@@ -49,7 +49,6 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	 * {ImageCombiner}.
 	 */
 	var imageCombiner = undefined;
-	var tissueViewer = undefined;
 	var cellPanel = undefined;
 	var modelPanel = undefined;
 	var modelsLoader = ModelsLoaderIn;
@@ -149,11 +148,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	organsFileMap['human'] = humanOrgansFileMap;
 	organsFileMap['rat'] = ratOrgansFileMap;
 	
-	
-	this.setTissueViewer = function(TissueViewerIn) {
-		tissueViewer = TissueViewerIn;
-	}
-	
+
 	this.setCellPanel = function(CellPanelIn) {
 		cellPanel = CellPanelIn;
 	}
@@ -233,7 +228,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
       organPartAddedCallbacks.push(callback);
   }
  
- 
+	/*
   var publishChanges = function(objects, eventType) {
     var ids = [];
     for (var i = 0; i < objects.length; i++) {
@@ -261,6 +256,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
     }
     return changed;
   }
+  */
 
 	/** 
 	 * Callback function when a pickable object has been picked. It will then call functions in tissueViewer
@@ -270,40 +266,29 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	 */
 	var _pickingCallback = function() {
 		return function(intersects, window_x, window_y) {
-		  
 			if (intersects[0] !== undefined) {
 				if (_this.scene.sceneName == "human/Cardiovascular/Heart") {
 					var id = Math.round(intersects[ 0 ].object.material.color.b * 255) ;
 					intersects[ 0 ].object.name = id.toString();
-					//console.log(intersects[ 0 ].object.userData);
 					if (_this.toolTip !== undefined) {
-  					_this.toolTip.setText("Node " + id);
-  					_this.toolTip.show(window_x, window_y);
+						_this.toolTip.setText("Node " + id);
+						_this.toolTip.show(window_x, window_y);
 					}
-					var tissueTitle = "<strong>Tissue: <span style='color:#FF4444'>" + id + "</span></strong>";
-					if (tissueViewer) {
-						tissueViewer.setTissueTitleString(tissueTitle);
-						tissueViewer.showButtons(true);
-						tissueViewer.showCollagenVisible(true);
+					_this.displayMessage(intersects[ 0 ].object.name + " selected.");
+					_this.setSelectedByObjects([intersects[ 0 ].object], true);
+				} else if (intersects[ 0 ].object.name) {
+					if (_this.toolTip !== undefined) {
+						_this.toolTip.setText(intersects[ 0 ].object.name);
+						_this.toolTip.show(window_x, window_y);
 					}
+					_this.displayMessage(intersects[ 0 ].object.name + " selected.");
 					_this.setSelectedByObjects([intersects[ 0 ].object], true);
-				} else if (_this.scene.sceneName.includes("human/Cardiovascular/Arterial")) {
-				  if (_this.toolTip !== undefined) {
-				    _this.toolTip.setText("Click to show vascular model");
-				    _this.toolTip.show(window_x, window_y);
-				  }
-					if (tissueViewer)
-						tissueViewer.resetTissuePanel();
-					if (cellPanel)
-						cellPanel.resetCellPanel();
-					if (modelPanel)
-						modelPanel.openModel("BG_Circulation_Model.svg");
-					_this.setSelectedByObjects([intersects[ 0 ].object], true);
-				} else if ((_this.scene.sceneName.includes("human/Cardiovascular/ScaffoldHeart"))||
-            (_this.scene.sceneName.includes("human/Cardiovascular/ScaffoldVentricle"))) {
-				  if (intersects[ 0 ].object.name)
-				    _this.setSelectedByObjects([intersects[ 0 ].object], true);
-				} 
+				}
+			} else {
+				if (_this.toolTip !== undefined) {
+					_this.toolTip.hide();
+				}
+				_this.setSelectedByObjects([], true);
 			}
 		}
 	};
@@ -323,42 +308,26 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 					intersects[ 0 ].object.name = id.toString();
 					_this.displayArea.style.cursor = "pointer";
 					if (_this.toolTip !== undefined) {
-  	        _this.toolTip.setText("Node " + id);
-  	        _this.toolTip.show(window_x, window_y);
+						_this.toolTip.setText("Node " + id);
+						_this.toolTip.show(window_x, window_y);
 					}
 					_this.setHighlightedByObjects([intersects[ 0 ].object], true);
 					return;
-				} else if (_this.scene.sceneName.includes("human/Cardiovascular/Arterial")) {
+				} else if (intersects[ 0 ].object.name) {
 				  _this.displayArea.style.cursor = "pointer";
 				  if (_this.toolTip !== undefined) {
-  					_this.toolTip.setText("Click to show vascular model");
+  					_this.toolTip.setText(intersects[ 0 ].object.name);
   					_this.toolTip.show(window_x, window_y);
 				  }
 				  _this.setHighlightedByObjects([intersects[ 0 ].object], true);
 				  return;
-				} else if ((_this.scene.sceneName.includes("human/Cardiovascular/ScaffoldHeart")) ||
-				    (_this.scene.sceneName.includes("human/Cardiovascular/ScaffoldVentricle"))) {
-				  _this.displayArea.style.cursor = "pointer";
-          if (intersects[ 0 ].object.name) {
-            if (_this.toolTip !== undefined) {
-              _this.toolTip.setText(intersects[ 0 ].object.name);
-              _this.toolTip.show(window_x, window_y);
-            }
-            _this.setHighlightedByObjects([intersects[ 0 ].object], true);
-          } else {
-            if (_this.toolTip !== undefined) {
-              _this.toolTip.hide();
-            }
-            _this.setHighlightedByObjects([], true);
-          }
-        }
-			}
-			else {
-			  if (_this.toolTip !== undefined) {
-			    _this.toolTip.hide();
-			  }
-			  _this.displayArea.style.cursor = "auto";
-			  _this.setHighlightedByObjects([], true);
+				}
+			} else {
+				if (_this.toolTip !== undefined) {
+					_this.toolTip.hide();
+				}
+				_this.displayArea.style.cursor = "auto";
+				_this.setHighlightedByObjects([], true);
 			}
 		}
 	};
@@ -670,12 +639,12 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	          _this.scene.resetView();
 	        }
 	        var annotation = new (require('../utilities/annotation').annotation)();
+	        annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName};
+	        geometry.userData = [annotation];
 			if (partName)
 				_this.displayMessage(partName + " loaded.");
 			else 
 				_this.displayMessage("Resource loaded.");
-	        annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName};
-	        geometry.userData = [annotation];
         }
       }
     }
@@ -763,7 +732,37 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		        sceneData.externalOrganLink = organsDetails.externalLink;
 		        sceneData.nerveMap = organsDetails.nerveMap;
 		    }
-	        var name = sceneData.currentName;
+	        sceneData.currentName= name;
+	  }
+
+	  this.loadOrgansFromURL= function(url, speciesName, systemName, partName) {
+		  if (_this.zincRenderer) {
+			  if (speciesName && systemName && partName) {
+				  resetZoom();
+			      setSceneData(speciesName, systemName, partName, undefined);
+			      compareSceneIsOn = false;
+			      var name = sceneData.currentName;
+			      var organScene = _this.zincRenderer.getSceneByName(name);
+			      if (organScene) {
+			    	  organScene.clearAll();
+			      } else {
+			    	  organScene = _this.zincRenderer.createScene(name);
+			      }
+			      for (var i = 0; i < sceneChangedCallbacks.length;i++) {
+			    	  sceneChangedCallbacks[i](sceneData);
+			      }
+			      organScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
+			      organScene.loadMetadataURL(url, _addOrganPartCallback(systemName, partName, false));
+			      _this.scene = organScene;
+			      _this.zincRenderer.setCurrentScene(organScene);
+			      _this.changeCompareSpecies("none");
+			      _this.graphicsHighlight.reset();
+			      var zincCameraControl = organScene.getZincCameraControls();
+			      zincCameraControl.enableRaycaster(organScene, _pickingCallback(), _hoverCallback());
+			      zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
+			      zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
+			  }
+		  }
 	  }
 
 	  /**
