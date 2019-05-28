@@ -6,14 +6,14 @@
 	user-select: none;
 }
 
-.tooltip {
+.mptooltip {
 	position: relative;
 	display: inline-block;
 	border-bottom: 1px dotted black;
 	pointer-events: none;
 }
 
-.tooltip .tooltiptext {
+.mptooltip .mptooltiptext {
 		font: 500 1em "Lucida Sans Unicode", "Lucida Grande", sans-serif;
     visibility: hidden;
     width: 120px;
@@ -34,7 +34,7 @@
     pointer-events: none;
 }
 
-.tooltip .tooltiptext::after {
+.mptooltip .mptooltiptext::after {
     content: "";
     position: absolute;
     top: 100%;
