@@ -498,10 +498,10 @@ var OrgansViewer = function(ModelsLoaderIn)  {
   }
 	
 	var imgZoom = function() {
-		var cssRule = (require('../utility').findCSSRule)(".organsImg");
-		var zoom = currentImgZoom * 100 + "%";
-		cssRule.style["max-height"] = zoom; 
-		cssRule.style["max-width"] = zoom;
+	//	var cssRule = (require('../utility').findCSSRule)(".organsImg");
+	//	var zoom = currentImgZoom * 100 + "%";
+	//	cssRule.style["max-height"] = zoom; 
+	//	cssRule.style["max-width"] = zoom;
 	}
 
 	var imgZoomIn = function(ratio) {
@@ -707,7 +707,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	        sceneData.currentName= name;
 	  }
 
-	  this.loadOrgansFromURL= function(url, speciesName, systemName, partName) {
+	  this.loadOrgansFromURL= function(url, speciesName, systemName, partName, viewURL) {
 		  if (_this.zincRenderer) {
 			  if (speciesName && systemName && partName) {
 				  resetZoom();
@@ -723,7 +723,10 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			      for (var i = 0; i < sceneChangedCallbacks.length;i++) {
 			    	  sceneChangedCallbacks[i](sceneData);
 			      }
-			      organScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
+			      if (viewURL)
+			    	  organScene.loadViewURL(viewURL);
+			      else
+			    	  organScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
 			      organScene.loadMetadataURL(url, _addOrganPartCallback(systemName, partName, false));
 			      _this.scene = organScene;
 			      _this.zincRenderer.setCurrentScene(organScene);
