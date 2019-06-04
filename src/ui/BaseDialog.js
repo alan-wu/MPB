@@ -13,6 +13,7 @@ var BaseDialog = function() {
   this.container = undefined;
   this.module = undefined;
   this.parent = undefined;
+  this.containment = undefined;
   this.content = undefined;
   this.datGui = undefined;
   this.UIIsReady = false;
@@ -66,6 +67,7 @@ BaseDialog.prototype.resizeStopCallback = function(myInstance) {
 BaseDialog.prototype.create = function(htmlData) {
   this.container = $('<div></div>');
   this.container.attr('title', this.title);
+  console.log(this.parent);
   if (this.parent === undefined)
 	  this.parent = $('body');
   this.container.dialog({
@@ -77,6 +79,7 @@ BaseDialog.prototype.create = function(htmlData) {
     closeOnEscape: false,
     position: { my: "left top", at: "left top", of: this.parent},
     resize: function() {
+      console.log($(this).parent());
       var heightPadding = parseInt($(this).css('padding-top'), 10) + parseInt($(this).css('padding-bottom'), 10),
         widthPadding = parseInt($(this).css('padding-left'), 10) + parseInt($(this).css('padding-right'), 10),
         titlebarMargin = parseInt($(this).prev('.ui-dialog-titlebar').css('margin-bottom'), 10);

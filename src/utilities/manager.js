@@ -25,15 +25,6 @@ exports.ModuleManager = function() {
       var dialog = new (require("../ui/OrgansViewerDialog").OrgansViewerDialog)(module, parent);
       return dialog; 
     }
-    this["Model Panel"] = [];
-    this["Model Panel"].module = function() {
-      var module = new (require("../modules/model_panel").ModelPanel)();
-      return module; 
-    }
-    this["Model Panel"].dialog=  function(module, parent) {
-      var dialog = new (require("../ui/ModelViewerDialog").ModelViewerDialog)(module, parent);
-      return dialog; 
-    }
     this["Scaffold Viewer"] = [];
     this["Scaffold Viewer"].module = function() {
       var module = new (require("../modules/ScaffoldViewer").ScaffoldViewer)();
