@@ -59,7 +59,7 @@
 	z-index:20000000;
 	color: #fff;
 	background-color:#00357d;
-	position:relative!important;
+	position:absolute!important;
 	opacity: 0;
   	visibility: hidden; /* Show the snackbar */
   	overflow: auto;
