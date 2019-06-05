@@ -1,6 +1,5 @@
 var THREE = require('zincjs').THREE;
 var ITEM_LOADED = require("../utility").ITEM_LOADED;
-
 /**
  * Provides rendering of the 3D-scaffold data in the dom of the provided id with models
  * defined in the modelsLoader.
@@ -40,7 +39,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			var bodyClicked = false;
 			for (var i = 0; i < intersects.length; i++) {
 				if (intersects[i] !== undefined && (intersects[ i ].object.name !== undefined)) {
-					if (!intersects[ i ].object.name.includes("Body")) {
+					if (intersects[ i ].object.name.indexOf("Body") === -1) {
 						_this.setSelectedByObjects([intersects[ i ].object], true);
 						_this.displayMessage(intersects[ i ].object.name + " selected.");
 						return;
@@ -61,7 +60,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			var bodyHovered = false;
 			for (var i = 0; i < intersects.length; i++) {
 				if (intersects[i] !== undefined && (intersects[ i ].object.name !== undefined)) {
-					if (!intersects[ i ].object.name.includes("Body")) {
+					if (intersects[ i ].object.name.indexOf("Body") === -1) {
 					  _this.displayArea.style.cursor = "pointer";
 					  _this.toolTip.setText(intersects[ i ].object.name);
 					  _this.toolTip.show(window_x, window_y);
@@ -204,7 +203,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	var readModel = function(systemName, partName, startup) {
 	  if (_this.scene) {
       var speciesMeta = systemMeta[currentSpecies];
-  		item = speciesMeta[systemName][partName];
+  		var item = speciesMeta[systemName][partName];
   		if (item["loaded"] ==  ITEM_LOADED.FALSE) {
   			var downloadPath = item["BodyURL"];
   			var scaling = false;

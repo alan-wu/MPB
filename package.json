@@ -53,5 +53,7 @@
     "webpack-jquery-ui": "^1.0.0",
     "zincjs": "^0.29.11"
   },
-  "dependencies": {}
+  "dependencies": {
+    "polyfill-array-includes": "^2.0.0"
+  }
 }
