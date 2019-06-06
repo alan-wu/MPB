@@ -12,8 +12,8 @@ exports.ModuleManager = function() {
       module.readSystemMeta();
       return module; 
     }
-    this["Body Viewer"].dialog = function(module, parent) {
-      var dialog = new (require("../ui/BodyViewerDialog").BodyViewerDialog)(module, parent);
+    this["Body Viewer"].dialog = function(module, parent, options) {
+      var dialog = new (require("../ui/BodyViewerDialog").BodyViewerDialog)(module, parent, options);
       return dialog; 
     }
     this["Organs Viewer"] = [];
@@ -21,8 +21,8 @@ exports.ModuleManager = function() {
       var module = new (require("../modules/organsRenderer").OrgansViewer)(modelsLoader);
       return module; 
     }
-    this["Organs Viewer"].dialog = function(module, parent) {
-      var dialog = new (require("../ui/OrgansViewerDialog").OrgansViewerDialog)(module, parent);
+    this["Organs Viewer"].dialog = function(module, parent, options) {
+      var dialog = new (require("../ui/OrgansViewerDialog").OrgansViewerDialog)(module, parent, options);
       return dialog; 
     }
     this["Scaffold Viewer"] = [];
@@ -30,8 +30,8 @@ exports.ModuleManager = function() {
       var module = new (require("../modules/ScaffoldViewer").ScaffoldViewer)();
       return module; 
     }
-    this["Scaffold Viewer"].dialog = function(module, parent) {
-      var dialog = new (require("../ui/ScaffoldDialog").ScaffoldDialog)(module, parent);
+    this["Scaffold Viewer"].dialog = function(module, parent, options) {
+      var dialog = new (require("../ui/ScaffoldDialog").ScaffoldDialog)(module, parent, options);
       return dialog; 
     }
   };

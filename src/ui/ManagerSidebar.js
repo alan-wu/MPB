@@ -304,6 +304,7 @@ var ManagerSidebar = function(parentIn) {
   
   var create = function(htmlData) {
     jelem = $(parent);
+    console.log(jelem[0])
     var childNodes = $.parseHTML(htmlData);
     for (i = 0; i < childNodes.length; i++) {
       (jelem[0]).appendChild(childNodes[i]);
