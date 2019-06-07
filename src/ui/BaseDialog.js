@@ -33,7 +33,7 @@ BaseDialog.prototype.close = function(myInstance) {
   return function(event, ui) {
     myInstance.container.dialog('destroy').remove();
     for (var i = 0; i < myInstance.onCloseCallbacks.length; i++) {
-      myInstance.onCloseCallbacks[i]( this);
+      myInstance.onCloseCallbacks[i]( myInstance);
     }
     if (myInstance.destroyModuleOnClose) {
       if (myInstance.module) {
@@ -47,7 +47,7 @@ BaseDialog.prototype.close = function(myInstance) {
 BaseDialog.prototype.beforeClose = function(myInstance) {
   return function(event, ui) {
     for (var i = 0; i < myInstance.beforeCloseCallbacks.length; i++) {
-      myInstance.beforeCloseCallbacks[i]( this );
+      myInstance.beforeCloseCallbacks[i]( myInstance );
     }
   }
 }
@@ -60,7 +60,7 @@ BaseDialog.prototype.resizeStopCallback = function(myInstance) {
 
     $(this).width($(this).parent().width() - widthPadding);
     for (var i = 0; i < myInstance.resizeStopCallbacks.length; i++) {
-      myInstance.resizeStopCallbacks[i]( this );
+      myInstance.resizeStopCallbacks[i]( myInstance );
     }
   }
 }
@@ -96,11 +96,17 @@ BaseDialog.prototype.undock = function() {
 	});
 }
 
+BaseDialog.prototype.getContainment = function() {
+	return this.containment;
+}
+
 BaseDialog.prototype.create = function(htmlData) {
   this.container = $('<div></div>');
   this.container.attr('title', this.title);
   if (this.parent === undefined)
 	  this.parent = $('body');
+  if (this.containment === undefined)
+	  this.containment = $('body');
   this.container.dialog({
 	appendTo: this.parent,
     show: "blind",

@@ -40,6 +40,7 @@
     "babel-loader": "^8.0.5",
     "babel-preset-minify": "^0.5.0",
     "better-docs": "^1.0.0",
+    "css-element-queries": "^1.2.0",
     "dialog-polyfill": "^0.4.10",
     "file-loader": "^1.1.11",
     "html-loader": "^0.5.5",
@@ -51,9 +52,8 @@
     "webpack": "^4.6.0",
     "webpack-cli": "^2.1.2",
     "webpack-jquery-ui": "^1.0.0",
-    "zincjs": "^0.29.11"
-  },
-  "dependencies": {
+    "zincjs": "^0.29.11",
     "polyfill-array-includes": "^2.0.0"
-  }
+  },
+  "dependencies": {}
 }
