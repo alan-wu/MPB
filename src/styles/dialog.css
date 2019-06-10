@@ -1,0 +1,15 @@
+.displayNone {
+  display: none;
+}
+
+.ui-dialog .ui-dialog-titlebar {
+	padding: .1em 1em;
+}
+
+#iconExpand{
+    cursor: pointer;
+    float: right;
+    margin-right:15px;
+    margin-top: 3px;
+    transform: scale(1.5, 1.5);
+}

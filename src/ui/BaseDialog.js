@@ -100,6 +100,21 @@ BaseDialog.prototype.getContainment = function() {
 	return this.containment;
 }
 
+BaseDialog.prototype.openFullscreen = function() {
+	return function() {
+		var elem = container[0];
+		if (elem.requestFullscreen) {
+			elem.requestFullscreen();
+		} else if (elem.mozRequestFullScreen) { /* Firefox */
+			elem.mozRequestFullScreen();
+		} else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+			elem.webkitRequestFullscreen();
+		} else if (elem.msRequestFullscreen) { /* IE/Edge */
+			elem.msRequestFullscreen();
+		}
+	}
+}
+
 BaseDialog.prototype.create = function(htmlData) {
   this.container = $('<div></div>');
   this.container.attr('title', this.title);
@@ -126,7 +141,23 @@ BaseDialog.prototype.create = function(htmlData) {
     },
     resizeStop: this.resizeStopCallback(this),
     beforeClose: this.beforeClose(this),
-    close: this.close(this)
+    close: this.close(this),
+    create: function(event, ui) {
+    	var myInstance = this;
+    	$('<span id="iconExpand" class="ui-icon ui-icon-arrow-2-ne-sw"></span>').
+    	appendTo($(this).dialog('widget').children('.ui-dialog-titlebar')).
+    	click(function() { 
+    		if (myInstance.requestFullscreen) {
+    			myInstance.requestFullscreen();
+    		} else if (myInstance.mozRequestFullScreen) { /* Firefox */
+    			myInstance.mozRequestFullScreen();
+    		} else if (myInstance.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+    			myInstance.webkitRequestFullscreen();
+    		} else if (myInstance.msRequestFullscreen) { /* IE/Edge */
+    			myInstance.msRequestFullscreen();
+    		}
+    	});
+    }
   });
   this.container.parent().draggable({
 	  containment: this.containment
