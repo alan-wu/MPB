@@ -5,6 +5,7 @@ exports.ModuleManager = function() {
   var ready = false;
   var moduleCounter = 0;
   var name = "Default Manager";
+  var gridView = undefined;
   var constructors = new function() {
     this["Body Viewer"] = [];
     this["Body Viewer"].module = function() {
@@ -12,8 +13,8 @@ exports.ModuleManager = function() {
       module.readSystemMeta();
       return module; 
     }
-    this["Body Viewer"].dialog = function(module, parent) {
-      var dialog = new (require("../ui/BodyViewerDialog").BodyViewerDialog)(module, parent);
+    this["Body Viewer"].dialog = function(module, parent, options) {
+      var dialog = new (require("../ui/BodyViewerDialog").BodyViewerDialog)(module, parent, options);
       return dialog; 
     }
     this["Organs Viewer"] = [];
@@ -21,17 +22,8 @@ exports.ModuleManager = function() {
       var module = new (require("../modules/organsRenderer").OrgansViewer)(modelsLoader);
       return module; 
     }
-    this["Organs Viewer"].dialog = function(module, parent) {
-      var dialog = new (require("../ui/OrgansViewerDialog").OrgansViewerDialog)(module, parent);
-      return dialog; 
-    }
-    this["Model Panel"] = [];
-    this["Model Panel"].module = function() {
-      var module = new (require("../modules/model_panel").ModelPanel)();
-      return module; 
-    }
-    this["Model Panel"].dialog=  function(module, parent) {
-      var dialog = new (require("../ui/ModelViewerDialog").ModelViewerDialog)(module, parent);
+    this["Organs Viewer"].dialog = function(module, parent, options) {
+      var dialog = new (require("../ui/OrgansViewerDialog").OrgansViewerDialog)(module, parent, options);
       return dialog; 
     }
     this["Scaffold Viewer"] = [];
@@ -39,8 +31,8 @@ exports.ModuleManager = function() {
       var module = new (require("../modules/ScaffoldViewer").ScaffoldViewer)();
       return module; 
     }
-    this["Scaffold Viewer"].dialog = function(module, parent) {
-      var dialog = new (require("../ui/ScaffoldDialog").ScaffoldDialog)(module, parent);
+    this["Scaffold Viewer"].dialog = function(module, parent, options) {
+      var dialog = new (require("../ui/ScaffoldDialog").ScaffoldDialog)(module, parent, options);
       return dialog; 
     }
   };
@@ -60,8 +52,8 @@ exports.ModuleManager = function() {
 		  console.log(module);
 		  return module;
 		}
-		constructors[name].dialog = function(module, parent) {
-		  var dialog = new dialogConstructor(module, parent);
+		constructors[name].dialog = function(module, parent, options) {
+		  var dialog = new dialogConstructor(module, parent, options);
 		  return dialog;
 		}
 	  }
@@ -137,14 +129,14 @@ exports.ModuleManager = function() {
   this.manageDialog = function(dialogIn) {
     if (dialogIn) {
       var moduleIn = dialogIn.getModule();
+      var item = undefined;
       if (moduleIn) {
-	    var item = findManagerItemWithModule(moduleIn);
+	    item = findManagerItemWithModule(moduleIn);
 	    if (item) {
 	      if (item.getDialog() === undefined) {
 	        item.setDialog(dialogIn);
 	        dialogIn.addBeforeCloseCallback(dialogDestroyCallback());
 	      }
-	      return item;
 	    } else {
 	      var managerItem = new ManagerItem();
 	      managerItem.setDialog(dialogIn);
@@ -153,10 +145,10 @@ exports.ModuleManager = function() {
 	      managerItems.push(managerItem);
 	      for (var i = 0; i < itemChangedCallbacks.length; i++)
 	        itemChangedCallbacks[i](managerItem, MANAGER_ITEM_CHANGE.ADDED)
-	      return managerItem;
+	      item = managerItem;
 	    }
       } else {
-    	var item = findManagerItemWithDialog(dialogIn);
+    	item = findManagerItemWithDialog(dialogIn);
     	if (item === undefined) {
   	      var managerItem = new ManagerItem();
 	      managerItem.setDialog(dialogIn);
@@ -164,9 +156,12 @@ exports.ModuleManager = function() {
 	      managerItems.push(managerItem);
 	      for (var i = 0; i < itemChangedCallbacks.length; i++)
 	        itemChangedCallbacks[i](managerItem, MANAGER_ITEM_CHANGE.ADDED)
-	      return managerItem;
+	      item = managerItem;
     	}
-    	return item;
+      }
+      //if gridVIew is defined and enabled, the dialog will be added to a grid
+      if (item && gridView) {
+    	  gridView.addManagerItem(item);
       }
     }
   }
@@ -175,6 +170,8 @@ exports.ModuleManager = function() {
     if (dialogIn) {
       var item = findManagerItemWithDialog(dialogIn);
       if (item) {
+    	  if (gridView)
+    		  gridView.removeManagerItem(item);
     	  item.setDialog(undefined);
       }
     }
@@ -224,7 +221,9 @@ exports.ModuleManager = function() {
       }
       if (index > -1) {
         moduleIn.removeChangedCallback(moduleChangedCallback());
-        managerItems[index].getDialog().removeBeforeCloseCallback(dialogDestroyCallback());
+        var dialog = managerItems[index].getDialog();
+        if (dialog)
+        	dialog.removeBeforeCloseCallback(dialogDestroyCallback());
         for (var i = 0; i < itemChangedCallbacks.length; i++) {
           itemChangedCallbacks[i]( managerItems[index], MANAGER_ITEM_CHANGE.REMOVED);
         }
@@ -307,6 +306,23 @@ exports.ModuleManager = function() {
 
   this.isReady = function() {
     return ready;
+  }
+  
+  this.initialiseGridView = function(container) {
+	  if (gridView === undefined)
+		  gridView = new (require("../ui/gridView").GridView)(container);
+  }
+  
+  this.enableGridView = function() {
+	  if (gridView) {
+		  gridView.enable(managerItems);
+	  }
+  }
+  
+  this.disableGridView = function() {
+	  if (gridView) {
+		  gridView.disable();
+	  }
   }
 
   var systemMetaReadyCallback = function() {

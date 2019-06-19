@@ -1,6 +1,7 @@
 //require("./styles/bootstrap.min.css");
 require("./styles/w3.css");
 require('./styles/bootstrap.min.css');
+require("polyfill-array-includes");
 
 exports.BaseModule = require("./modules/BaseModule").BaseModule;
 exports.BodyViewer = require("./modules/bodyRenderer").BodyViewer;
