@@ -1,4 +1,4 @@
-require("../styles/Snackbar.css");
+require("../styles/snackbar.css");
 
 exports.Snackbar = function(containerIn) {
   var element = undefined;
