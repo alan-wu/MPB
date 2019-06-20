@@ -9,6 +9,7 @@ exports.GridView = function(containerIn) {
 	var _this = this;
 	var dialogs = [];
 	var sensor = undefined;
+	var height = "800px";
 	this.isEnabled = false;
 
 	this.enable = function(managerItems) {
@@ -30,9 +31,19 @@ exports.GridView = function(containerIn) {
 		dialogs = [];
 		rowElement.innerHTML = "";
 	}
+	
+	this.setHeight = function(heightIn) {
+		height = heightIn;
+		if (_this.isEnabled) {
+			for (var i = 0; i < dialogs.length; i++) {
+				var containment = dialogs[i].getContainment();
+				containment.style.height = height;
+			}
+		}
+	} 
 
 	var getNewItemContainer = function() {
-		var itemTemplate = '<div class="Column"><div class="itemContainment" style="height:800px;"></div></div>';
+		var itemTemplate = '<div class="Column"><div class="itemContainment" style="height:' + height + ';"></div></div>';
 		var item = $(itemTemplate);
 		var itemContainment = item.find(".itemContainment")[0];
 		rowElement.appendChild(item[0]);

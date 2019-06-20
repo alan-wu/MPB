@@ -252,7 +252,6 @@ var ManagerSidebar = function(parentIn) {
     	  module.setName(name);
       var dialog = moduleManager.createDialog(module, parent);
       dialog.destroyModuleOnClose = true;
-      moduleManager.manageDialog(dialog);
       addDialog.dialog("close");
     } else {
       messageDialog.dialog("open");
@@ -304,7 +303,6 @@ var ManagerSidebar = function(parentIn) {
   
   var create = function(htmlData) {
     jelem = $(parent);
-    console.log(jelem[0])
     var childNodes = $.parseHTML(htmlData);
     for (i = 0; i < childNodes.length; i++) {
       (jelem[0]).appendChild(childNodes[i]);

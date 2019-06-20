@@ -45,7 +45,9 @@
     "file-loader": "^1.1.11",
     "html-loader": "^0.5.5",
     "jquery": "^3.4.1",
-    "lodash": ">=4.17.11",
+    "lodash": "^4.17.11",
+    "polyfill-array-includes": "^2.0.0",
+    "query-string": "^5.1.1",
     "raw-loader": "^0.5.1",
     "style-loader": "^0.21.0",
     "url-loader": "^1.0.1",
@@ -53,7 +55,7 @@
     "webpack-cli": "^2.1.2",
     "webpack-jquery-ui": "^1.0.0",
     "zincjs": "^0.29.11",
-    "polyfill-array-includes": "^2.0.0"
+    "js-yaml": ">=3.13.1"
   },
   "dependencies": {}
 }
