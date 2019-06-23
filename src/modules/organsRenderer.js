@@ -640,7 +640,6 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	  
 	  var downloadCompletedCallback = function() {
 		  return function() {
-			 console.log("here");
 			  _this.settingsChanged();
 		  }
 	  }

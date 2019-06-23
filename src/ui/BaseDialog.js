@@ -148,6 +148,7 @@ BaseDialog.prototype.create = function(htmlData) {
     close: this.closeInternal(this),
     create: function(event, ui) {
     	var myInstance = this;
+    	$(this).dialog('widget').find('.ui-dialog-title').css("width", "85%");
     	$('<span id="iconExpand" class="ui-icon ui-icon-arrow-2-ne-sw"></span>').
     	appendTo($(this).dialog('widget').children('.ui-dialog-titlebar')).
     	click(function() { 
