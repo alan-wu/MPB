@@ -13,6 +13,12 @@
   bottom: 30px; /* 30px from the bottom */
   opacity: 0;
   visibility: hidden; /* Show the snackbar */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 /* Show the snackbar when clicking on a button (class added with JavaScript) */

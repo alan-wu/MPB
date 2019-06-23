@@ -34,6 +34,17 @@ exports.ManagerItem = function() {
   this.getDialog = function() {
     return dialog;
   }
+  
+  this.getSettings = function() {
+      if (module) {
+    	  var newSettings = module.exportSettings();
+    	  if (dialog) {
+    		  newSettings.parent = require("../utility").getSelector(dialog.parent);
+    	  }
+    	  return newSettings;
+      }
+	  return undefined;
+  }
 }
 
 exports.MANAGER_ITEM_CHANGE = MANAGER_ITEM_CHANGE;

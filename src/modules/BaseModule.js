@@ -1,5 +1,4 @@
-var MODULE_CHANGE = { ALL: 0, DESTROYED: 1, NAME_CHANGED: 2 };
-
+var MODULE_CHANGE = { ALL: 0, DESTROYED: 1, NAME_CHANGED: 2, SETTINGS_CHANGED: 3 };
 
 var BaseModule = function() {
   this.typeName = "Base Module";
@@ -18,6 +17,28 @@ BaseModule.prototype.setName = function(name) {
       callbackArray[i]( this, MODULE_CHANGE.NAME_CHANGED );
     }
   }
+}
+
+BaseModule.prototype.settingsChanged = function() {
+	var callbackArray = this.onChangedCallbacks.slice();
+    for (var i = 0; i < callbackArray.length; i++) {
+      callbackArray[i]( this, MODULE_CHANGE.SETTINGS_CHANGED );
+    }
+}
+
+BaseModule.prototype.exportSettings = function() {
+	  var settings = {};
+	  settings.dialog = this.typeName;
+	  settings.name = this.instanceName;
+	  return settings;
+}
+
+BaseModule.prototype.importSettings = function(settings) {
+	if (settings.dialog == this.typeName) {
+		this.setName(settings.name);
+		return true;
+	}
+	return false;
 }
 
 BaseModule.prototype.publishChanges = function(annotations, eventType) {

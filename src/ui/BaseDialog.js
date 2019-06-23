@@ -29,7 +29,11 @@ BaseDialog.prototype.getModule = function() {
 	return this.module;
 }
 
-BaseDialog.prototype.close = function(myInstance) {
+BaseDialog.prototype.close = function() {
+	this.container.dialog('close'); 
+}
+
+BaseDialog.prototype.closeInternal = function(myInstance) {
   return function(event, ui) {
     myInstance.container.dialog('destroy').remove();
     for (var i = 0; i < myInstance.onCloseCallbacks.length; i++) {
@@ -141,9 +145,10 @@ BaseDialog.prototype.create = function(htmlData) {
     },
     resizeStop: this.resizeStopCallback(this),
     beforeClose: this.beforeClose(this),
-    close: this.close(this),
+    close: this.closeInternal(this),
     create: function(event, ui) {
     	var myInstance = this;
+    	$(this).dialog('widget').find('.ui-dialog-title').css("width", "85%");
     	$('<span id="iconExpand" class="ui-icon ui-icon-arrow-2-ne-sw"></span>').
     	appendTo($(this).dialog('widget').children('.ui-dialog-titlebar')).
     	click(function() { 

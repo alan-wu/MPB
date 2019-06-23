@@ -1,14 +1,18 @@
 var THREE = require('zincjs').THREE;
 
-//Current model's associate data, data fields, external link, nerve map informations,
-//these are proived in the organsFileMap array.
+// Current model's associate data, data fields, external link, nerve map
+// informations,
+// these are proived in the organsFileMap array.
 var OrgansSceneData = function() {
   this.currentName = "";
   this.currentSystem = "";
   this.currentPart = "";
   this.currentSpecies  = "";
-  //Current model's associate data, data fields, external link, nerve map informations,
-  //these are proived in the organsFileMap array.
+  this.metaURL = "";
+  this.viewURL = "";
+  // Current model's associate data, data fields, external link, nerve map
+	// informations,
+  // these are proived in the organsFileMap array.
   this.associateData = undefined;
   this.dataFields = undefined;
   this.externalOrganLink = undefined;
@@ -18,12 +22,16 @@ var OrgansSceneData = function() {
 
 
 /**
- * Viewer of 3D-organs models. Users can toggle on/off different views. Data is displayed instead
- * if models are not available.
+ * Viewer of 3D-organs models. Users can toggle on/off different views. Data is
+ * displayed instead if models are not available.
  * 
  * @class
- * @param {PJP.ModelsLoader} ModelsLoaderIn - defined in modelsLoade.js, providing locations of files.
- * @param {String} PanelName - Id of the target element to create the  {@link PJP.OrgansViewer} on.
+ * @param {PJP.ModelsLoader}
+ *            ModelsLoaderIn - defined in modelsLoade.js, providing locations of
+ *            files.
+ * @param {String}
+ *            PanelName - Id of the target element to create the
+ *            {@link PJP.OrgansViewer} on.
  * @author Alan Wu
  * @returns {PJP.OrgansViewer}
  */
@@ -39,12 +47,12 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	var additionalSpecies = undefined;
 	var sceneData = new OrgansSceneData();
 	var timeoutID = 0;
-	/**new**/
+	/** new* */
 	var timeChangedCallbacks = new Array();
 	var sceneChangedCallbacks = new Array();
 	var organPartAddedCallbacks = new Array();
 	var layoutUpdateRequiredCallbacks = new Array();
-
+	var currentURL = undefined;
 	/**
 	 * {ImageCombiner}.
 	 */
@@ -54,15 +62,15 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	var modelsLoader = ModelsLoaderIn;
 	var _this = this;
 	_this.typeName = "Organs Viewer";
-	//Secondary renderer, used for comparing species models.
+	// Secondary renderer, used for comparing species models.
 	var secondaryRenderer = undefined;
 	var secondaryRendererContainer = undefined;
 	var secondaryDisplayArea = undefined;
 	
-	//Array for storing different species models urls.
+	// Array for storing different species models urls.
 	var organsFileMap = {};
 	
-	//Array for storing rat's models urls and its associated data.
+	// Array for storing rat's models urls and its associated data.
 	var ratOrgansFileMap = {};
 	ratOrgansFileMap["Cardiovascular"] = {};
 	ratOrgansFileMap["Cardiovascular"]["Kidneys-Arteries"] = {
@@ -79,7 +87,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	     associateData: undefined  
 	  };
 	
-	//Array for storing human's models urls and its associated data.
+	// Array for storing human's models urls and its associated data.
 	var humanOrgansFileMap = {};
 	humanOrgansFileMap["Cardiovascular"] = {};
 	humanOrgansFileMap["Digestive"] = {};
@@ -198,8 +206,8 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	}
 	
 	 /**
-   * Add a callback which will be called when time has changed
-   */
+		 * Add a callback which will be called when time has changed
+		 */
 	this.addTimeChangedCallback = function(callback) {
 	  if (typeof(callback === "function"))
 	    timeChangedCallbacks.push(callback);
@@ -228,9 +236,10 @@ var OrgansViewer = function(ModelsLoaderIn)  {
       organPartAddedCallbacks.push(callback);
   }
 	 
-	/** 
-	 * Callback function when a pickable object has been picked. It will then call functions in tissueViewer
-	 * and cellPanel to show corresponding informations.
+	/**
+	 * Callback function when a pickable object has been picked. It will then
+	 * call functions in tissueViewer and cellPanel to show corresponding
+	 * informations.
 	 * 
 	 * @callback
 	 */
@@ -264,9 +273,9 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		}
 	};
 	
-	/** 
-	 * Callback function when a pickable object has been hovered over. It will show
-	 * objecty id/name as _this.toolTip text.
+	/**
+	 * Callback function when a pickable object has been hovered over. It will
+	 * show objecty id/name as _this.toolTip text.
 	 * 
 	 * @callback
 	 */
@@ -276,7 +285,8 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			if (intersected !== undefined) {
 				if (_this.scene.sceneName == "human/Cardiovascular/Heart") {
 					var id = Math.round(intersected.object.material.color.b * 255) ;
-					//a temporary hack to put id into object name, this will be done differently
+					// a temporary hack to put id into object name, this will be
+					// done differently
 					intersected.object.name = id.toString();
 					_this.displayArea.style.cursor = "pointer";
 					if (_this.toolTip !== undefined) {
@@ -364,6 +374,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	
 	/**
 	 * Change some of the ZincGeometry property for never map geometry
+	 * 
 	 * @callback
 	 */
 	var _addNerveMapGeometryCallback = function(GroupName) {
@@ -378,8 +389,8 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	}
 	
 	/**
-	 * Read in the nerve map models onto the primary renderer when nerve map has been
-	 * toggled on.
+	 * Read in the nerve map models onto the primary renderer when nerve map has
+	 * been toggled on.
 	 */
 	var setupNerveMapPrimaryRenderer = function() {
 		var sceneName = sceneData.currentName + "_nervemap";
@@ -409,7 +420,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	}
 
 	/**
-	 * Use the secondary renderer and display relavant models on it. 
+	 * Use the secondary renderer and display relavant models on it.
 	 */
 	var readSpeciesIntoSecondaryRenderer = function(species) {
 		var sceneName = sceneData.currentSpecies + "/" + sceneData.currentName;
@@ -455,7 +466,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
     for (var i = 0; i < layoutUpdateRequiredCallbacks.length;i++) {
       layoutUpdateRequiredCallbacks[i](false, true);
     }
-		//setupOrgansNerveSVG();
+		// setupOrgansNerveSVG();
 	}
 	
 	/**
@@ -498,10 +509,10 @@ var OrgansViewer = function(ModelsLoaderIn)  {
   }
 	
 	var imgZoom = function() {
-	//	var cssRule = (require('../utility').findCSSRule)(".organsImg");
-	//	var zoom = currentImgZoom * 100 + "%";
-	//	cssRule.style["max-height"] = zoom; 
-	//	cssRule.style["max-width"] = zoom;
+	// var cssRule = (require('../utility').findCSSRule)(".organsImg");
+	// var zoom = currentImgZoom * 100 + "%";
+	// cssRule.style["max-height"] = zoom;
+	// cssRule.style["max-width"] = zoom;
 	}
 
 	var imgZoomIn = function(ratio) {
@@ -519,8 +530,9 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		imgZoom();
 	}
 
-	/** 
+	/**
 	 * Trigger zoom event on the nerve map composite image.
+	 * 
 	 * @callback
 	 */
 	var onImageScrollEvent = function(event) {
@@ -587,45 +599,62 @@ var OrgansViewer = function(ModelsLoaderIn)  {
     }
     return undefined;
   }
+
+  var addOrganPart = function(systemName, partName, useDefautColour, geometry) {
+	  if (geometry.groupName) {
+		  for (var i = 0; i < organPartAddedCallbacks.length;i++) {
+			  organPartAddedCallbacks[i](geometry.groupName, geometry.isTimeVarying());
+		  }
+		  if (useDefautColour)
+			  modelsLoader.setGeometryColour(geometry, systemName, partName);
+		  if (systemName && partName) {
+			  var organDetails = getOrganDetails(sceneData.currentSpecies, systemName, partName);
+			  if (organDetails === undefined || organDetails.view == undefined)
+			  {
+				  _this.scene.viewAll();
+				  var zincCameraControl = _this.scene.getZincCameraControls();
+				  var viewport = zincCameraControl.getCurrentViewport();
+				  zincCameraControl.setDefaultCameraSettings(viewport);
+				  _this.scene.resetView();
+			  }
+			  var annotation = new (require('../utilities/annotation').annotation)();
+			  annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName};
+			  geometry.userData = [annotation];
+			  if (partName)
+				  _this.displayMessage(partName + " loaded.");
+			  else 
+				  _this.displayMessage("Resource loaded.");
+		  }
+	  }
+  }
+
+	  /**
+		 * New organs geometry has been added to the scene, add UIs and make
+		 * sure the viewport is correct.
+		 */
+	  var _addOrganPartCallback = function(systemName, partName, useDefautColour) {
+	    return function(geometry) {
+	    	addOrganPart(systemName, partName, useDefautColour, geometry);
+	    }
+	  }
+	  
+	  var downloadCompletedCallback = function() {
+		  return function() {
+			  _this.settingsChanged();
+		  }
+	  }
+	  
+	  var singleItemDownloadCompletedCallback = function(systemName, partName, useDefautColour) {
+		    return function(geometry) {
+		    	addOrganPart(systemName, partName, useDefautColour, geometry);
+		    	_this.settingsChanged();
+		    }
+	  }
 	  
 	  /**
-	   * New organs geometry has been added to the scene, add UIs and make sure
-	   * the viewport is correct.
-	   */
-  var _addOrganPartCallback = function(systemName, partName, useDefautColour) {
-    return function(geometry) {
-      if (geometry.groupName) {
-        for (var i = 0; i < organPartAddedCallbacks.length;i++) {
-          organPartAddedCallbacks[i](geometry.groupName, geometry.isTimeVarying());
-        }
-        if (useDefautColour)
-          modelsLoader.setGeometryColour(geometry, systemName, partName);
-        if (systemName && partName) {
-	        var organDetails = getOrganDetails(sceneData.currentSpecies, systemName, partName);
-	        if (organDetails === undefined || organDetails.view == undefined)
-	        {
-	          _this.scene.viewAll();
-	          var zincCameraControl = _this.scene.getZincCameraControls();
-	          var viewport = zincCameraControl.getCurrentViewport();
-	          zincCameraControl.setDefaultCameraSettings(viewport);
-	          _this.scene.resetView();
-	        }
-	        var annotation = new (require('../utilities/annotation').annotation)();
-	        annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName};
-	        geometry.userData = [annotation];
-			if (partName)
-				_this.displayMessage(partName + " loaded.");
-			else 
-				_this.displayMessage("Resource loaded.");
-        }
-      }
-    }
-  }
-	  
-	  /** 
-	   * Toggle data field displays. Data fields displays flow/pressure and other activities of the
-	   * organs.
-	   */
+		 * Toggle data field displays. Data fields displays flow/pressure and
+		 * other activities of the organs.
+		 */
 	  this.updateFieldvisibility = function(dataFields, value) {
       for ( var i = 0; i < dataFields.length; i ++ ) {
         if (value != i) {
@@ -648,9 +677,11 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	  }
 	  
 	  /**
-	   * Return an array containing name(s) of species that also contains the currently displayed organs.
-	   * @returns {Array} containing species name 
-	   */
+		 * Return an array containing name(s) of species that also contains the
+		 * currently displayed organs.
+		 * 
+		 * @returns {Array} containing species name
+		 */
 	  this.getAvailableSpecies = function(currentSpecies, currentSystem, currentPart) {
 	    var availableSpecies = new Array();
 	    availableSpecies.push("none");
@@ -688,13 +719,15 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	        sceneData.associateData = undefined;
 	        sceneData.dataFields = undefined;
 	        sceneData.externalOrganLink = undefined;
-	        sceneData.nerveMap = undefined; 
+	        sceneData.nerveMap = undefined;
+	        sceneData.metaURL = "";
+	        sceneData.viewURL = "";
 	        sceneData.currentSpecies = speciesName;
 	        sceneData.currentSystem = systemName;
 	        sceneData.currentPart = partName;
 	        // This is used as title
 	        var name = speciesName + "/" + systemName + "/" + partName;
-	        //Get informations from the array
+	        // Get informations from the array
 	        if (organsDetails !== undefined) {
 	        	if (organsDetails.sceneName !== undefined)
 	        		name = speciesName + "/" + organsDetails.sceneName;
@@ -704,12 +737,12 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		        sceneData.externalOrganLink = organsDetails.externalLink;
 		        sceneData.nerveMap = organsDetails.nerveMap;
 		    }
-	        sceneData.currentName= name;
+	        sceneData.currentName = name;
 	  }
 
-	  this.loadOrgansFromURL= function(url, speciesName, systemName, partName, viewURL) {
+	  this.loadOrgansFromURL = function(url, speciesName, systemName, partName, viewURL) {
 		  if (_this.zincRenderer) {
-			  if (speciesName && systemName && partName) {
+			  if (speciesName && systemName && partName && (sceneData.metaURL !== url)) {
 				  resetZoom();
 			      setSceneData(speciesName, systemName, partName, undefined);
 			      compareSceneIsOn = false;
@@ -723,11 +756,14 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			      for (var i = 0; i < sceneChangedCallbacks.length;i++) {
 			    	  sceneChangedCallbacks[i](sceneData);
 			      }
-			      if (viewURL)
-			    	  organScene.loadViewURL(viewURL);
+			      if (viewURL && viewURL != "")
+			    	  sceneData.viewURL = viewURL;
 			      else
-			    	  organScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
-			      organScene.loadMetadataURL(url, _addOrganPartCallback(systemName, partName, false));
+			    	  sceneData.viewURL = modelsLoader.getBodyDirectoryPrefix() + "/body_view.json";
+			      organScene.loadViewURL(sceneData.viewURL);
+			      sceneData.metaURL = url;
+			      organScene.loadMetadataURL(url, _addOrganPartCallback(systemName, partName, false),
+			    	downloadCompletedCallback());	      
 			      _this.scene = organScene;
 			      _this.zincRenderer.setCurrentScene(organScene);
 			      _this.changeCompareSpecies("none");
@@ -741,18 +777,22 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	  }
 
 	  /**
-	   * Load organ(s) with the provided species, system and part. This will update
-	   * the UIs, load in the models.
-	   * If models are not available, it will attempt to display the data instead (same
-	   * geometry as shown on the {@link PJP.BodyViewer}
-	   * 
-	   * @param {String} speciesName
-	   * @param {String} systemName
-	   * @param {String} systemName  
-	   * @async
-	   */
+		 * Load organ(s) with the provided species, system and part. This will
+		 * update the UIs, load in the models. If models are not available, it
+		 * will attempt to display the data instead (same geometry as shown on
+		 * the {@link PJP.BodyViewer}
+		 * 
+		 * @param {String}
+		 *            speciesName
+		 * @param {String}
+		 *            systemName
+		 * @param {String}
+		 *            systemName
+		 * @async
+		 */
 	  this.loadOrgans = function(speciesName, systemName, partName) {
-	    //Do the work now if UI is ready otherwise try again later with a timeout setup.
+	    // Do the work now if UI is ready otherwise try again later with a
+		// timeout setup.
 	    if (_this.zincRenderer) {
 	      if (speciesName && systemName && partName) {
 	        resetZoom();
@@ -776,18 +816,19 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	          directionalLight.intensity = 1.4;
 	          // Models with the same name exists, read in the models.
 	          if (organsDetails != undefined) {
-	            //Use organs specific viewports if it exists, otherwise use the default viewport.
+	            // Use organs specific viewports if it exists, otherwise use the
+				// default viewport.
 	            if (organsDetails.view !== undefined)
 	              organScene.loadViewURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.view);
 	            else {
 	              organScene.loadViewURL(modelsLoader.getBodyDirectoryPrefix() + "/body_view.json");
 	            }
 	            organScene.loadMetadataURL(modelsLoader.getOrgansDirectoryPrefix() + "/" + organsDetails.meta, 
-	              _addOrganPartCallback(systemName, partName, false));
+	              _addOrganPartCallback(systemName, partName, false), downloadCompletedCallback());
 	            var zincCameraControl = organScene.getZincCameraControls();
 	            zincCameraControl.setMouseButtonAction("AUXILIARY", "ZOOM");
 	            zincCameraControl.setMouseButtonAction("SECONDARY", "PAN");
-	            //Create a picker scene if it exists.
+	            // Create a picker scene if it exists.
 	            if (organsDetails.picker != undefined) {
 	              var pickerSceneName = name + "_picker_scene";
 	              pickerScene = _this.zincRenderer.createScene(pickerSceneName);
@@ -802,12 +843,13 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	            var metaItem = systemMeta[systemName][partName];
 	            var downloadPath = metaItem["BodyURL"];
 	            if (metaItem["FileFormat"] == "JSON") {
-	              organScene.loadMetadataURL(downloadPath, _addOrganPartCallback(systemName, partName, false));
+	              organScene.loadMetadataURL(downloadPath, _addOrganPartCallback(systemName, partName, false),
+	            		  downloadCompletedCallback());
 	            }
 	            else if (metaItem["FileFormat"] == "STL")
-	              organScene.loadSTL(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
+	              organScene.loadSTL(downloadPath, partName, singleItemDownloadCompletedCallback(systemName, partName, true));
 	            else if (metaItem["FileFormat"] == "OBJ") 
-	              organScene.loadOBJ(downloadPath, partName, _addOrganPartCallback(systemName, partName, true));
+	              organScene.loadOBJ(downloadPath, partName, singleItemDownloadCompletedCallback(systemName, partName, true));
 	            _this.zincRenderer.setCurrentScene(organScene);
 	            _this.graphicsHighlight.reset();
 	            var zincCameraControl = organScene.getZincCameraControls();
@@ -831,8 +873,8 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	          pickerScene = _this.zincRenderer.getSceneByName(pickerSceneName);
 	          _this.scene.forEachGeometry(_addOrganPartCallback());
 	          _this.scene.forEachGlyphset(_addOrganPartCallback());
+		      _this.settingsChanged();
 	        }
-	        
 	        preRenderTimeUpdate();
 	      }
 	    } else {
@@ -862,6 +904,32 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	    }
 	    (require('./RendererModule').RendererModule).prototype.destroy.call( _this );
 	  }
+	  
+	  this.exportSettings = function() {
+		  var settings = {};
+		  settings.name = _this.instanceName;
+		  settings.system = sceneData.currentSystem;
+		  settings.part = sceneData.currentPart;
+		  settings.species  = sceneData.currentSpecies;
+		  settings.metaURL = sceneData.metaURL;
+		  settings.viewURL = sceneData.viewURL;
+		  settings.dialog = "Organs Viewer";
+		  return settings;
+	  }
+	  
+	  this.importSettings = function(settings) {
+		  if (settings && (settings.dialog == this.typeName)) {
+			  _this.setName(settings.name);
+			  if (settings.metaURL !== undefined && settings.metaURL != "") {
+				  _this.loadOrgansFromURL(settings.metaURL, settings.species,
+					settings.system, settings.part, settings.viewURL);
+			  } else {
+				  _this.loadOrgans(settings.species, settings.system, settings.part);
+			  }
+			  return true;
+		  }
+		  return false;
+	  }
 
 	/**
 	 * Add UI callbacks after html page has been loaded.
@@ -872,17 +940,17 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	}
 		
 	/**
-	 * initialise loading of the html layout for the organs panel, 
-	 * this is called when the {@link PJP.OrgansViewer} is created.
+	 * initialise loading of the html layout for the organs panel, this is
+	 * called when the {@link PJP.OrgansViewer} is created.
 	 * 
-	 * @async 
+	 * @async
 	 */
 	 var initialise = function() {
-	   //addUICallback();
+	   // addUICallback();
 	   _this.initialiseRenderer(undefined);
 	   if (_this.zincRenderer)
 	     _this.zincRenderer.addPreRenderCallbackFunction(preRenderTimeUpdateCallback());
-     //createNewDialog(require("./snippets/organsViewer.html"));
+     // createNewDialog(require("./snippets/organsViewer.html"));
   }
 	 
 	initialise();
