@@ -278,6 +278,7 @@ exports.ModuleManager = function() {
       if (constructors[module.typeName]) {
         var dialog = constructors[module.typeName].dialog(module, parent);
         _this.manageDialog(dialog);
+        dialog.destroyModuleOnClose = true;
         return dialog;
       }
     }

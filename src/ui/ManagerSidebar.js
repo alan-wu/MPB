@@ -88,7 +88,8 @@ var ManagerElement = function(manager, jelemIn) {
         addDialog.data("manager", moduleManager);
         dialog_selection.val("Please pick one");
         addDialog.find("#dialog_name")[0].value = "";
-        addDialog.dialog("open"); 
+        addDialog.dialog("moveToTop");
+        addDialog.dialog("open");
       }
     }
   }
@@ -121,6 +122,7 @@ var ManagerElement = function(manager, jelemIn) {
         renameDialog.data("managerItem", managerItem);
         var nameElem = renameDialog.find("#new_name");
         nameElem[0].value = managerItem.getModule().getName();
+        renameDialog.dialog("moveToTop");
         renameDialog.dialog("open");
       }
     }
@@ -254,6 +256,7 @@ var ManagerSidebar = function(parentIn) {
       dialog.destroyModuleOnClose = true;
       addDialog.dialog("close");
     } else {
+      messageDialog.dialog("moveToTop");
       messageDialog.dialog("open");
     }
   }
@@ -266,6 +269,7 @@ var ManagerSidebar = function(parentIn) {
       _this.addManager(manager);
       addManagerDialog.dialog("close");
     } else {
+      messageDialog.dialog("moveToTop");
       messageDialog.dialog("open");
     }
   } 
@@ -275,7 +279,8 @@ var ManagerSidebar = function(parentIn) {
       event.stopPropagation();
       if (addManagerDialog) {
         addManagerDialog.find("#manager_name")[0].value = "";
-        addManagerDialog.dialog("open"); 
+        addManagerDialog.dialog("moveToTop");
+        addManagerDialog.dialog("open");
       }
     }
   }
