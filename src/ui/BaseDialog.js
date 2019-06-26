@@ -344,6 +344,9 @@ BaseDialog.prototype.maximiseCallback = function(dialogInstance) {
 		dialogInstance.setPosition(0, 0);
 		dialogInstance.setWidth("100%");
 		dialogInstance.setHeight("100%");
+	    for (var i = 0; i < dialogInstance.resizeStopCallbacks.length; i++) {
+	    	dialogInstance.resizeStopCallbacks[i]( dialogInstance );
+	    }
 	}
 }
 
