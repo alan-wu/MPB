@@ -1,15 +1,9 @@
 require("../styles/my_styles.css");
 
 var OrgansViewerDialog = function(organsViewerIn, parentIn, options) {
-  (require('./BaseDialog').BaseDialog).call(this);
-  this.parent = parentIn;
-  this.containment = parentIn;
-  if (options !== undefined) {
-	  if (options.containment !== undefined)
-		  this.containment = options.containment;
-  }
-  var sceneData = undefined;
+  (require('./BaseDialog').BaseDialog).call(this, parentIn, options);
   this.module = organsViewerIn;
+  var sceneData = undefined;
   var organPartsGui = undefined;
   var speedSlider = undefined;
   var timeSlider = undefined;

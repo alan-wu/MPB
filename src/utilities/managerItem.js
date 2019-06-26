@@ -40,6 +40,7 @@ exports.ManagerItem = function() {
     	  var newSettings = module.exportSettings();
     	  if (dialog) {
     		  newSettings.parent = require("../utility").getSelector(dialog.parent);
+    		  newSettings.isDocked = dialog.isDocked;
     	  }
     	  return newSettings;
       }

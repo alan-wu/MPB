@@ -273,10 +273,10 @@ exports.ModuleManager = function() {
       itemChangedCallbacks.push(callback);
   }
   
-  this.createDialog = function(module, parent) {
+  this.createDialog = function(module, parent, options) {
     if (module && ready) {
       if (constructors[module.typeName]) {
-        var dialog = constructors[module.typeName].dialog(module, parent);
+        var dialog = constructors[module.typeName].dialog(module, parent, options);
         _this.manageDialog(dialog);
         dialog.destroyModuleOnClose = true;
         return dialog;
@@ -402,7 +402,7 @@ exports.ModuleManager = function() {
 					  parent = document.querySelector(settings.parent);
 				  else
 					  parent = document.querySelector("body");
-				  _this.createDialog(module, parent);
+				  _this.createDialog(module, parent, settings);
 			  }
 		  }
 	  } 

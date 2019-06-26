@@ -2,14 +2,8 @@
  * A customised dialog for body viewer.
  */
 var ScaffoldDialog = function(scaffoldViewerIn, parentIn, options) {
-  (require('./BaseDialog').BaseDialog).call(this);
-  this.parent = parentIn;
+  (require('./BaseDialog').BaseDialog).call(this, parentIn, options);
   this.module = scaffoldViewerIn;
-  this.containment = parentIn;
-  if (options !== undefined) {
-	  if (options.containment !== undefined)
-		  this.containment = options.containment;
-  }
   var modal = undefined;
   var optionsChanged = false;
   var _myInstance = this;

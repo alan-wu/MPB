@@ -8,12 +8,12 @@ var dat = require("./dat.gui.js");
 require("../styles/dat-gui-swec.css");
 require("../styles/jquery-ui.theme.min.css");
 require("../styles/dialog.css");
+var ResizeSensor = require('css-element-queries/src/ResizeSensor');
 
-var BaseDialog = function() {
-  this.container = undefined;
+var BaseDialog = function(parent, options) {
+  this.parent = parent;
+  this.containment = parent;
   this.module = undefined;
-  this.parent = undefined;
-  this.containment = undefined;
   this.content = undefined;
   this.datGui = undefined;
   this.UIIsReady = false;
@@ -23,6 +23,10 @@ var BaseDialog = function() {
   this.resizeStopCallbacks = [];
   this.snackbar = undefined;
   this.title = "Default";
+  this.autoResize = false;
+  this.sensor = undefined;
+  this.isDocked = false;
+  this.processOptions(options);
 }
 
 BaseDialog.prototype.getModule = function() {
@@ -78,9 +82,14 @@ BaseDialog.prototype.dock = function() {
 		containment: this.containment,
 		disabled: true
 	});
+	this.setPosition(0 , 0);
 	this.setWidth("100%");
 	this.setHeight("100%");
-	this.setPosition(0 , 0);
+	this.sensor = undefined;
+	this.setAutoResize(false);
+	this.setAutoResize(true);
+	this.hideCloseButton();
+	this.isDocked = true;
 }
 
 BaseDialog.prototype.dockToContainment = function(containment) {
@@ -89,15 +98,19 @@ BaseDialog.prototype.dockToContainment = function(containment) {
 }
 
 BaseDialog.prototype.undock = function() {
-	this.containment = this.parent;
-	this.container.parent().draggable({
-		containment: this.containment,
-		disabled: false
-	});
-	this.container.parent().resizable({
-		containment: this.containment,
-		disabled: false
-	});
+	if (this.isDocked == true) {
+		this.containment = this.parent;
+		this.container.parent().draggable({
+			containment: this.containment,
+			disabled: false
+		});
+		this.container.parent().resizable({
+			containment: this.containment,
+			disabled: false
+		});
+		this.setAutoResize(false);
+		this.isDocked = false;
+	}
 }
 
 BaseDialog.prototype.getContainment = function() {
@@ -172,7 +185,7 @@ BaseDialog.prototype.create = function(htmlData) {
   });
   
   //this is a docked widget if the containment and parent are not the same
-  if (this.containment != this.parent) {
+  if ((this.containment != this.parent) || this.isDocked) {
 	  this.dock();
   }
   
@@ -296,9 +309,9 @@ BaseDialog.prototype.setPosition = function(leftIn, topIn) {
 };
 
 BaseDialog.prototype.showCloseButton = function() {
-	  this.container.dialog("option",
+	this.container.dialog("option",
 	       "classes.ui-dialog-titlebar-close", "displayBlock");
-	}
+}
 
 
 BaseDialog.prototype.hideCloseButton = function() {
@@ -325,5 +338,37 @@ BaseDialog.prototype.setLeft = function(leftIn) {
 BaseDialog.prototype.setTop = function(topIn) {
   this.container[0].parentNode.style.top = topIn;
 };
+
+BaseDialog.prototype.maximiseCallback = function(dialogInstance) {
+	return function() {
+		dialogInstance.setPosition(0, 0);
+		dialogInstance.setWidth("100%");
+		dialogInstance.setHeight("100%");
+	}
+}
+
+BaseDialog.prototype.setAutoResize = function(flag) {
+	if (flag != this.autoResize) {
+		if (flag == true) {
+			this.sensor = new ResizeSensor(this.containment, this.maximiseCallback(this));
+			this.autoResize = true;
+		} else if (flag == false){
+			this.sensor = undefined;
+			this.autoResize = false;
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
+
+BaseDialog.prototype.processOptions = function(options) {
+	if (options !== undefined) {
+		  if (options.containment !== undefined)
+			  this.containment = options.containment;
+		  if (options.isDocked !== undefined)
+			  this.isDocked = options.isDocked;
+	}
+}
 
 exports.BaseDialog = BaseDialog;

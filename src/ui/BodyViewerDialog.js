@@ -2,14 +2,8 @@
  * A customised dialog for body viewer.
  */
 var BodyViewerDialog = function(bodyViewerIn, parentIn, options) {
-  (require('./BaseDialog').BaseDialog).call(this);
-  this.parent = parentIn;
+  (require('./BaseDialog').BaseDialog).call(this, parentIn, options);
   this.module = bodyViewerIn;
-  this.containment = parentIn;
-  if (options !== undefined) {
-	  if (options.containment !== undefined)
-		  this.containment = options.containment;
-  }
   var systemGuiFolder = new Array();
   var systemPartsGuiControls = new Array();
   var _myInstance = this;

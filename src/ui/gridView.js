@@ -1,5 +1,4 @@
 require("../styles/gridView.css")
-var ResizeSensor = require('css-element-queries/src/ResizeSensor');
 
 exports.GridView = function(containerIn) {
 	var container = containerIn;
@@ -8,7 +7,7 @@ exports.GridView = function(containerIn) {
 	var template = require("../snippets/gridView.html");
 	var _this = this;
 	var dialogs = [];
-	var sensor = undefined;
+	//var sensor = undefined;
 	var height = "800px";
 	this.isEnabled = false;
 
@@ -58,15 +57,6 @@ exports.GridView = function(containerIn) {
 		return false;
 	}
 	
-	var updateSize = function() {
-		if (_this.isEnabled) {
-			for (var i = 0; i < dialogs.length; i++) {
-				dialogs[i].setWidth("100%");
-				dialogs[i].setHeight("100%");
-			}
-		}
-	}
-
 	this.addManagerItem = function(item) {
 		if (_this.isEnabled) {
 			var dialog = item.getDialog();
@@ -79,7 +69,6 @@ exports.GridView = function(containerIn) {
 		}
 	}
 	
-
 	var removeDialog = function(dialog) {
 		if (dialog && (dialogs.includes(dialog) == true)) {
 			var containment = dialog.getContainment();
@@ -109,8 +98,6 @@ exports.GridView = function(containerIn) {
 		parent = $(template);
 		rowElement = parent.find(".Row")[0];
 		container.appendChild(parent[0]);
-		parent.find(".portalGridViewContainer")[0].onscroll = resize();
-		sensor  = new ResizeSensor(parent[0], resize());
 	}
 
 	setup();
