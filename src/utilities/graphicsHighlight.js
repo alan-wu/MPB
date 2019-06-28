@@ -87,7 +87,7 @@ exports.GraphicsHighlight = function() {
     // Selected object cannot be highlighted
     var array = getUnmatchingObjects(objects, currentSelectedObjects);
     for (var i = 0; i < array.length; i++) {
-      if (array[i] && array[i].material)
+      if (array[i] && array[i].material && array[i].material.emissive)
         array[i].material.emissive.setHex(_this.highlightColour);
     }
     currentHighlightedObjects = array;
@@ -96,16 +96,22 @@ exports.GraphicsHighlight = function() {
   
   this.resetHighlighted = function() {
     for (var i = 0; i < currentHighlightedObjects.length; i++) {
-      currentHighlightedObjects[i].material.emissive.setHex(_this.originalColour);
-      currentHighlightedObjects[i].material.depthFunc = THREE.LessEqualDepth;
+		if (currentHighlightedObjects[i].material.emissive)
+			currentHighlightedObjects[i].material.emissive.setHex(_this.originalColour);
+		if (currentHighlightedObjects[i].material.depthFunc)
+			currentHighlightedObjects[i].material.depthFunc = THREE.LessEqualDepth;
     }
     currentHighlightedObjects = [];
   }
   
   this.resetSelected = function() {
     for (var i = 0; i < currentSelectedObjects.length; i++) {
-      currentSelectedObjects[i].material.emissive.setHex(_this.originalColour);
-      currentSelectedObjects[i].material.depthFunc = THREE.LessEqualDepth;
+    	if (currentSelectedObjects[i] && currentSelectedObjects[i].material) {
+    		if (currentSelectedObjects[i].material.emissive)
+    			currentSelectedObjects[i].material.emissive.setHex(_this.originalColour);
+    		if (currentSelectedObjects[i].material.depthFunc)
+    			currentSelectedObjects[i].material.depthFunc = THREE.LessEqualDepth;
+    	}
     }
     currentSelectedObjects = [];
   }
@@ -117,7 +123,8 @@ exports.GraphicsHighlight = function() {
     currentHighlightedObjects = array;
     _this.resetSelected();
     for (var i = 0; i < objects.length; i++) {
-      objects[i].material.emissive.setHex(_this.selectColour);
+    	if (objects[i] && objects[i].material && objects[i].material.emissive)
+    		objects[i].material.emissive.setHex(_this.selectColour);
     }
     currentSelectedObjects = objects;
     return isDifferent(currentSelectedObjects, previousHSelectedObjects);

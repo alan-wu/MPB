@@ -611,11 +611,9 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			  var organDetails = getOrganDetails(sceneData.currentSpecies, systemName, partName);
 			  if (organDetails === undefined || organDetails.view == undefined)
 			  {
-				  _this.scene.viewAll();
 				  var zincCameraControl = _this.scene.getZincCameraControls();
 				  var viewport = zincCameraControl.getCurrentViewport();
 				  zincCameraControl.setDefaultCameraSettings(viewport);
-				  _this.scene.resetView();
 			  }
 			  var annotation = new (require('../utilities/annotation').annotation)();
 			  annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName};
@@ -640,6 +638,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	  
 	  var downloadCompletedCallback = function() {
 		  return function() {
+			  _this.scene.viewAll();
 			  _this.settingsChanged();
 		  }
 	  }
@@ -647,6 +646,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	  var singleItemDownloadCompletedCallback = function(systemName, partName, useDefautColour) {
 		    return function(geometry) {
 		    	addOrganPart(systemName, partName, useDefautColour, geometry);
+		    	_this.scene.viewAll();
 		    	_this.settingsChanged();
 		    }
 	  }

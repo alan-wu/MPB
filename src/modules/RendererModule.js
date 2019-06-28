@@ -43,7 +43,13 @@ RendererModule.prototype.setHighlightedByObjects = function(objects, propagateCh
     var eventType = require("../utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
     var annotations = [];
     for (var i = 0; i < objects.length; i++) {
-      annotations[i] = objects[i].userData.userData[0];
+    	if (objects[i].userData && objects[i].userData.userData && objects[i].userData.userData[0] !== undefined)
+    		annotations[i] = objects[i].userData.userData[0];
+    	else if (objects[i].name !== undefined) {
+	        var annotation = new (require('../utilities/annotation').annotation)();
+	        annotation.data = {species:undefined, system:undefined, part:objects[i].name};
+	        annotations[i] = annotation;
+    	}
     }
     this.publishChanges(annotations, eventType);
   }
@@ -56,7 +62,7 @@ RendererModule.prototype.setSelectedByObjects = function(objects, propagateChang
     var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
     var annotations = [];
     for (var i = 0; i < objects.length; i++) {
-    	if (objects[i].userData.userData[0] !== undefined)
+    	if (objects[i].userData && objects[i].userData.userData && objects[i].userData.userData[0] !== undefined)
     		annotations[i] = objects[i].userData.userData[0];
     	else if (objects[i].name !== undefined) {
 	        var annotation = new (require('../utilities/annotation').annotation)();
