@@ -323,9 +323,13 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		  geometries[i].setVisibility(value);
 		}
 		var glyphsets = _this.scene.findGlyphsetsWithGroupName(name);
-    for (var i = 0; i < glyphsets.length; i ++ ) {
-      glyphsets[i].setVisibility(value);
-    }
+	    for (var i = 0; i < glyphsets.length; i ++ ) {
+	      glyphsets[i].setVisibility(value);
+	    }
+		var pointsets = _this.scene.findPointsetsWithGroupName(name);
+	    for (var i = 0; i < pointsets.length; i ++ ) {
+	    	pointsets[i].setVisibility(value);
+	    }
 		if (pickerScene) {
 	    geometries = pickerScene.findGeometriesWithGroupName(name);
 	    for (var i = 0; i < geometries.length; i ++ ) {

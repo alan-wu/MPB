@@ -3,7 +3,7 @@ var MANAGER_ITEM_CHANGE = require("./managerItem").MANAGER_ITEM_CHANGE;
 var _ = require("lodash/lang");
 
 exports.ModuleManager = function() {
-  var ready = false;
+  var metaLoaded= false;
   var moduleCounter = 0;
   var name = "Default Manager";
   var gridView = undefined;
@@ -274,7 +274,7 @@ exports.ModuleManager = function() {
   }
   
   this.createDialog = function(module, parent, options) {
-    if (module && ready) {
+    if (module) {
       if (constructors[module.typeName]) {
         var dialog = constructors[module.typeName].dialog(module, parent, options);
         _this.manageDialog(dialog);
@@ -306,7 +306,7 @@ exports.ModuleManager = function() {
   }
 
   this.createModule = function(moduleName) {
-    if (modelsLoader && ready) {
+    if (modelsLoader) {
       var module = constructors[moduleName].module();
       if (module) {
 	      moduleCounter = moduleCounter + 1;
@@ -340,8 +340,8 @@ exports.ModuleManager = function() {
       eventNotifier.unsubscribe(subscription);
   }
 
-  this.isReady = function() {
-    return ready;
+  this.isMetaReady = function() {
+    return metaLoaded;
   }
   
   this.initialiseGridView = function(container) {
@@ -480,14 +480,17 @@ exports.ModuleManager = function() {
 
   var systemMetaReadyCallback = function() {
     return function() {
-      ready = true;
+    	metaLoaded = true;
     }
+  }
+  
+  this.initialiseModelsLoader = function(url) {
+	    modelsLoader.addSystemMetaIsReadyCallback(systemMetaReadyCallback());
+	    modelsLoader.initialiseLoading(url);
   }
 
   var initialise = function() {
-    modelsLoader = new (require("../modelsLoader").ModelsLoader)();
-    modelsLoader.addSystemMetaIsReadyCallback(systemMetaReadyCallback());
-    modelsLoader.initialiseLoading();
+	modelsLoader = new (require("../modelsLoader").ModelsLoader)();
     subscription = eventNotifier.subscribe(_this, eventNotifierCallback(), undefined);
   }
 

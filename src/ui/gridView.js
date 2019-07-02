@@ -64,7 +64,6 @@ exports.GridView = function(containerIn) {
 				var containment = getNewItemContainer();
 				dialog.dockToContainment(containment);
 				dialogs.push(dialog);
-				updateSize();
 			}
 		}
 	}
@@ -88,12 +87,6 @@ exports.GridView = function(containerIn) {
 		removeDialog(dialog);
 	}
 	
-	var resize = function() {
-		return function() {
-			updateSize();
-		}
-	}
-
 	var setup = function() {
 		parent = $(template);
 		rowElement = parent.find(".Row")[0];
