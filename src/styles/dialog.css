@@ -4,6 +4,15 @@
 
 .ui-dialog .ui-dialog-titlebar {
 	padding: .1em 1em;
+	font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.ui-dialog {
+	box-sizing:border-box;
+}
+
+.ui-dialog .ui-dialog-content {
+	box-sizing:border-box;
 }
 
 #iconExpand{
@@ -12,4 +21,8 @@
     margin-right:15px;
     margin-top: 3px;
     transform: scale(1.5, 1.5);
+}
+
+.action-dialog {
+	font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
 }

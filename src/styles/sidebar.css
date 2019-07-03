@@ -24,6 +24,7 @@
 .dropdown:hover .dropbtn {background-color: #3e8e41;}
 
 .sidebar-manager {
+  width:auto!important;
   background-color: #2b7ccc;
   color: #000000;
   font-weight: 700;
@@ -45,6 +46,7 @@
 .add-dialog:hover {background-color: #b2d8ff  !important;}
 
 .sidebar-module {
+  width:auto!important;
   padding: 5px 8px !important;
   color: #000;
 	background-color:#3ab3f7;
@@ -53,9 +55,12 @@
   border-radius: 5px;
 }
 
-.sidebar-module:hover {background-color: #b2d8ff  !important;}
+.sidebar-module:hover {background-color: #b2d8ff  !important;width:auto!important}
 
 .sidebar {
+	font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
 	z-index:20000000;
 	color: #fff;
 	background-color:#00357d;

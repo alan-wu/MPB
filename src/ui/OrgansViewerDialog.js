@@ -62,7 +62,7 @@ var OrgansViewerDialog = function(organsViewerIn, parentIn, options) {
       element.className = "organsSecondNerveDisplay";
       element.style.display = "none";
       element = _myInstance.container.find("#timeSliderContainer")[0];
-      element.style.width = "100%";
+      element.style.width = "95%";
       // move the following to model viewer?
       //element = _myInstance.container.find("#organsTertieryDisplayArea")[0];
       //element.style.display = "block";
@@ -71,7 +71,7 @@ var OrgansViewerDialog = function(organsViewerIn, parentIn, options) {
       var element = _myInstance.container.find("#organsDisplayArea")[0];
       element.style.width = "100%";
       element = _myInstance.container.find("#timeSliderContainer")[0];
-      element.style.width = "100%";
+      element.style.width = "95%";
       element = _myInstance.container.find("#organsSecondaryDisplayArea")[0];
       element.style.display = "none";
       element = _myInstance.container.find("#organsTertieryDisplayArea")[0];
