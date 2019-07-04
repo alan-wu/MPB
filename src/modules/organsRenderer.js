@@ -95,7 +95,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	humanOrgansFileMap["Cardiovascular"]["Heart"] = {
 			view: "cardiovascular/heart/heart_view.json",
 			meta: "cardiovascular/heart/animated_nerve_1.json",
-			picker: "cardiovascular/heart/picking_node_1.json",
+			//picker: "cardiovascular/heart/picking_node_1.json",
 			associateData: undefined,
 			externalLink: "https://models.cellml.org/e/bd/deforming_heart.rdf/view"};
 	humanOrgansFileMap["Cardiovascular"]["Arterial Flow"] = {
@@ -247,16 +247,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		return function(intersects, window_x, window_y) {
 			var intersected = _this.getIntersectedObject(intersects);
 			if (intersected !== undefined) {
-				if (_this.scene.sceneName == "human/Cardiovascular/Heart") {
-					var id = Math.round(intersected.object.material.color.b * 255) ;
-					intersected.object.name = id.toString();
-					if (_this.toolTip !== undefined) {
-						_this.toolTip.setText("Node " + id);
-						_this.toolTip.show(window_x, window_y);
-					}
-					_this.displayMessage(intersected.object.name + " selected.");
-					_this.setSelectedByObjects([intersected.object], true);
-				} else if (intersected.object.name) {
+				if (intersected.object.name) {
 					if (_this.toolTip !== undefined) {
 						_this.toolTip.setText(intersected.object.name);
 						_this.toolTip.show(window_x, window_y);
@@ -283,19 +274,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		return function(intersects, window_x, window_y) {
 			var intersected = _this.getIntersectedObject(intersects);
 			if (intersected !== undefined) {
-				if (_this.scene.sceneName == "human/Cardiovascular/Heart") {
-					var id = Math.round(intersected.object.material.color.b * 255) ;
-					// a temporary hack to put id into object name, this will be
-					// done differently
-					intersected.object.name = id.toString();
-					_this.displayArea.style.cursor = "pointer";
-					if (_this.toolTip !== undefined) {
-						_this.toolTip.setText("Node " + id);
-						_this.toolTip.show(window_x, window_y);
-					}
-					_this.setHighlightedByObjects([intersected.object], true);
-					return;
-				} else if (intersected.object.name) {
+				if (intersected.object.name) {
 				  _this.displayArea.style.cursor = "pointer";
 				  if (_this.toolTip !== undefined) {
   					_this.toolTip.setText(intersected.object.name);
@@ -619,9 +598,9 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 				  var viewport = zincCameraControl.getCurrentViewport();
 				  zincCameraControl.setDefaultCameraSettings(viewport);
 			  }
-			  var annotation = new (require('../utilities/annotation').annotation)();
-			  annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName};
-			  geometry.userData = [annotation];
+			  //var annotation = new (require('../utilities/annotation').annotation)();
+			  //annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName, object:geometry};
+			  //geometry.userData = [annotation];
 			  if (partName)
 				  _this.displayMessage(partName + " loaded.");
 			  else 

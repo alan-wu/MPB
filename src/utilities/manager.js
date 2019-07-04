@@ -8,6 +8,7 @@ exports.ModuleManager = function() {
   var name = "Default Manager";
   var gridView = undefined;
   var currentSettings = undefined;
+  this.defaultEvent = false;
   var fragmentParser = new (require("./fragmentParser").FragmentParser)();
   var constructors = new function() {
     this["Body Viewer"] = [];
@@ -234,7 +235,8 @@ exports.ModuleManager = function() {
       var managerItem = new ManagerItem();
       managerItem.setModule(moduleIn);
       moduleIn.addChangedCallback(moduleChangedCallback());
-      moduleIn.addNotifier(eventNotifier);
+      if (_this.defaultEvent)
+    	  moduleIn.addNotifier(eventNotifier);
       managerItems.push(managerItem);
       for (var i = 0; i < itemChangedCallbacks.length; i++)
         itemChangedCallbacks[i](managerItem, MANAGER_ITEM_CHANGE.ADDED);

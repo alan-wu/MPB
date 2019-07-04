@@ -47,7 +47,7 @@ RendererModule.prototype.setHighlightedByObjects = function(objects, propagateCh
     		annotations[i] = objects[i].userData.userData[0];
     	else if (objects[i].name !== undefined) {
 	        var annotation = new (require('../utilities/annotation').annotation)();
-	        annotation.data = {species:undefined, system:undefined, part:objects[i].name};
+	        annotation.data = {species:undefined, system:undefined, part:objects[i].name, object:objects[i].userData};
 	        annotations[i] = annotation;
     	}
     }
@@ -66,7 +66,7 @@ RendererModule.prototype.setSelectedByObjects = function(objects, propagateChang
     		annotations[i] = objects[i].userData.userData[0];
     	else if (objects[i].name !== undefined) {
 	        var annotation = new (require('../utilities/annotation').annotation)();
-	        annotation.data = {species:undefined, system:undefined, part:objects[i].name};
+	        annotation.data = {species:undefined, system:undefined, part:objects[i].name, object:objects[i].userData};
 	        annotations[i] = annotation;
     	}
     }
