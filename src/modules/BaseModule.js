@@ -7,6 +7,7 @@ var BaseModule = function() {
   this.messageFunction = undefined;
   /**  Notifier handle for informing other modules of any changes **/
   this.eventNotifiers = [];
+  this.broadcastChannels = {};
 }
 
 BaseModule.prototype.setName = function(name) {
@@ -17,6 +18,22 @@ BaseModule.prototype.setName = function(name) {
       callbackArray[i]( this, MODULE_CHANGE.NAME_CHANGED );
     }
   }
+}
+
+BaseModule.prototype.addBroadcastChannels = function(ChannelName) {
+	if (ChannelName in this.broadcastChannels)
+		return false;
+	var newChannel = new (require('broadcast-channel')).default(ChannelName);
+	this.broadcastChannels[ChannelName] = newChannel;
+	return true;
+}
+
+BaseModule.prototype.removeBroadcastChannels = function(ChannelName) {
+	if (ChannelName in this.broadcastChannels) {
+		this.broadcastChannels[ChannelName].close();
+		delete broadcastChannels[ChannelName];
+	}
+	
 }
 
 BaseModule.prototype.settingsChanged = function() {
@@ -44,6 +61,11 @@ BaseModule.prototype.importSettings = function(settings) {
 BaseModule.prototype.publishChanges = function(annotations, eventType) {
   for (var i = 0; i < this.eventNotifiers.length; i++) {
     this.eventNotifiers[i].publish(this, eventType, annotations);
+  }
+  if (eventType === require("../utilities/eventNotifier").EVENT_TYPE.SELECTED) {
+	  for (var key in this.broadcastChannels) {
+		  this.broadcastChannels[key].postMessage(annotations);
+	  }
   }
 }
 

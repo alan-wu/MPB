@@ -9,6 +9,7 @@ exports.ModuleManager = function() {
   var gridView = undefined;
   var currentSettings = undefined;
   this.defaultEvent = false;
+  this.serialiseDiv = true;
   var fragmentParser = new (require("./fragmentParser").FragmentParser)();
   var constructors = new function() {
     this["Body Viewer"] = [];
@@ -21,12 +22,12 @@ exports.ModuleManager = function() {
       var dialog = new (require("../ui/BodyViewerDialog").BodyViewerDialog)(module, parent, options);
       return dialog;
     }
-    this["Organs Viewer"] = [];
-    this["Organs Viewer"].module = function() {
+    this["Organ Viewer"] = [];
+    this["Organ Viewer"].module = function() {
       var module = new (require("../modules/organsRenderer").OrgansViewer)(modelsLoader);
       return module; 
     }
-    this["Organs Viewer"].dialog = function(module, parent, options) {
+    this["Organ Viewer"].dialog = function(module, parent, options) {
       var dialog = new (require("../ui/OrgansViewerDialog").OrgansViewerDialog)(module, parent, options);
       return dialog; 
     }
@@ -186,7 +187,7 @@ exports.ModuleManager = function() {
   this.getSettings = function() {
 	  var settings = [];
       for (var i = 0; i < managerItems.length; i++) {
-          var newSettings = managerItems[i].getSettings();
+          var newSettings = managerItems[i].getSettings(_this.serialiseDiv);
           if (newSettings) {
         	  settings.push(newSettings);
           }
@@ -329,7 +330,7 @@ exports.ModuleManager = function() {
         if (id.type == "anatomical") {
           for (var i = 0; (i < managerItems.length); i++) {
             var module = managerItems[i].getModule();
-            if (module.typeName === "Organs Viewer")
+            if (module.typeName === "Organ Viewer")
               module.loadOrgans(id.data.species, id.data.system, id.data.part);
           }
         }
@@ -373,7 +374,7 @@ exports.ModuleManager = function() {
 	  var copyItems = remainingItems.slice();
 	  for (var i = 0; i < copyItems.length; i++) {
 		  var item = copyItems[i];
-		  var currentSettings = item.getSettings();
+		  var currentSettings = item.getSettings(_this.serialiseDiv);
 		  if (_.isEqual(setting, currentSettings)) {
 			  return [true, i];
 		  }
@@ -385,7 +386,7 @@ exports.ModuleManager = function() {
 	  var copyItems = remainingItems.slice();
 	  for (var i = 0; i < copyItems.length; i++) {
 		  var item = copyItems[i];
-		  var currentSettings = item.getSettings();
+		  var currentSettings = item.getSettings(_this.serialiseDiv);
 		  if (_.isEqual(setting.dialog, currentSettings.dialog)) {
 			  return [true, i];
 		  }

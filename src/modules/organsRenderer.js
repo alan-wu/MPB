@@ -61,7 +61,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	var modelPanel = undefined;
 	var modelsLoader = ModelsLoaderIn;
 	var _this = this;
-	_this.typeName = "Organs Viewer";
+	_this.typeName = "Organ Viewer";
 	// Secondary renderer, used for comparing species models.
 	var secondaryRenderer = undefined;
 	var secondaryRendererContainer = undefined;
@@ -896,7 +896,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		  settings.species  = sceneData.currentSpecies;
 		  settings.metaURL = sceneData.metaURL;
 		  settings.viewURL = sceneData.viewURL;
-		  settings.dialog = "Organs Viewer";
+		  settings.dialog = "Organ Viewer";
 		  return settings;
 	  }
 	  

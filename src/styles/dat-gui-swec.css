@@ -1,6 +1,6 @@
 .dg {
-       color: black;
-       font: 500 15px "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+       color: #505050;
+       font: 500 13px "Roboto,Noto,sans-serif", "Lucida Grande", sans-serif;
        text-shadow: white 0 0 0;
 }
 .dg.main{
@@ -14,7 +14,7 @@
        background: silver
 } 
 .dg .c .slider:hover {
-       background: silver
+       background: #c2d8ff
 } 
 
 .dg .c input[type=text] {
@@ -27,21 +27,21 @@
        padding: 0 0
 } 
 .dg .c input[type=text]:active {
-       background: white;
+       background: #c2d8ff;
        color: black;
        outline-color: lightblue;
        outline-style: solid;
        outline-width: 1.2px
 } 
 .dg .c input[type=text]:focus {
-       background: white;
+       background: #c2d8ff;
        color: black;
        outline-color: lightblue;
        outline-style: solid;
        outline-width: 1.2px
 } 
 .dg .c input[type=text]:hover {
-       background: white;
+       background: #c2d8ff;
        color: black;
        outline-color: lightblue;
        outline-style: solid;
@@ -91,7 +91,7 @@
 }
 
 .dg .cr {
-	opacity:0.8;
+	opacity:0.95;
 }
 .dg .cr.boolean .property-name{
 	width:80%;
@@ -101,20 +101,15 @@
 	float:right;
 }
 .dg .cr.boolean:hover {
-       background: white;
-       border-bottom: 1px solid silver;
+       background: #c2d8ff;
        border-right: 1px solid silver
 }
 .dg .cr.function:hover {
-       background: white;
-       border-bottom: 1px solid silver;
+       background: #c2d8ff;
        border-right: 1px solid silver
 } 
 .dg li.cr {
-       background: linear-gradient(45deg, #fcfcfc, #2b7ccc);
-       border-bottom: 1px solid silver;
-       border-right: 1px solid silver;
-       margin-bottom: 3px;
+       background: #fcfcfc;
     	 border-radius: 0px 10px 10px 0px;
     	 transition: all .2s ease-in;
 }
@@ -122,8 +117,7 @@
 			margin-bottom: 0px;
 }
 .dg li.cr:hover {
-       background: white;
-       border-bottom: 1px solid silver;
+       background: #c2d8ff;
        border-right: 1px solid silver
 }
 .dg li.title, .dg closed {
@@ -162,4 +156,18 @@
 }
 .dg.main .close-button.close-bottom {
 	position:relative;
+}
+
+.dg.main .closed + .close-button.close-bottom {
+	background-image: url("images/hamburger.png")!important;
+	text-indent: -9999px;
+	background-size:40px;
+	width:40px!important;
+	height:40px!important;
+	background-color:#fff!important;
+	border: none;
+}
+
+.dg li:not(.folder) {
+	border-bottom:none;
 }

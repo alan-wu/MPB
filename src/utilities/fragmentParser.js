@@ -1,7 +1,6 @@
-//Try parsing this #dialog=Flatmaps&name=body&dataUrl=static/body;dialog=OrgansViewer&species=human&system=Cardiovascular&part=Heart;dialog=DataViewer&url=myURL
-
 const queryString = require('query-string');
 
+//This object parses the url fragments and return releavant json objects or stringify json object into fragments.
 exports.FragmentParser = function() {
 	
 	const getFragments = hash => {
@@ -13,8 +12,20 @@ exports.FragmentParser = function() {
 	}
 		
 	const getQueryJSON = fragment => {
-		if (fragment && fragment !== "")
-			return queryString.parse(fragment);
+		if (fragment && fragment !== "") {
+			let objects = queryString.parse(fragment);
+			for (let property in objects) {
+				let value = objects[property];
+				if (!Number.isNaN(Number(value))) {
+					value = Number(value);
+				} else if (value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
+					value = value.toLowerCase() === 'true';
+				}
+				objects[property] = value;
+			}
+			return objects;
+			
+		}
 		return undefined;
 	}
 	

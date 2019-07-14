@@ -15,6 +15,14 @@
 	box-sizing:border-box;
 }
 
+.ui-dialog *::backdrop{
+    background-color: rgba(255,255,255,1);
+}
+
+.ui-dialog *::-ms-backdrop {
+    background-color: rgba(255,255,255,1);
+}
+
 #iconExpand{
     cursor: pointer;
     float: right;

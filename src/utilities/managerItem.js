@@ -35,10 +35,10 @@ exports.ManagerItem = function() {
     return dialog;
   }
   
-  this.getSettings = function() {
+  this.getSettings = function(serialiseDiv) {
       if (module) {
     	  var newSettings = module.exportSettings();
-    	  if (dialog) {
+    	  if (dialog && serialiseDiv) {
     		  newSettings.parent = require("../utility").getSelector(dialog.parent);
     		  newSettings.isDocked = dialog.isDocked;
     	  }
