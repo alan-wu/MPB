@@ -1,6 +1,6 @@
 {
   "name": "physiomeportal",
-  "version": "0.3.12alpha",
+  "version": "0.3.13alpha",
   "description": "Physiome Portal",
   "main": "build/physiomeportal.js",
   "files": [
@@ -10,6 +10,9 @@
     "build/physiomeportal.js",
     "build/physiomeportal.js.map",
     "src/styles/dat-gui-swec.css",
+    "src/styles/images/collapse.png",
+    "src/styles/images/hamburger.png",
+    "src/styles/openg.png",
     "webpack.config.js"
   ],
   "scripts": {
