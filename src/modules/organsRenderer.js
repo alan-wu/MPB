@@ -586,26 +586,28 @@ var OrgansViewer = function(ModelsLoaderIn)  {
   var addOrganPart = function(systemName, partName, useDefautColour, geometry) {
 	  if (geometry.groupName) {
 		  for (var i = 0; i < organPartAddedCallbacks.length;i++) {
-			  organPartAddedCallbacks[i](geometry.groupName, geometry.isTimeVarying());
+			  organPartAddedCallbacks[i](geometry.groupName, _this.scene.isTimeVarying());
 		  }
 		  if (useDefautColour)
 			  modelsLoader.setGeometryColour(geometry, systemName, partName);
 		  if (systemName && partName) {
 			  var organDetails = getOrganDetails(sceneData.currentSpecies, systemName, partName);
+			  /*
 			  if (organDetails === undefined || organDetails.view == undefined)
 			  {
 				  var zincCameraControl = _this.scene.getZincCameraControls();
 				  var viewport = zincCameraControl.getCurrentViewport();
 				  zincCameraControl.setDefaultCameraSettings(viewport);
 			  }
+			  */
 			  //var annotation = new (require('../utilities/annotation').annotation)();
 			  //annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName, object:geometry};
 			  //geometry.userData = [annotation];
-			  if (partName)
-				  _this.displayMessage(partName + " loaded.");
-			  else 
-				  _this.displayMessage("Resource loaded.");
 		  }
+		  if (partName)
+			  _this.displayMessage(partName + " loaded.");
+		  else 
+			  _this.displayMessage("Resource loaded.");
 	  }
   }
 
@@ -709,7 +711,13 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	        sceneData.currentSystem = systemName;
 	        sceneData.currentPart = partName;
 	        // This is used as title
-	        var name = speciesName + "/" + systemName + "/" + partName;
+	        var name = "";
+	        if (speciesName)
+	        	name = speciesName + "/";
+	        if (systemName)
+	        	name = systemName + "/";
+	        if (partName)
+	        	name = partName;
 	        // Get informations from the array
 	        if (organsDetails !== undefined) {
 	        	if (organsDetails.sceneName !== undefined)
@@ -725,7 +733,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 
 	  this.loadOrgansFromURL = function(url, speciesName, systemName, partName, viewURL) {
 		  if (_this.zincRenderer) {
-			  if (speciesName && systemName && partName && (sceneData.metaURL !== url)) {
+			  if (partName && (sceneData.metaURL !== url)) {
 				  resetZoom();
 			      setSceneData(speciesName, systemName, partName, undefined);
 			      compareSceneIsOn = false;
@@ -739,14 +747,14 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			      for (var i = 0; i < sceneChangedCallbacks.length;i++) {
 			    	  sceneChangedCallbacks[i](sceneData);
 			      }
-			      if (viewURL && viewURL != "")
+			      if (viewURL && viewURL != "") {
 			    	  sceneData.viewURL = viewURL;
-			      else
-			    	  sceneData.viewURL = modelsLoader.getBodyDirectoryPrefix() + "/body_view.json";
-			      organScene.loadViewURL(sceneData.viewURL);
+				      organScene.loadViewURL(sceneData.viewURL);
+			      } else
+			    	  sceneData.viewURL = undefined;
 			      sceneData.metaURL = url;
 			      organScene.loadMetadataURL(url, _addOrganPartCallback(systemName, partName, false),
-			    	downloadCompletedCallback());	      
+			    	  downloadCompletedCallback());	      
 			      _this.scene = organScene;
 			      _this.zincRenderer.setCurrentScene(organScene);
 			      _this.changeCompareSpecies("none");
@@ -891,11 +899,15 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	  this.exportSettings = function() {
 		  var settings = {};
 		  settings.name = _this.instanceName;
-		  settings.system = sceneData.currentSystem;
-		  settings.part = sceneData.currentPart;
-		  settings.species  = sceneData.currentSpecies;
+		  if (sceneData.currentSystem)
+			  settings.system = sceneData.currentSystem;
+		  if (sceneData.currentSpecies)
+			  settings.species  = sceneData.currentSpecies;
+		  if (sceneData.currentPart)
+			  settings.part = sceneData.currentPart;
 		  settings.metaURL = sceneData.metaURL;
-		  settings.viewURL = sceneData.viewURL;
+		  if (sceneData.viewURL)
+			  settings.viewURL = sceneData.viewURL;
 		  settings.dialog = "Organ Viewer";
 		  return settings;
 	  }

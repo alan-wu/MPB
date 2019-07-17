@@ -18,7 +18,7 @@ exports.FragmentParser = function() {
 				let value = objects[property];
 				if (!Number.isNaN(Number(value))) {
 					value = Number(value);
-				} else if (value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
+				} else if (value !== null && (value.toString().toLowerCase() === 'true' || value.toString().toLowerCase() === 'false')) {
 					value = value.toLowerCase() === 'true';
 				}
 				objects[property] = value;
