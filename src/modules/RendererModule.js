@@ -37,20 +37,32 @@ RendererModule.prototype.getIntersectedObject = function(intersects) {
 	return undefined;
 }
 
+RendererModule.prototype.getAnnotationsFromObjects = function(objects) {
+    var annotations = [];
+    for (var i = 0; i < objects.length; i++) {
+    	var zincObject = objects[i].userData;
+		var annotation = undefined;
+    	if (zincObject) {
+    		if (zincObject.isGlyph) {
+    			annotation = zincObject.getGlyphset().userData ? zincObject.getGlyphset().userData[0] : undefined;
+    			if (annotation && annotation.data)
+    				annotation.data.id = objects[i].name;
+    		} else {
+    			annotation = zincObject.userData ? zincObject.userData[0] : undefined;
+    			if (annotation && annotation.data)
+    				annotation.data.id = objects[i].name;
+    		}    		
+    	}
+    	annotations[i] = annotation;
+    }
+	return annotations;
+}
+
 RendererModule.prototype.setHighlightedByObjects = function(objects, propagateChanges) {
   var changed = this.graphicsHighlight.setHighlighted(objects);
   if (changed && propagateChanges) {
     var eventType = require("../utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
-    var annotations = [];
-    for (var i = 0; i < objects.length; i++) {
-    	if (objects[i].userData && objects[i].userData.userData && objects[i].userData.userData[0] !== undefined)
-    		annotations[i] = objects[i].userData.userData[0];
-    	else if (objects[i].name !== undefined) {
-	        var annotation = new (require('../utilities/annotation').annotation)();
-	        annotation.data = {species:undefined, system:undefined, part:objects[i].name, object:objects[i].userData};
-	        annotations[i] = annotation;
-    	}
-    }
+    var annotations = this.getAnnotationsFromObjects(objects);
     this.publishChanges(annotations, eventType);
   }
   return changed;
@@ -60,16 +72,7 @@ RendererModule.prototype.setSelectedByObjects = function(objects, propagateChang
   var changed = this.graphicsHighlight.setSelected(objects);
   if (changed && propagateChanges) {
     var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
-    var annotations = [];
-    for (var i = 0; i < objects.length; i++) {
-    	if (objects[i].userData && objects[i].userData.userData && objects[i].userData.userData[0] !== undefined)
-    		annotations[i] = objects[i].userData.userData[0];
-    	else if (objects[i].name !== undefined) {
-	        var annotation = new (require('../utilities/annotation').annotation)();
-	        annotation.data = {species:undefined, system:undefined, part:objects[i].name, object:objects[i].userData};
-	        annotations[i] = annotation;
-    	}
-    }
+    var annotations = this.getAnnotationsFromObjects(objects);
     this.publishChanges(annotations, eventType);
   }
   return changed;

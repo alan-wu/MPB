@@ -124,9 +124,11 @@ var OrgansViewerDialog = function(organsViewerIn, parentIn, options) {
 	}
 
 	var updateSpeedSlider = function() {
-		var playRate = _myInstance.module.getPlayRate();
-		organGuiControls.Speed = playRate;
-		speedSlider.updateDisplay();
+		if (speedSlider) {
+			var playRate = _myInstance.module.getPlayRate();
+			organGuiControls.Speed = playRate;
+			speedSlider.updateDisplay();
+		}
 	}
 
 	var texSliderChanged = function() {
@@ -338,8 +340,9 @@ var OrgansViewerDialog = function(organsViewerIn, parentIn, options) {
 		addUICallback();
 		_myInstance.addDatGui();
 		var control = new organsControl();
-		var controller = _myInstance.datGui.addColor(control, 'Background');
+		/* var controller = _myInstance.datGui.addColor(control, 'Background');
 		controller.onChange(organsBackGroundChanged());
+		*/
 		_myInstance.container.find("#organGui")[0]
 				.appendChild(_myInstance.datGui.domElement);
 		var resetViewButton = {
@@ -352,9 +355,11 @@ var OrgansViewerDialog = function(organsViewerIn, parentIn, options) {
 				_myInstance.module.viewAll()
 			}
 		};
+		/*
 		speedSlider = _myInstance.datGui
 				.add(organGuiControls, 'Speed', 0, 5000).step(50).onChange(
 						speedSliderChanged());
+						*/
 		_myInstance.datGui.add(resetViewButton, 'Reset View');
 		_myInstance.datGui.add(viewAllButton, 'View All');
 		organPartsGui = _myInstance.datGui.addFolder('Visibility Control');

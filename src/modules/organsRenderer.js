@@ -446,9 +446,9 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	}
 
 	var activateAdditionalNerveMapRenderer = function() {
-    for (var i = 0; i < layoutUpdateRequiredCallbacks.length;i++) {
-      layoutUpdateRequiredCallbacks[i](false, true);
-    }
+	    for (var i = 0; i < layoutUpdateRequiredCallbacks.length;i++) {
+	      layoutUpdateRequiredCallbacks[i](false, true);
+	    }
 		// setupOrgansNerveSVG();
 	}
 	
@@ -590,25 +590,14 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		  }
 		  if (useDefautColour)
 			  modelsLoader.setGeometryColour(geometry, systemName, partName);
-		  if (systemName && partName) {
-			  var organDetails = getOrganDetails(sceneData.currentSpecies, systemName, partName);
-			  /*
-			  if (organDetails === undefined || organDetails.view == undefined)
-			  {
-				  var zincCameraControl = _this.scene.getZincCameraControls();
-				  var viewport = zincCameraControl.getCurrentViewport();
-				  zincCameraControl.setDefaultCameraSettings(viewport);
-			  }
-			  */
-			  //var annotation = new (require('../utilities/annotation').annotation)();
-			  //annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName, object:geometry};
-			  //geometry.userData = [annotation];
-		  }
 		  if (partName)
 			  _this.displayMessage(partName + " loaded.");
 		  else 
 			  _this.displayMessage("Resource loaded.");
 	  }
+	  var annotation = new (require('../utilities/annotation').annotation)();
+	  annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName, group:geometry.groupName};
+	  geometry.userData = [annotation];
   }
 
 	  /**

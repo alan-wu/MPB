@@ -63,8 +63,12 @@ BaseModule.prototype.publishChanges = function(annotations, eventType) {
     this.eventNotifiers[i].publish(this, eventType, annotations);
   }
   if (eventType === require("../utilities/eventNotifier").EVENT_TYPE.SELECTED) {
-	  for (var key in this.broadcastChannels) {
-		  this.broadcastChannels[key].postMessage(annotations);
+	  if (annotations && annotations[0]) {
+		  var annotation = annotations[0];	  
+		  var data = {action: "query-data", resource: annotation.data.id, data: annotation.data, sender: this.instanceName};
+		  for (var key in this.broadcastChannels) {
+			  this.broadcastChannels[key].postMessage(data);
+		  }
 	  }
   }
 }
