@@ -148,25 +148,31 @@
        text-align: center;
        text-shadow: 1px 0 0 white
 } 
-.dg.main .close-button:hover {
-       outline-color: lightblue;
-       outline-style: solid;
-       outline-width: 1.5px;
-       background-color: #fff;
-}
-.dg.main .close-button.close-bottom {
-	position:relative;
+
+.dg.main .close-button.close-bottom:hover {
+       background-color: lightblue;
 }
 
-.dg.main .closed + .close-button.close-bottom {
+.dg.main .close-button.close-bottom {
+	position:absolute;
+	top: 0px;
 	background-image: url("images/hamburger.png")!important;
 	text-indent: -9999px;
 	background-size:40px;
 	width:40px!important;
 	height:40px!important;
-	background-color:#fff!important;
+	background-color:#fff;
 	border: none;
 }
+
+.dg.main > ul{
+    margin-top: 40px;
+}
+
+.folder .dg ul li:last-child {
+    border-radius: 0px 0px 10px;
+}
+
 
 .dg li:not(.folder) {
 	border-bottom:none;
