@@ -156,7 +156,7 @@
 .dg.main .close-button.close-bottom {
 	position:absolute;
 	top: 0px;
-	background-image: url("images/hamburger.png")!important;
+	background-image: url("./images/hamburger.png")!important;
 	text-indent: -9999px;
 	background-size:40px;
 	width:40px!important;

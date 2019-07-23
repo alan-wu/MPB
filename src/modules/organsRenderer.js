@@ -612,7 +612,6 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	  
 	  var downloadCompletedCallback = function() {
 		  return function() {
-			  _this.scene.viewAll();
 			  _this.settingsChanged();
 		  }
 	  }
@@ -620,7 +619,6 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	  var singleItemDownloadCompletedCallback = function(systemName, partName, useDefautColour) {
 		    return function(geometry) {
 		    	addOrganPart(systemName, partName, useDefautColour, geometry);
-		    	_this.scene.viewAll();
 		    	_this.settingsChanged();
 		    }
 	  }
