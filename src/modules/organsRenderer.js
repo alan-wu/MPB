@@ -590,11 +590,9 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		  }
 		  if (useDefautColour)
 			  modelsLoader.setGeometryColour(geometry, systemName, partName);
-		  if (partName)
-			  _this.displayMessage(partName + " loaded.");
-		  else 
-			  _this.displayMessage("Resource loaded.");
+		  _this.displayMessage(geometry.groupName + " loaded.");
 	  }
+	  _this.displayMessage("Resource loaded.");
 	  var annotation = new (require('../utilities/annotation').annotation)();
 	  annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName, group:geometry.groupName};
 	  geometry.userData = [annotation];
@@ -613,6 +611,8 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	  var downloadCompletedCallback = function() {
 		  return function() {
 			  _this.settingsChanged();
+			  _this.scene.viewAll();
+			  _this.displayMessage("All resources loaded.");
 		  }
 	  }
 	  
@@ -740,6 +740,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			      } else
 			    	  sceneData.viewURL = undefined;
 			      sceneData.metaURL = url;
+			      _this.displayMessage("Downloading...");
 			      organScene.loadMetadataURL(url, _addOrganPartCallback(systemName, partName, false),
 			    	  downloadCompletedCallback());	      
 			      _this.scene = organScene;
