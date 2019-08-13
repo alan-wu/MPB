@@ -1,6 +1,6 @@
 {
   "name": "physiomeportal",
-  "version": "0.4.2",
+  "version": "0.4.4",
   "description": "Physiome Portal",
   "main": "build/physiomeportal.js",
   "files": [
@@ -16,7 +16,8 @@
     "webpack.config.js"
   ],
   "scripts": {
-    "build": "webpack --mode=none",
+    "build": "webpack --config webpack.frontend.js --mode=none; webpack --config webpack.backend.js --mode=none",
+    "build-backend": "webpack --config webpack.backend.js --mode=none",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -44,23 +45,25 @@
     "babel-loader": "^8.0.5",
     "babel-preset-minify": "^0.5.0",
     "better-docs": "^1.0.0",
-    "broadcast-channel": "^2.1.12",
-    "css-element-queries": "^1.2.0",
-    "dialog-polyfill": "^0.4.10",
     "file-loader": "^1.1.11",
     "html-loader": "^0.5.5",
-    "jquery": "^3.4.1",
     "js-yaml": ">=3.13.1",
-    "lodash": "^4.17.14",
-    "polyfill-array-includes": "^2.0.0",
-    "query-string": "^5.1.1",
     "raw-loader": "^0.5.1",
     "style-loader": "^0.21.0",
     "url-loader": "^1.0.1",
     "webpack": "^4.6.0",
     "webpack-cli": "^3.3.6",
-    "webpack-jquery-ui": "^2.0.1",
-    "zincjs": "^0.30.2"
+    "webpack-node-externals": "^1.7.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "broadcast-channel": "^2.1.12",
+    "css-element-queries": "^1.2.0",
+    "dialog-polyfill": "^0.4.10",
+    "jquery": "^3.4.1",
+    "lodash": "^4.17.14",
+    "polyfill-array-includes": "^2.0.0",
+    "query-string": "^5.1.1",
+    "webpack-jquery-ui": "^2.0.1",
+    "zincjs": "^0.31.3"
+  }
 }
