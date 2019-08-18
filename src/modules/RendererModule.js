@@ -12,14 +12,57 @@ var RendererModule = function()  {
 
 RendererModule.prototype = Object.create((require('./BaseModule').BaseModule).prototype);
 
+/**
+ * This function will get the the first intersected object with name or
+ * the first glyph object with name.
+ */
+RendererModule.prototype.getIntersectedObject = function(intersects) {
+	if (intersects) {
+		var intersected = undefined;
+		for (var i = 0; i < intersects.length; i++) {
+			if (intersects[i] !== undefined) {
+				if (intersects[i].object && intersects[i].object.name) {					
+					if (intersected === undefined)
+						intersected = intersects[i];
+					if (intersects[i].object.userData && 
+					  (intersects[i].object.userData.isGlyph !== undefined)) {
+						return intersects[i];
+					}
+				} 
+				
+			}
+		}
+		return intersected;
+	}
+	return undefined;
+}
+
+RendererModule.prototype.getAnnotationsFromObjects = function(objects) {
+    var annotations = [];
+    for (var i = 0; i < objects.length; i++) {
+    	var zincObject = objects[i].userData;
+		var annotation = undefined;
+    	if (zincObject) {
+    		if (zincObject.isGlyph) {
+    			annotation = zincObject.getGlyphset().userData ? zincObject.getGlyphset().userData[0] : undefined;
+    			if (annotation && annotation.data)
+    				annotation.data.id = objects[i].name;
+    		} else {
+    			annotation = zincObject.userData ? zincObject.userData[0] : undefined;
+    			if (annotation && annotation.data)
+    				annotation.data.id = objects[i].name;
+    		}    		
+    	}
+    	annotations[i] = annotation;
+    }
+	return annotations;
+}
+
 RendererModule.prototype.setHighlightedByObjects = function(objects, propagateChanges) {
   var changed = this.graphicsHighlight.setHighlighted(objects);
   if (changed && propagateChanges) {
     var eventType = require("../utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
-    var annotations = [];
-    for (var i = 0; i < objects.length; i++) {
-      annotations[i] = objects[i].userData.userData[0];
-    }
+    var annotations = this.getAnnotationsFromObjects(objects);
     this.publishChanges(annotations, eventType);
   }
   return changed;
@@ -29,14 +72,17 @@ RendererModule.prototype.setSelectedByObjects = function(objects, propagateChang
   var changed = this.graphicsHighlight.setSelected(objects);
   if (changed && propagateChanges) {
     var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
-    var annotations = [];
-    for (var i = 0; i < objects.length; i++) {
-      annotations[i] = objects[i].userData.userData[0];
-    }
+    var annotations = this.getAnnotationsFromObjects(objects);
     this.publishChanges(annotations, eventType);
   }
   return changed;
 }
+
+var addGlyphToArray = function(objects) {
+    return function(glyph) {
+      objects.push(glyph.getMesh());
+    }
+  }
 
 RendererModule.prototype.findObjectsByGroupName = function(groupName) {
   var geometries = this.scene.findGeometriesWithGroupName(groupName);

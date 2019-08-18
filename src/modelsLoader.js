@@ -114,8 +114,10 @@ exports.ModelsLoader = function()  {
 		xmlhttp.send();
 	}
 
-	this.initialiseLoading = function() {
+	this.initialiseLoading = function(url) {
 		if (metaFilesReady == false) {
+			if (url)
+				this.systemMetaURL = url;
 			var xmlhttp = new XMLHttpRequest();
 			xmlhttp.onreadystatechange = function() {
 			    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {

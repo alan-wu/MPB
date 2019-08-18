@@ -1,7 +1,5 @@
-require("../styles/my_styles.css");
 var THREE = require('zincjs').THREE;
 var ITEM_LOADED = require("../utility").ITEM_LOADED;
-
 /**
  * Provides rendering of the 3D-scaffold data in the dom of the provided id with models
  * defined in the modelsLoader.
@@ -41,8 +39,9 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			var bodyClicked = false;
 			for (var i = 0; i < intersects.length; i++) {
 				if (intersects[i] !== undefined && (intersects[ i ].object.name !== undefined)) {
-					if (!intersects[ i ].object.name.includes("Body")) {
+					if (intersects[ i ].object.name.indexOf("Body") === -1) {
 						_this.setSelectedByObjects([intersects[ i ].object], true);
+						_this.displayMessage(intersects[ i ].object.name + " selected.");
 						return;
 					} else {
 						bodyClicked = true;
@@ -61,11 +60,11 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			var bodyHovered = false;
 			for (var i = 0; i < intersects.length; i++) {
 				if (intersects[i] !== undefined && (intersects[ i ].object.name !== undefined)) {
-					if (!intersects[ i ].object.name.includes("Body")) {
+					if (intersects[ i ].object.name.indexOf("Body") === -1) {
 					  _this.displayArea.style.cursor = "pointer";
 					  _this.toolTip.setText(intersects[ i ].object.name);
 					  _this.toolTip.show(window_x, window_y);
-				    _this.setHighlightedByObjects([intersects[ i ].object], true);
+				      _this.setHighlightedByObjects([intersects[ i ].object], true);
 						return;
 					} else {
 						bodyHovered = true;
@@ -102,7 +101,7 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	 * @callback
 	 */
 	this.changeBodyPartsVisibility = function(name, systemName, value) {
-    var speciesMeta = systemMeta[currentSpecies];
+		var speciesMeta = systemMeta[currentSpecies];
 		if (speciesMeta[systemName].hasOwnProperty(name) && speciesMeta[systemName][name].geometry) {
 		  speciesMeta[systemName][name].geometry.setVisibility(value);
 		}
@@ -118,10 +117,10 @@ var BodyViewer = function(ModelsLoaderIn)  {
 			item["loaded"] = ITEM_LOADED.TRUE;
 			item.geometry = geometry;
 			if (startup) {
-        for (var i = 0; i < systemPartAddedCallbacks.length;i++) {
-          systemPartAddedCallbacks[i](systemName, partName,
-            (item["loaded"] == ITEM_LOADED.TRUE));
-        }
+				for (var i = 0; i < systemPartAddedCallbacks.length;i++) {
+					systemPartAddedCallbacks[i](systemName, partName,
+							(item["loaded"] == ITEM_LOADED.TRUE));
+				}
 			}
 			if (scaling == true) {
 				geometry.morph.scale.x = 1.00;
@@ -136,6 +135,10 @@ var BodyViewer = function(ModelsLoaderIn)  {
 				geometry.setAlpha(0.5);
 				geometry.morph.material.side = THREE.FrontSide;
 			}
+			if (partName)
+				_this.displayMessage(partName + " loaded.");
+			else 
+				_this.displayMessage("Resource loaded.");
 			var annotation = new (require('../utilities/annotation').annotation)();
 			annotation.data = {species:currentSpecies, system:systemName, part:partName};
 			geometry.userData = [annotation];
@@ -162,20 +165,20 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	}
 	
 	this.forEachPartInBody = function(callback) {
-    var speciesMeta = systemMeta[currentSpecies];
-    for (var systemName  in speciesMeta) {
-      var partMap = speciesMeta[systemName];
-      for (var partName in partMap) {
-        if (partMap.hasOwnProperty(partName)) {
-          var item = partMap[partName];
-          var visibility = false;
-          if (item && (item["loaded"] === ITEM_LOADED.TRUE) && item.geometry) {
-            visibility = item.geometry.morph.visible;
-          }
-          callback(systemName, partName, visibility);
-        }
-      }
-    }
+	    var speciesMeta = systemMeta[currentSpecies];
+	    for (var systemName  in speciesMeta) {
+	      var partMap = speciesMeta[systemName];
+	      for (var partName in partMap) {
+	        if (partMap.hasOwnProperty(partName)) {
+	          var item = partMap[partName];
+	          var visibility = false;
+	          if (item && (item["loaded"] === ITEM_LOADED.TRUE) && item.geometry) {
+	            visibility = item.geometry.morph.visible;
+	          }
+	          callback(systemName, partName, visibility);
+	        }
+	      }
+	    }
 	}
 	 
 	/**
@@ -200,11 +203,12 @@ var BodyViewer = function(ModelsLoaderIn)  {
 	var readModel = function(systemName, partName, startup) {
 	  if (_this.scene) {
       var speciesMeta = systemMeta[currentSpecies];
-  		item = speciesMeta[systemName][partName];
+  		var item = speciesMeta[systemName][partName];
   		if (item["loaded"] ==  ITEM_LOADED.FALSE) {
   			var downloadPath = item["BodyURL"];
   			var scaling = false;
   			item["loaded"] =  ITEM_LOADED.DOWNLOADING;
+			_this.displayMessage("Downloading data.");
   			if (item["FileFormat"] == "JSON") {
   				if (systemName == "Musculo-skeletal" || systemName == "Skin (integument)")
   					scaling = true;
@@ -226,9 +230,9 @@ var BodyViewer = function(ModelsLoaderIn)  {
 				if (item["loadAtStartup"] == true) {
 					readModel(systemName, partName, true);
 				} else {
-	        for (var i = 0; i < systemPartAddedCallbacks.length;i++) {
-	          systemPartAddedCallbacks[i](systemName, partName, false);
-	        }
+					for (var i = 0; i < systemPartAddedCallbacks.length;i++) {
+						systemPartAddedCallbacks[i](systemName, partName, false);
+					}
 				}
 			}
 		}

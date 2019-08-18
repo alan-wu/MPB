@@ -1,12 +1,11 @@
 var path = require('path');
 var webpack = require('webpack');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   mode: "none",
   entry: {
-    "physiomeportal": "./src/index.js",
-    "physiomeportal.min": "./src/index.js",
+    "physiomeportal": "./src/index.js"
   },
   output: {
     path: path.resolve(__dirname, 'build'),
@@ -15,6 +14,9 @@ module.exports = {
     libraryTarget: 'umd',
     globalObject: 'this'
   },
+  externals: [
+    nodeExternals({}),
+  ],
   module: {
     rules: [
       { test: /\.(html)$/, use: [{ loader: 'html-loader' }]},
@@ -31,6 +33,19 @@ module.exports = {
         ]
       },
       { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' },
+      {
+          test: /\.js$/,
+          loader: 'babel-loader',
+          query: {
+              presets: ['@babel/preset-env',
+            	  ['minify',  {
+            		  builtIns: false,
+            		  evaluate: false,
+            		  mangle: false,
+            	   }]]
+          }
+      }
+      
 //      {
 //        test: /node_modules/,
 //        loader: 'ify-loader'
@@ -38,17 +53,12 @@ module.exports = {
     ]
   },
   plugins: [
-    new UglifyJsPlugin({
-      include: /\.min\.js$/,
-      uglifyOptions: {
-        compress: true
-      }
-    }),
     new webpack.ProvidePlugin({
       $: "jquery",
       jQuery: "jquery",
       "window.jQuery": "jquery",
       "window.$": "jquery"
     })
-  ]
+  ],
+  devtool: 'source-map'
 };

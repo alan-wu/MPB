@@ -5,7 +5,7 @@ exports.ToolTip = function(container) {
   var tipElement = undefined;
   var tiptextElement = undefined;
   var parent = undefined;
-  var template = '<div id="tooltipcontainer"><div class="tooltip" id="tip"><span class="tooltiptext" id="tiptext"> Tooltip text</span></div></div>';
+  var template = '<div id="tooltipcontainer"><div class="mptooltip" id="tip"><span class="mptooltiptext" id="tiptext"> Tooltip text</span></div></div>';
   var _this = this;
   
   /**

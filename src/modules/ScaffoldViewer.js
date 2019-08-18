@@ -1,4 +1,3 @@
-require("../styles/my_styles.css");
 var THREE = require('zincjs').THREE;
 var ITEM_LOADED = require("../utility").ITEM_LOADED;
 
@@ -17,7 +16,6 @@ var ScaffoldViewer = function(typeAtStartUp)  {
   var meshUpdatedCallbacks = new Array();
   var meshAllPartsDownloadedCallbacks = new Array();
   var availableMeshTypes = undefined;
-  this.alertFunction = undefined;
   this.promptFunction = undefined;
   this.confirmFunction = undefined;
   var currentMeshType = "3d_heart1";
@@ -101,7 +99,7 @@ var ScaffoldViewer = function(typeAtStartUp)  {
             registerLandmarks(coords, datapoint.name, true);
           }
         } else {
-          _this.alertFunction(returnedObject['error']);
+          _this.displayMessage(returnedObject['error']);
         }
         
       }
@@ -161,10 +159,30 @@ var ScaffoldViewer = function(typeAtStartUp)  {
       for (var i = 0; i < meshAllPartsDownloadedCallbacks.length;i++) {
         meshAllPartsDownloadedCallbacks[i]();
       }
-      if (csg) {
-    	csg.allDownloadsCompletedCallback();
-        csg.updatePlane();
+
+      var xmlhttp = new XMLHttpRequest();
+      xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4) {
+          if (xmlhttp.status == 200) {
+            var data = JSON.parse(xmlhttp.responseText);
+            if (csg) {
+              if (data != null)
+            	  csg.enablePathCutting(data);
+              else
+            	  csg.enableStandardCutting();
+            }
+          } else {
+        	if (csg)
+        		csg.enableStandardCutting();
+          }
+          if (csg) {
+        	csg.allDownloadsCompletedCallback();
+          }
+        }
       }
+      var finalURL = "./getCenterLine";
+      xmlhttp.open("GET", finalURL, true);
+      xmlhttp.send();
       settingsChanged = false;
     }
   }
@@ -180,7 +198,6 @@ var ScaffoldViewer = function(typeAtStartUp)  {
     var argumentString = "meshtype=" + currentMeshType;
     argumentString = addOptionsToURL(argumentString);
     var finalURL = "./generator?" + argumentString;
-    console.log(argumentString);
     _this.scene.loadMetadataURL(finalURL, itemDownloadCallback, allCompletedCallback);
     meshChanged = true;
   }
@@ -188,6 +205,7 @@ var ScaffoldViewer = function(typeAtStartUp)  {
   //Data include meshtype, options and landmark
   var importData = function(data) {
     if (data && data.meshtype && data.options) {
+      _this.displayMessage("Importing data");
       currentMeshType = data.meshtype;
       currentOptions = data.options;
       currentLandmarks = data.landmarks;
@@ -234,8 +252,8 @@ var ScaffoldViewer = function(typeAtStartUp)  {
           verifierEntered(verifier);
         }
       } else {
-        if (_this.alertFunction)
-          _this.alertFunction("Loading abort");
+        if (_this.displayMessage)
+        	_this.displayMessage("Loading abort");
       }
     }
   } 
@@ -248,8 +266,7 @@ var ScaffoldViewer = function(typeAtStartUp)  {
         if (_this.promptFunction)
           _this.promptFunction("Enter your verifier here", "...", verifierEnteredCallback());
       } else {
-        if (_this.alertFunction)
-          _this.alertFunction("Loading abort");
+          _this.displayMessage("Loading abort");
       }
     }
   }
@@ -261,7 +278,7 @@ var ScaffoldViewer = function(typeAtStartUp)  {
 
   var parseWorkspaceResponse = function(options) {
     if (options.status === 'error')
-      modal.alert(options.message);
+      _this.displayMessage(options.message);
     else if (options.status === 'success') {
       if (options.VerifyURL)
         verificationCodePrompt(options.VerifyURL);
@@ -275,8 +292,12 @@ var ScaffoldViewer = function(typeAtStartUp)  {
       var xmlhttp = new XMLHttpRequest();
       xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-          var options = JSON.parse(xmlhttp.responseText);
-          parseWorkspaceResponse(options);
+        	if (xmlhttp.status == 200) {
+	          var options = JSON.parse(xmlhttp.responseText);
+	          parseWorkspaceResponse(options);
+        	} else {
+        	  _this.displayMessage("Error reading workspace");
+        	}
         }     
       }
       var requestString = "./getWorkspaceResponse" + "?url=" + url + "&filename="+filename;
@@ -330,8 +351,8 @@ var ScaffoldViewer = function(typeAtStartUp)  {
             var response = JSON.parse(xmlhttp.responseText);
             if (response.status == "success")
               changesCommitted = true;
-            if (response.message && _this.alertFunction)
-              _this.alertFunction(response.message);
+            if (response.message)
+              _this.displayMessage(response.message);
           }     
         }
         var requestString = "./commitWorkspaceChanges" + "?msg=" + msg;
@@ -349,8 +370,7 @@ var ScaffoldViewer = function(typeAtStartUp)  {
         _this.promptFunction("Please enter commit message", msg, commitWorkspaceCallback());
     }
     else {
-      if (_this.alertFunction)
-        _this.alertFunction("Everything is up-to-date");
+    	_this.displayMessage("Everything is up-to-date");
     }
   }
     
@@ -361,8 +381,8 @@ var ScaffoldViewer = function(typeAtStartUp)  {
         xmlhttp.onreadystatechange = function() {
           if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             var response = JSON.parse(xmlhttp.responseText);
-            if (response.message && _this.alertFunction)
-              _this.alertFunction(response.message);
+            if (response.message)
+              _this.displayMessage(response.message);
           }     
         }
         var requestString = "./pushWorkspace";
@@ -437,14 +457,12 @@ var ScaffoldViewer = function(typeAtStartUp)  {
         console.log(response);
         if (response.data) {
           importData(response.data);
-          if (_this.alertFunction)
-            _this.alertFunction(response.message);
+          _this.displayMessage(response.message);
         }
         else if (response.message) {
           settingsChanged = true;
           _this.updateMesh();
-          if (_this.alertFunction)
-            _this.alertFunction(response.message);
+          _this.displayMessage(response.message);
         }
       }
     }
@@ -544,6 +562,18 @@ var ScaffoldViewer = function(typeAtStartUp)  {
   this.addCSGGui = function(parent) {
     if (csg)
       csg.addDatGui(parent);
+  }
+  
+  this.setMessageFunction = function(functionIn) {
+	  (require('./BaseModule').BaseModule).prototype.setMessageFunction.call( _this, functionIn );
+	  if (csg)
+		  csg.setMessageFunction(functionIn);
+  }
+  
+  this.destroy = function() {
+	if (csg)
+	  csg.clear();
+    (require('./RendererModule').RendererModule).prototype.destroy.call( _this );
   }
   
   /**

@@ -34,6 +34,18 @@ exports.ManagerItem = function() {
   this.getDialog = function() {
     return dialog;
   }
+  
+  this.getSettings = function(serialiseDiv) {
+      if (module) {
+    	  var newSettings = module.exportSettings();
+    	  if (dialog && serialiseDiv) {
+    		  newSettings.parent = require("../utility").getSelector(dialog.parent);
+    		  newSettings.isDocked = dialog.isDocked;
+    	  }
+    	  return newSettings;
+      }
+	  return undefined;
+  }
 }
 
 exports.MANAGER_ITEM_CHANGE = MANAGER_ITEM_CHANGE;

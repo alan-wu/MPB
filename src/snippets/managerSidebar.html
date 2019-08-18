@@ -1,15 +1,25 @@
-<div class="w3-sidebar w3-bar-block w3-animate-left sidebar" id="managerSidebar">
+<div class="w3-bar-block sidebar leftShow" id="managerSidebar">
   <button class="w3-bar-item w3-button w3-large" id="sidebarClose">Close &times;</button>
-
-  <button class="w3-bar-item w3-button" id="addManager">+ Add Manager</button>
-
+	<select id="profileSelect" class="profile green" style='display:none'>
+	  <option value="0">Select an use case</option>
+	  <option value="1">Use case 1</option>
+	  <option value="2">Use case 2</option>
+	  <option value="3">Use case 3</option>
+	  <option value="4">Use case 4</option>
+	  <option value="5">Use case 5</option>
+	  <option value="6">Use case 6</option>
+	  <option value="7">Use case 7</option>
+	  <option value="8">Use case 8</option>
+	</select>
+  <button class="w3-bar-item w3-button sidebar-topbutton" id="addManager">+ Add Manager</button>
+  <button class="w3-bar-item w3-button sidebar-topbutton" id="Feedback" style="text-align:center!important;bottom:0px;position:absolute;">Feedback</button>
 </div>
 
-<div>
-  <button id="sidebarOpen" class="w3-button w3-white w3-xxlarge" style="z-index:20000000;opacity:0.9;display:block;'">&#9776;</button>
+<div style="z-index:200000">
+  <button id="sidebarOpen" class="w3-button w3-white w3-xxlarge" style="opacity:0.9;display:block;'">&#9776;</button>
 </div>
 
-<div id="rename-form" title="Rename Module">
+<div id="rename-form" class="action-dialog" title="Rename Module">
   <p style="border: 1px solid transparent; padding: 0.3em;">Please enter new name</p>
   <form>
     <fieldset>
@@ -21,7 +31,7 @@
   </form>
 </div>
 
-<div id="add-manager-form" title="Add Manager">
+<div id="add-manager-form" class="action-dialog" title="Add Manager">
   <p style="border: 1px solid transparent; padding: 0.3em;">Choose a name for the manager</p>
   <form>
     <fieldset>
@@ -35,7 +45,7 @@
   </form>
 </div>
 
-<div id="add-dialog-form" title="Add Dialog">
+<div id="add-dialog-form" class="action-dialog" title="Add Dialog">
   <p style="border: 1px solid transparent; padding: 0.3em;">Select a module type and enter a name for the dialog</p>
   <form>
     <fieldset>
@@ -55,6 +65,6 @@
   </form>
 </div>
 
-<div id="message-dialog" title=Message>
+<div id="message-dialog" class="action-dialog" title=Message>
   <p style="border: 1px solid transparent; padding: 0.3em;" id >Please select a dialog type and enter a new name.</p>
 </div>

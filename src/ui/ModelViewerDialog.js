@@ -4,7 +4,7 @@
 var ModelViewerDialog = function(modelPanelIn, parentIn) {
   (require('./BaseDialog').BaseDialog).call(this);
   this.parent = parentIn;
-  var modelPanel = modelPanelIn;
+  this.module = modelPanelIn;
   var otherModelControls = undefined;
   var modelControl = function() {
     this.Background = [ 255, 255, 255 ]; // RGB array
@@ -21,20 +21,16 @@ var ModelViewerDialog = function(modelPanelIn, parentIn) {
       _myInstance.container[0].style.backgroundColor = backgroundColourString;
     }
   }
-  
-  this.getModule = function() {
-    return modelPanel;
-  }
 
   var addUICallback = function() {
     var callbackElement = _myInstance.container.find("#modelsControllerButton")[0];
-    callbackElement.onclick = function() { modelPanel.runModel() };
+    callbackElement.onclick = function() { _myInstance.module.runModel() };
     callbackElement = _myInstance.container.find("#svgZoomOut")[0];
-    callbackElement.onclick = function() { modelPanel.zoomOut(0.2); };
+    callbackElement.onclick = function() { _myInstance.module.zoomOut(0.2); };
     callbackElement = _myInstance.container.find("#svgZoomReset")[0];
-    callbackElement.onclick = function() { modelPanel.zoomReset(); };
+    callbackElement.onclick = function() { _myInstance.module.zoomReset(); };
     callbackElement = _myInstance.container.find("#svgZoomIn")[0];
-    callbackElement.onclick = function() { modelPanel.zoomIn(0.2) }; 
+    callbackElement.onclick = function() { _myInstance.module.zoomIn(0.2) }; 
   }
   
   var initialiseModelControlUI = function() {
@@ -46,16 +42,7 @@ var ModelViewerDialog = function(modelPanelIn, parentIn) {
     _myInstance.container.find("#modelGui")[0].appendChild(_myInstance.datGui.domElement);
     otherModelControls = _myInstance.datGui.addFolder('Others');
   }
-  
-  var _modelViewerDialogClose = function() {
-    return function(myDialog) {
-      if (_myInstance.destroyModuleOnClose) {
-        modelPanel.destroy();
-        modelPanel = undefined;
-      }
-    }
-  }
-  
+   
   var modelPanelChangedCallback = function() {
     return function(module, change) {
       if (change === require("../modules/BaseModule").MODULE_CHANGE.NAME_CHANGED) {
@@ -65,15 +52,14 @@ var ModelViewerDialog = function(modelPanelIn, parentIn) {
   }
 
   var initialise = function() {
-    if (modelPanel) {
+    if (_myInstance.module) {
       _myInstance.create(require("../snippets/modelPanel.html"));
-      var name = modelPanel.getName();
+      var name = _myInstance.module.getName();
       _myInstance.setTitle(name);
       initialiseModelControlUI();
       var svgElement = _myInstance.container.find("#testsvg")[0];
-      modelPanel.enableSVGController(svgElement);
-      modelPanel.addChangedCallback(modelPanelChangedCallback());
-      _myInstance.onCloseCallbacks.push(_modelViewerDialogClose());
+      _myInstance.module.enableSVGController(svgElement);
+      _myInstance.module.addChangedCallback(modelPanelChangedCallback());
     }
   }
   
