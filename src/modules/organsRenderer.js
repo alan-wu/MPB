@@ -190,9 +190,9 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	 */
 	var preRenderTimeUpdate = function() {
 		var currentTime = _this.zincRenderer.getCurrentTime();
-    for (var i = 0; i < timeChangedCallbacks.length;i++) {
-      timeChangedCallbacks[i](currentTime);
-    }
+		for (var i = 0; i < timeChangedCallbacks.length;i++) {
+			timeChangedCallbacks[i](currentTime);
+		}
 		if (!sceneData.nerveMapIsActive && pickerScene)
 			pickerScene.setMorphsTime(currentTime);
 		if (sceneData.nerveMap && sceneData.nerveMap.additionalReader)
@@ -467,15 +467,15 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	}
 	
 	this.changeBackgroundColour = function(backgroundColourString) {
-	  var colour = new THREE.Color(backgroundColourString);
-    if (_this.zincRenderer) {
-      var internalRenderer = _this.zincRenderer.getThreeJSRenderer();
-      internalRenderer.setClearColor( colour, 1 );
-    }
-    if (secondaryRenderer) {
-      var internalRenderer = secondaryRenderer.getThreeJSRenderer();
-      internalRenderer.setClearColor( colour, 1 );
-    }
+		var colour = new THREE.Color(backgroundColourString);
+		if (_this.zincRenderer) {
+			var internalRenderer = _this.zincRenderer.getThreeJSRenderer();
+			internalRenderer.setClearColor( colour, 1 );
+		}
+		if (secondaryRenderer) {
+			var internalRenderer = secondaryRenderer.getThreeJSRenderer();
+			internalRenderer.setClearColor( colour, 1 );
+		}
 	}
 
 	this.initialiseSecondaryRenderer = function(displayAreaIn) {
