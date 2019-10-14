@@ -9,6 +9,8 @@
     "README.md",
     "build/physiomeportal.js",
     "build/physiomeportal.js.map",
+    "build/physiomeportal.frontend.js",
+    "build/physiomeportal.frontend.js.map",
     "src/styles/dat-gui-swec.css",
     "src/styles/images/collapse.png",
     "src/styles/images/hamburger.png",
