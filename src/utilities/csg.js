@@ -93,8 +93,7 @@ exports.csg = function(sceneIn, zincRendererIn) {
       if (currentGeometry === undefined) {
         currentGeometry = zincGeometry.geometry.clone();
       } else {
-        currentGeometry.mergeMesh(zincGeometry.morph);
-        currentGeometry.mergeVertices();
+        currentGeometry.merge(zincGeometry.geometry);
       }
       getCentroid();
     } else {

@@ -41,19 +41,19 @@ RendererModule.prototype.getAnnotationsFromObjects = function(objects) {
     var annotations = [];
     for (var i = 0; i < objects.length; i++) {
     	var zincObject = objects[i].userData;
-		var annotation = undefined;
-    	if (zincObject) {
-    		if (zincObject.isGlyph) {
-    			annotation = zincObject.getGlyphset().userData ? zincObject.getGlyphset().userData[0] : undefined;
-    			if (annotation && annotation.data)
-    				annotation.data.id = objects[i].name;
-    		} else {
-    			annotation = zincObject.userData ? zincObject.userData[0] : undefined;
-    			if (annotation && annotation.data)
-    				annotation.data.id = objects[i].name;
-    		}    		
-    	}
-    	annotations[i] = annotation;
+      var annotation = undefined;
+      if (zincObject) {
+        if (zincObject.isGlyph) {
+          annotation = zincObject.getGlyphset().userData ? zincObject.getGlyphset().userData[0] : undefined;
+          if (annotation && annotation.data)
+            annotation.data.id = objects[i].name;
+        } else {
+          annotation = zincObject.userData ? zincObject.userData[0] : undefined;
+          if (annotation && annotation.data)
+            annotation.data.id = objects[i].name;
+        }    		
+      }
+      annotations[i] = annotation;
     }
 	return annotations;
 }
