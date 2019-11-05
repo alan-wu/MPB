@@ -292,33 +292,33 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			}
 		}
 	};
+
+	var changeOrganPartsVisibilityForScene = function(scene, name, value) {
+		var geometries = scene.findGeometriesWithGroupName(name);
+		for (var i = 0; i < geometries.length; i ++ ) {
+		  geometries[i].setVisibility(value);
+		}
+		var glyphsets = scene.findGlyphsetsWithGroupName(name);
+	    for (var i = 0; i < glyphsets.length; i ++ ) {
+	      glyphsets[i].setVisibility(value);
+	    }
+		var pointsets = scene.findPointsetsWithGroupName(name);
+	    for (var i = 0; i < pointsets.length; i ++ ) {
+	    	pointsets[i].setVisibility(value);
+		}
+		var lines = scene.findLinesWithGroupName(name);
+	    for (var i = 0; i < lines.length; i ++ ) {
+	    	lines[i].setVisibility(value);
+	    }
+	}
 				
 	/**
 	 * Change visibility for parts of the current scene.
 	 */
 	var changeOrganPartsVisibility = function(name, value) {
-		var geometries = _this.scene.findGeometriesWithGroupName(name);
-		for (var i = 0; i < geometries.length; i ++ ) {
-		  geometries[i].setVisibility(value);
-		}
-		var glyphsets = _this.scene.findGlyphsetsWithGroupName(name);
-	    for (var i = 0; i < glyphsets.length; i ++ ) {
-	      glyphsets[i].setVisibility(value);
-	    }
-		var pointsets = _this.scene.findPointsetsWithGroupName(name);
-	    for (var i = 0; i < pointsets.length; i ++ ) {
-	    	pointsets[i].setVisibility(value);
-	    }
-		if (pickerScene) {
-	    geometries = pickerScene.findGeometriesWithGroupName(name);
-	    for (var i = 0; i < geometries.length; i ++ ) {
-	      geometries[i].setVisibility(value);
-	    }
-	    glyphsets = pickerScene.findGlyphsetsWithGroupName(name);
-	    for (var i = 0; i < glyphsets.length; i ++ ) {
-	      glyphsets[i].setVisibility(value);
-	    }
-		}
+		changeOrganPartsVisibilityForScene(_this.scene, name, value);
+		if (pickerScene)
+			changeOrganPartsVisibilityForScene(pickerScene, name, value);
 	}
 	
 	this.updateDataGeometryVisibility = function(value) {
@@ -583,19 +583,19 @@ var OrgansViewer = function(ModelsLoaderIn)  {
     return undefined;
   }
 
-  var addOrganPart = function(systemName, partName, useDefautColour, geometry) {
-	  if (geometry.groupName) {
+  var addOrganPart = function(systemName, partName, useDefautColour, zincObject) {
+	  if (zincObject.groupName) {
 		  for (var i = 0; i < organPartAddedCallbacks.length;i++) {
-			  organPartAddedCallbacks[i](geometry.groupName, _this.scene.isTimeVarying());
+			  organPartAddedCallbacks[i](zincObject.groupName, _this.scene.isTimeVarying());
 		  }
 		  if (useDefautColour)
-			  modelsLoader.setGeometryColour(geometry, systemName, partName);
-		  _this.displayMessage(geometry.groupName + " loaded.");
+			  modelsLoader.setGeometryColour(zincObject, systemName, partName);
+		  _this.displayMessage(zincObject.groupName + " loaded.");
 	  }
 	  _this.displayMessage("Resource loaded.");
 	  var annotation = new (require('../utilities/annotation').annotation)();
-	  annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName, group:geometry.groupName};
-	  geometry.userData = [annotation];
+	  annotation.data = {species:sceneData.currentSpecies, system:systemName, part:partName, group:zincObject.groupName};
+	  zincObject.userData = [annotation];
   }
 
 	  /**
@@ -603,8 +603,8 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		 * sure the viewport is correct.
 		 */
 	  var _addOrganPartCallback = function(systemName, partName, useDefautColour) {
-	    return function(geometry) {
-	    	addOrganPart(systemName, partName, useDefautColour, geometry);
+	    return function(zincObject) {
+	    	addOrganPart(systemName, partName, useDefautColour, zincObject);
 	    }
 	  }
 	  
@@ -851,7 +851,9 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	          var pickerSceneName = name + "_picker_scene";
 	          pickerScene = _this.zincRenderer.getSceneByName(pickerSceneName);
 	          _this.scene.forEachGeometry(_addOrganPartCallback());
-	          _this.scene.forEachGlyphset(_addOrganPartCallback());
+			  _this.scene.forEachGlyphset(_addOrganPartCallback());
+			  _this.scene.forEachPointset(_addOrganPartCallback());
+	          _this.scene.forEachLine(_addOrganPartCallback());
 		      _this.settingsChanged();
 	        }
 	        preRenderTimeUpdate();
