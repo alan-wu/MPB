@@ -25,16 +25,6 @@ var OrgansViewerDialog = function(organsViewerIn, parentIn, options) {
 	};
 
 	/**
-	 * Load the appropriate svg diagram to the svg viewer on the organs panel.
-	 */
-	var setupOrgansNerveSVG = function() {
-		var svgObject = _myInstance.container.find("#organSVG")[0];
-		if (sceneData.nerveMap["svg"]["url"]) {
-			svgObject.setAttribute('data', sceneData.nerveMap["svg"]["url"]);
-		}
-	}
-
-	/**
 	 * Update layout of the organs panel, there are three different layouts at
 	 * this moment. 1. Normal display - Fullscreen/split screen with a single
 	 * display. 2. Nerve map display - Three panels when it is on fullscreen
@@ -179,17 +169,6 @@ var OrgansViewerDialog = function(organsViewerIn, parentIn, options) {
 		}
 	}
 
-	var toggleFieldVisibility = function(dataFields) {
-		return function(value) {
-			_myInstance.module.updateFieldvisibility(dataFields, value);
-
-		}
-	}
-
-	var openOrganModelLink = function() {
-		window.open(sceneData.externalOrganLink, '');
-	}
-
 	/**
 	 * Reset dat.gui ui and also update it to fit the current displaying organs.
 	 */
@@ -199,21 +178,6 @@ var OrgansViewerDialog = function(organsViewerIn, parentIn, options) {
 		_myInstance.datGui.removeFolder('Visibility Control');
 		organPartsGui = _myInstance.datGui.addFolder('Visibility Control');
 		organPartsGui.open();
-		if (sceneData.associateData) {
-			organPartGuiControls["Data Geometry"] = false;
-			organPartsGui.add(organPartGuiControls, "Data Geometry").onChange(
-					changeDataGeometryVisibility());
-		}
-		if (sceneData.dataFields) {
-			organPartGuiControls.Field = -1;
-			var fieldPairs = {};
-			fieldPairs["None"] = -1;
-			for (var i = 0; i < sceneData.dataFields.length; i++) {
-				fieldPairs[sceneData.dataFields[i].PartName] = i;
-			}
-			organPartsGui.add(organPartGuiControls, 'Field', fieldPairs)
-					.onChange(toggleFieldVisibility(sceneData.dataFields));
-		}
 		if (sceneData.nerveMap) {
 			var nerveMapButton = {
 				'Toggle nerve' : function() {
@@ -221,17 +185,6 @@ var OrgansViewerDialog = function(organsViewerIn, parentIn, options) {
 				}
 			};
 			organPartsGui.add(nerveMapButton, 'Toggle nerve');
-		}
-		var otherSpecies = _myInstance.module.getAvailableSpecies(
-				sceneData.currentSpecies, sceneData.currentSystem,
-				sceneData.currentPart);
-		if (otherSpecies.length > 1) {
-			organPartGuiControls["Compare With"] = "none";
-			var compareSelected = organPartsGui.add(organPartGuiControls,
-					'Compare With', otherSpecies);
-			compareSelected.onChange(function(species) {
-				_myInstance.module.changeCompareSpecies(species);
-			});
 		}
 
 		var element = _myInstance.container.find("#texSlider")[0];
@@ -296,16 +249,6 @@ var OrgansViewerDialog = function(organsViewerIn, parentIn, options) {
 			if (timeVarying)
 				toggleTimeControlsVisibility(true);
 		}
-	}
-
-	var expandCollapseOrgans = function(source, portName) {
-		if (source.value == "Expand") {
-			fullScreen = true;
-		} else {
-			fullScreen = false;
-		}
-		expandCollapse(source, portName);
-		activateAdditionalNerveMapRenderer();
 	}
 
 	/**
