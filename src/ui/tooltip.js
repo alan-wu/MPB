@@ -4,8 +4,7 @@ exports.ToolTip = function(container) {
   var tooltipcontainerElement = undefined;
   var tipElement = undefined;
   var tiptextElement = undefined;
-  var parent = undefined;
-  var template = '<div id="tooltipcontainer"><div class="mptooltip" id="tip"><span class="mptooltiptext" id="tiptext"> Tooltip text</span></div></div>';
+  var template = '<div class="mptooltip" id="tip"><span class="mptooltiptext" id="tiptext"> Tooltip text</span></div>';
   var _this = this;
   
   /**
@@ -38,16 +37,17 @@ exports.ToolTip = function(container) {
   }
 
   var setupToolTipContainer = function() {
-    parent = $(template);
+    tooltipcontainerElement = document.createElement("div");
+    tooltipcontainerElement.id = "tooltipcontainer";
+    tooltipcontainerElement.innerHTML = template;
     /*
     for (i = 0; i < childNodes.length; i++) {
       parent[0].appendChild(childNodes[i]);
     }
     */
-    tooltipcontainerElement = parent[0];
-    tipElement = parent.find("#tip")[0];
-    tiptextElement = parent.find("#tiptext")[0];
-    container.appendChild(parent[0]);
+    tipElement = tooltipcontainerElement.querySelector("#tip");
+    tiptextElement = tooltipcontainerElement.querySelector("#tiptext");
+    container.appendChild(tooltipcontainerElement);
   }
   
   setupToolTipContainer();
