@@ -427,14 +427,6 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	    }
 	  }
 	  
-	  this.destroy = function() {
-	    if (secondaryRenderer) {
-	      secondaryRenderer.dispose();
-	      secondaryRenderer = null;
-	    }
-	    (require('./RendererModule').RendererModule).prototype.destroy.call( _this );
-	  }
-	  
 	  this.exportSettings = function() {
 		  var settings = {};
 		  settings.name = _this.instanceName;
