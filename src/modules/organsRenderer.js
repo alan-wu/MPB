@@ -1,5 +1,4 @@
 var THREE = require('zincjs').THREE;
-
 // Current model's associate data, data fields, external link, nerve map
 // informations,
 // these are proived in the organsFileMap array.
@@ -10,7 +9,10 @@ var OrgansSceneData = function() {
   this.currentSpecies  = "";
   this.metaURL = "";
   this.viewURL = "";
-  this.groups = [];
+  this.geometries = [];
+  this.lines = [];
+  this.glyphsets = [];
+  this.pointsets = [];
   this.currentTime = 0.0;
   this.timeVarying = false;
   // Current model's associate data, data fields, external link, nerve map
@@ -176,32 +178,79 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		}
 	};
 
-	var changeOrganPartsVisibilityForScene = function(scene, name, value) {
-		var geometries = scene.findGeometriesWithGroupName(name);
-		for (var i = 0; i < geometries.length; i ++ ) {
-		  geometries[i].setVisibility(value);
+	var changeOrganPartsVisibilityForScene = function(scene, name, value, type) {
+		if (type == "all" || type == "geometries") {
+			var geometries = scene.findGeometriesWithGroupName(name);
+			for (var i = 0; i < geometries.length; i ++ ) {
+				geometries[i].setVisibility(value);
+			}
 		}
-		var glyphsets = scene.findGlyphsetsWithGroupName(name);
-	    for (var i = 0; i < glyphsets.length; i ++ ) {
-	      glyphsets[i].setVisibility(value);
-	    }
-		var pointsets = scene.findPointsetsWithGroupName(name);
-	    for (var i = 0; i < pointsets.length; i ++ ) {
-	    	pointsets[i].setVisibility(value);
+		if (type == "all" || type == "glyphsets") {
+			var glyphsets = scene.findGlyphsetsWithGroupName(name);
+			for (var i = 0; i < glyphsets.length; i ++ ) {
+				glyphsets[i].setVisibility(value);
+			}
 		}
-		var lines = scene.findLinesWithGroupName(name);
-	    for (var i = 0; i < lines.length; i ++ ) {
-	    	lines[i].setVisibility(value);
-	    }
+		if (type == "all" || type == "pointsets") {
+			var pointsets = scene.findPointsetsWithGroupName(name);
+			for (var i = 0; i < pointsets.length; i ++ ) {
+				pointsets[i].setVisibility(value);
+			}
+		}
+		if (type == "all" || type == "lines") {
+			var lines = scene.findLinesWithGroupName(name);
+			for (var i = 0; i < lines.length; i ++ ) {
+				lines[i].setVisibility(value);
+			}
+		}
+	}
+
+	/**
+	 * Change visibility for parts of the current scene.
+	 */
+	this.changeGeometriesVisibility = function(name, value) {
+		changeOrganPartsVisibilityForScene(_this.scene, name, value, 'geometries');
+		if (pickerScene)
+			changeOrganPartsVisibilityForScene(pickerScene, name, value, 'geometries');
+	}
+
+	/**
+	 * Change visibility for parts of the current scene.
+	 */
+	this.changeGlyphsetsVisibility = function(name, value) {
+		changeOrganPartsVisibilityForScene(_this.scene, name, value, 'glyphsets');
+		if (pickerScene)
+			changeOrganPartsVisibilityForScene(pickerScene, name, value, 'glyphsets');
+	}
+
+	/**
+	 * Change visibility for parts of the current scene.
+	 */
+	this.changeLinesVisibility = function(name, value) {
+		changeOrganPartsVisibilityForScene(_this.scene, name, value, 'lines');
+		if (pickerScene)
+			changeOrganPartsVisibilityForScene(pickerScene, name, value, 'lines');
+	}
+
+	/**
+	 * Change visibility for parts of the current scene.
+	 */
+	this.changePointsetsVisibility = function(name, value) {
+		changeOrganPartsVisibilityForScene(_this.scene, name, value, 'pointsets');
+		if (pickerScene)
+			changeOrganPartsVisibilityForScene(pickerScene, name, value, 'pointsets');
 	}
 				
 	/**
 	 * Change visibility for parts of the current scene.
 	 */
-	this.changeOrganPartsVisibility = function(name, value) {
-		changeOrganPartsVisibilityForScene(_this.scene, name, value);
+	this.changeOrganPartsVisibility = function(name, value, typeIn) {
+		var type = "all";
+		if (typeIn !== undefined)
+			type = typeIn;
+		changeOrganPartsVisibilityForScene(_this.scene, name, value, type);
 		if (pickerScene)
-			changeOrganPartsVisibilityForScene(pickerScene, name, value);
+			changeOrganPartsVisibilityForScene(pickerScene, name, value, type);
 	}
 	
 	this.changeOrganPartsVisibilityCallback = function(name) {
@@ -285,23 +334,44 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		}
 	}
 
-  var addOrganPart = function(systemName, partName, useDefautColour, zincObject) {
-	  if (zincObject.groupName) {
-		  for (var i = 0; i < organPartAddedCallbacks.length;i++) {
-			  organPartAddedCallbacks[i](zincObject.groupName, _this.scene.isTimeVarying());
-		  }
-		  if (useDefautColour)
-			  modelsLoader.setGeometryColour(zincObject, systemName, partName);
-		  if (!_this.sceneData.groups.includes(zincObject.groupName))
-		  	  _this.sceneData.groups.push(zincObject.groupName);
-		  _this.displayMessage(zincObject.groupName + " loaded.");
-	  } else {
-		  _this.displayMessage("Resource loaded.");
-	  }
-	  var annotation = new (require('../utilities/annotation').annotation)();
-	  annotation.data = {species:_this.sceneData.currentSpecies, system:systemName, part:partName, group:zincObject.groupName};
-	  zincObject.userData = [annotation];
-  }
+	var addOrganPartToSceneData = function(zincObject) {
+		if (zincObject.groupName) {
+			if (zincObject.isGeometry) {
+				if (!_this.sceneData.geometries.includes(zincObject.groupName)) {
+					_this.sceneData.geometries.push(zincObject.groupName);
+				}
+			} else if (zincObject.isGlyphset) {
+				if (!_this.sceneData.glyphsets.includes(zincObject.groupName)) {
+					_this.sceneData.glyphsets.push(zincObject.groupName);
+				}
+			} else if (zincObject.isLines) {
+				if (!_this.sceneData.lines.includes(zincObject.groupName)) {
+					_this.sceneData.lines.push(zincObject.groupName);
+				}
+			} else if (zincObject.isPointset) {
+				if (!_this.sceneData.pointsets.includes(zincObject.groupName)) {
+					_this.sceneData.pointsets.push(zincObject.groupName);
+				}
+			}
+		}
+	}
+
+	var addOrganPart = function(systemName, partName, useDefautColour, zincObject) {
+		if (zincObject.groupName) {
+			for (var i = 0; i < organPartAddedCallbacks.length;i++) {
+				organPartAddedCallbacks[i](zincObject.groupName, _this.scene.isTimeVarying());
+			}
+			if (useDefautColour)
+				modelsLoader.setGeometryColour(zincObject, systemName, partName);
+			addOrganPartToSceneData(zincObject);
+			_this.displayMessage(zincObject.groupName + " loaded.");
+		} else {
+			_this.displayMessage("Resource loaded.");
+		}
+		var annotation = new (require('../utilities/annotation').annotation)();
+		annotation.data = {species:_this.sceneData.currentSpecies, system:systemName, part:partName, group:zincObject.groupName};
+		zincObject.userData = [annotation];
+	}
 
 	  /**
 		 * New organs geometry has been added to the scene, add UIs and make
@@ -385,7 +455,10 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	        _this.sceneData.currentSystem = systemName;
 			_this.sceneData.currentPart = partName;
 			_this.sceneData.currentTime = 0.0;
-			_this.sceneData.groups.splice(0);
+			_this.sceneData.geometries.splice(0);
+			_this.sceneData.lines.splice(0);
+			_this.sceneData.glyphsets.splice(0);
+			_this.sceneData.pointsets.splice(0);
 			_this.sceneData.timeVarying = false;
 	        // This is used as title
 	        var name = "";
