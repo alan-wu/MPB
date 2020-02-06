@@ -4,8 +4,6 @@ require('webpack-jquery-ui/droppable');
 require('webpack-jquery-ui/resizable');
 require('webpack-jquery-ui/selectable');
 require('webpack-jquery-ui/sortable');
-var Zinc = require('zincjs');
-var WEBGL = require('./utilities/WebGL').WEBGL;
 
 exports.ITEM_LOADED = { FALSE: -1, DOWNLOADING: 0, TRUE: 1 };
 
@@ -25,26 +23,7 @@ exports.createDialogContainer = function (DialogNameIn, data) {
   return e1;
 }
 
-/**
- * Create a {@link Zinc.Renderer} on the dom element with corresponding elementID.
- * @param {String} elementID - id of the target dom element.
- * @returns {Zinc.Renderer}
- */
-exports.createRenderer = function () {
-  var localContainer = document.createElement( 'div' );
-  var localRenderer = undefined;;
-  localContainer.style.height = "100%";
-  if (WEBGL.isWebGLAvailable()) {
-    var localRenderer = new Zinc.Renderer(localContainer, window);
-    Zinc.defaultMaterialColor = 0xFFFF9C;
-    localRenderer.initialiseVisualisation();
-    localRenderer.playAnimation = false;
-  } else {
-    var warning = WEBGL.getWebGLErrorMessage();
-    localContainer.appendChild(warning);
-  }
-  return {"renderer":localRenderer, "container":localContainer};
-}
+
 
 /**
  * Find the {@link CSSStyleRule} with the provided css sheet title and selector name.

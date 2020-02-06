@@ -1,5 +1,28 @@
 var THREE = require('zincjs').THREE;
 
+/**
+ * Create a {@link Zinc.Renderer} on the dom element with corresponding elementID.
+ * @param {String} elementID - id of the target dom element.
+ * @returns {Zinc.Renderer}
+ */
+var createRenderer = function () {
+  var WEBGL = require('../utilities/WebGL').WEBGL;
+  var localContainer = document.createElement( 'div' );
+  var localRenderer = undefined;;
+  localContainer.style.height = "100%";
+  if (WEBGL.isWebGLAvailable()) {
+    var Zinc = require('zincjs');
+    var localRenderer = new Zinc.Renderer(localContainer, window);
+    Zinc.defaultMaterialColor = 0xFFFF9C;
+    localRenderer.initialiseVisualisation();
+    localRenderer.playAnimation = false;
+  } else {
+    var warning = WEBGL.getWebGLErrorMessage();
+    localContainer.appendChild(warning);
+  }
+  return {"renderer":localRenderer, "container":localContainer};
+}
+
 var RendererModule = function()  {
   (require('./BaseModule').BaseModule).call(this);
   this.scene = undefined;
@@ -159,7 +182,7 @@ RendererModule.prototype.getPlayRate = function(value) {
  */
 RendererModule.prototype.initialiseRenderer = function(displayAreaIn) {
   if (this.zincRenderer === undefined || this.rendererContainer === undefined) {
-    var returnedValue = (require("../utility").createRenderer)();
+    var returnedValue = createRenderer();
     this.zincRenderer = returnedValue["renderer"];
     this.rendererContainer = returnedValue["container"];
   }
