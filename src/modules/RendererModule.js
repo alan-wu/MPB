@@ -44,15 +44,15 @@ RendererModule.prototype.getIntersectedObject = function(intersects) {
 		var intersected = undefined;
 		for (var i = 0; i < intersects.length; i++) {
 			if (intersects[i] !== undefined) {
-				if (intersects[i].object && intersects[i].object.name) {					
-					if (intersected === undefined)
-						intersected = intersects[i];
+				if (intersects[i].object) {
+          if (intersects[i].object.name)
+					  if (intersected === undefined)
+						  intersected = intersects[i];
 					if (intersects[i].object.userData && 
-					  (intersects[i].object.userData.isGlyph !== undefined)) {
+					  (intersects[i].object.userData.isGlyph)) {
 						return intersects[i];
 					}
 				} 
-				
 			}
 		}
 		return intersected;
@@ -66,8 +66,11 @@ RendererModule.prototype.getAnnotationsFromObjects = function(objects) {
     	var zincObject = objects[i].userData;
       var annotation = undefined;
       if (zincObject) {
-        if (zincObject.isGlyph) {
-          annotation = zincObject.getGlyphset().userData ? zincObject.getGlyphset().userData[0] : undefined;
+        if (zincObject.isGlyph || zincObject.isGlyphset) {
+          var glyphset = zincObject;
+          if (zincObject.isGlyph)
+            glyphset = zincObject.getGlyphset();
+          annotation = glyphset.userData ? glyphset.userData[0] : undefined;
           if (annotation && annotation.data)
             annotation.data.id = objects[i].name;
         } else {
@@ -101,11 +104,30 @@ RendererModule.prototype.setSelectedByObjects = function(objects, propagateChang
   return changed;
 }
 
-var addGlyphToArray = function(objects) {
-    return function(glyph) {
-      objects.push(glyph.getMesh());
+RendererModule.prototype.setSelectedByZincObject = function(zincObject, propagateChanges) {
+  if (zincObject && zincObject.isGlyphset) {
+    var objects = [];
+    zincObject.forEachGlyph(addGlyphToArray(objects));
+    var changed = this.graphicsHighlight.setSelected(objects);
+    if (changed && propagateChanges) {
+      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
+      var annotations = this.getAnnotationsFromObjects([objects[0]]);
+      this.publishChanges(annotations, eventType);
     }
+    return changed;
   }
+  else {
+    return this.setSelectedByObjects([zincObject ? zincObject.morph : undefined]);
+  }
+
+
+}
+
+var addGlyphToArray = function(objects) {
+  return function(glyph) {
+    objects.push(glyph.getMesh());
+  }
+}
 
 RendererModule.prototype.findObjectsByGroupName = function(groupName) {
   var geometries = this.scene.findGeometriesWithGroupName(groupName);
