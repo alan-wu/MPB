@@ -120,6 +120,34 @@ var OrgansViewer = function(ModelsLoaderIn)  {
     if (typeof(callback === "function"))
       organPartAddedCallbacks.push(callback);
   }
+
+  this.getNamedObjectsToScreenCoordinates = function(name, camera) {
+    var vector = new THREE.Vector3();
+    vector.setFromMatrixPosition( obj.matrixWorld );
+    var widthHalf = (width/2);
+    var heightHalf = (height/2);
+    vector.project(camera);
+    vector.x = ( vector.x * widthHalf ) + widthHalf;
+    vector.y = - ( vector.y * heightHalf ) + heightHalf;
+    return vector;
+  }
+
+  var getIntersectedID = function(intersected) {
+    var id = undefined;
+    if (intersected !== undefined) {
+      if (intersected.object.name) {
+        id = intersected.object.name;
+        _this.setHighlightedByObjects([intersected.object], true);
+      } else {
+        var annotations = _this.getAnnotationsFromObjects([intersected.object]);
+        if (annotations && annotations[0]) {
+          id = annotations[0].data.group;
+          //_this.setHighlightedByObjects([intersected.object], true);
+        }
+      }
+    }
+    return id;
+  }
 	 
 	/**
 	 * Callback function when a pickable object has been picked. It will then
@@ -130,17 +158,20 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	 */
 	var _pickingCallback = function() {
 		return function(intersects, window_x, window_y) {
-			var intersected = _this.getIntersectedObject(intersects);
-			if (intersected !== undefined) {
-				if (intersected.object.name) {
-					if (_this.toolTip !== undefined) {
-						_this.toolTip.setText(intersected.object.name);
-						_this.toolTip.show(window_x, window_y);
-					}
-					_this.displayMessage(intersected.object.name + " selected.");
-					_this.setSelectedByObjects([intersected.object], true);
-				}
-			} else {
+      var intersected = _this.getIntersectedObject(intersects);
+      var id = getIntersectedID(intersected);
+      if (id) {
+        if (_this.toolTip !== undefined) {
+          _this.toolTip.setText(id);
+          _this.toolTip.show(window_x, window_y);
+        }
+        _this.displayMessage(intersected.object.name + " selected.");
+        if (intersected.object.name)
+          _this.setSelectedByObjects([intersected.object], true);
+        else if (intersected.object.userData.isGlyph)
+          _this.setSelectedByZincObject(intersected.object.userData.getGlyphset(), true);
+        return;
+      } else {
 				if (_this.toolTip !== undefined) {
 					_this.toolTip.hide();
 				}
@@ -157,24 +188,24 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	 */
 	var _hoverCallback = function() {
 		return function(intersects, window_x, window_y) {
-			var intersected = _this.getIntersectedObject(intersects);
-			if (intersected !== undefined) {
-				if (intersected.object.name) {
-				  _this.displayArea.style.cursor = "pointer";
-				  if (_this.toolTip !== undefined) {
-  					_this.toolTip.setText(intersected.object.name);
-  					_this.toolTip.show(window_x, window_y);
-				  }
-				  _this.setHighlightedByObjects([intersected.object], true);
-				  return;
-				}
-			} else {
-				if (_this.toolTip !== undefined) {
+      var intersected = _this.getIntersectedObject(intersects);
+      var id = getIntersectedID(intersected);
+      if (id) {
+        _this.displayArea.style.cursor = "pointer";
+        if (_this.toolTip !== undefined) {
+          _this.toolTip.setText(id);
+          _this.toolTip.show(window_x, window_y);
+        }
+        _this.setHighlightedByObjects([intersected.object], true);
+        return;
+      }
+      else {
+        if (_this.toolTip !== undefined) {
 					_this.toolTip.hide();
 				}
 				_this.displayArea.style.cursor = "auto";
 				_this.setHighlightedByObjects([], true);
-			}
+      }
 		}
 	};
 
@@ -239,8 +270,8 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		changeOrganPartsVisibilityForScene(_this.scene, name, value, 'pointsets');
 		if (pickerScene)
 			changeOrganPartsVisibilityForScene(pickerScene, name, value, 'pointsets');
-	}
-				
+  }
+  			
 	/**
 	 * Change visibility for parts of the current scene.
 	 */

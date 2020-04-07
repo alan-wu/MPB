@@ -48,6 +48,7 @@ exports.ToolTip = function(container) {
     tipElement = tooltipcontainerElement.querySelector("#tip");
     tiptextElement = tooltipcontainerElement.querySelector("#tiptext");
     container.appendChild(tooltipcontainerElement);
+    
   }
   
   setupToolTipContainer();

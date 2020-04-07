@@ -1,6 +1,6 @@
 {
   "name": "physiomeportal",
-  "version": "0.4.13",
+  "version": "0.4.15",
   "description": "Physiome Portal",
   "main": "build/physiomeportal.js",
   "files": [
@@ -63,6 +63,6 @@
     "polyfill-array-includes": "^2.0.0",
     "query-string": "^5.1.1",
     "webpack-jquery-ui": "^2.0.1",
-    "zincjs": "^0.33.7"
+    "zincjs": "^0.33.9"
   }
 }
