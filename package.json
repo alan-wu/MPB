@@ -63,6 +63,6 @@
     "polyfill-array-includes": "^2.0.0",
     "query-string": "^5.1.1",
     "webpack-jquery-ui": "^2.0.1",
-    "zincjs": "^0.33.8"
+    "zincjs": "^0.33.9"
   }
 }
