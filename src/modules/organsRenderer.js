@@ -83,11 +83,27 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		if (_this.sceneData.nerveMap && _this.sceneData.nerveMap.additionalReader)
 			_this.sceneData.nerveMap.additionalReader.setTime(currentTime / 3000.0);
 		_this.sceneData.currentTime = currentTime / 30.0;
-	}
+  }
+  
+  var postRenderSelectedCoordinatesUpdate = function() {
+    if (_this.selectedCenter) {
+      const vector = new THREE.Vector3();
+      vector.copy(_this.selectedCenter);
+      var coord = _this.scene.vectorToScreenXY(vector);
+      _this.selectedScreenCoordinates.x = coord.x;
+      _this.selectedScreenCoordinates.y = coord.y;
+    }
+  }
 	
-	var preRenderTimeUpdateCallback = function() {
+	var preRenderUpdateCallback = function() {
 		return function() {
-		  preRenderTimeUpdate();
+      preRenderTimeUpdate();
+		}
+  }
+  
+  var postRenderUpdateCallback = function() {
+		return function() {
+      postRenderSelectedCoordinatesUpdate();
 		}
 	}
 	
@@ -129,7 +145,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
     vector.project(camera);
     vector.x = ( vector.x * widthHalf ) + widthHalf;
     vector.y = - ( vector.y * heightHalf ) + heightHalf;
-    return vector;
+    return vector;T
   }
 
   var getIntersectedID = function(intersected) {
@@ -142,7 +158,6 @@ var OrgansViewer = function(ModelsLoaderIn)  {
         var annotations = _this.getAnnotationsFromObjects([intersected.object]);
         if (annotations && annotations[0]) {
           id = annotations[0].data.group;
-          //_this.setHighlightedByObjects([intersected.object], true);
         }
       }
     }
@@ -581,8 +596,10 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	 */
 	 var initialise = function() {
 	   _this.initialiseRenderer(undefined);
-	   if (_this.zincRenderer)
-	     _this.zincRenderer.addPreRenderCallbackFunction(preRenderTimeUpdateCallback());
+	   if (_this.zincRenderer) {
+       _this.zincRenderer.addPreRenderCallbackFunction(preRenderUpdateCallback());
+       _this.zincRenderer.addPostRenderCallbackFunction(postRenderUpdateCallback());
+     }
   }
 	 
 	initialise();
