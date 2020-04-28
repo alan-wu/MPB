@@ -109,7 +109,7 @@ RendererModule.prototype.setHighlightedByZincObject = function(
     zincObject.forEachGlyph(addGlyphToArray(objects));
     var changed = this.graphicsHighlight.setHighlighted(objects);
     if (changed && propagateChanges) {
-      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
+      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
       var annotations = this.getAnnotationsFromObjects([objects[0]]);
       this.publishChanges(annotations, eventType);
     }
