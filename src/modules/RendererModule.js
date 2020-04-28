@@ -101,6 +101,25 @@ RendererModule.prototype.setHighlightedByObjects = function(objects, propagateCh
   return changed;
 }
 
+
+RendererModule.prototype.setHighlightedByZincObject = function(
+  zincObject, propagateChanges) {
+  if (zincObject && zincObject.isGlyphset) {
+    var objects = [];
+    zincObject.forEachGlyph(addGlyphToArray(objects));
+    var changed = this.graphicsHighlight.setHighlighted(objects);
+    if (changed && propagateChanges) {
+      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
+      var annotations = this.getAnnotationsFromObjects([objects[0]]);
+      this.publishChanges(annotations, eventType);
+    }
+    return changed;
+  }
+  else {
+    return this.setHighlightedByObjects([zincObject ? zincObject.morph : undefined], propagateChanges);
+  }
+}
+
 RendererModule.prototype.setupLiveCoordinates = function(zincObjects) {
   if (zincObjects && (zincObjects.length > 0)) {
     var boundingBox = this.scene.getBoundingBoxOfZincObjects(zincObjects);
