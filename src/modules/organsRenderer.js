@@ -403,13 +403,13 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	}
 
 	var addOrganPart = function(systemName, partName, useDefautColour, zincObject) {
+    for (var i = 0; i < organPartAddedCallbacks.length;i++) {
+      organPartAddedCallbacks[i](zincObject.groupName, _this.scene.isTimeVarying(), zincObject);
+    }
+    if (useDefautColour)
+      modelsLoader.setGeometryColour(zincObject, systemName, partName);
+    addOrganPartToSceneData(zincObject);
 		if (zincObject.groupName) {
-			for (var i = 0; i < organPartAddedCallbacks.length;i++) {
-				organPartAddedCallbacks[i](zincObject.groupName, _this.scene.isTimeVarying());
-			}
-			if (useDefautColour)
-				modelsLoader.setGeometryColour(zincObject, systemName, partName);
-			addOrganPartToSceneData(zincObject);
 			_this.displayMessage(zincObject.groupName + " loaded.");
 		} else {
 			_this.displayMessage("Resource loaded.");
