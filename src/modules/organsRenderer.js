@@ -148,20 +148,29 @@ var OrgansViewer = function(ModelsLoaderIn)  {
     return vector;T
   }
 
-  var getIntersectedID = function(intersected) {
+  var getIdObjectFromIntersect = function(intersected) {
     var id = undefined;
+    var intersectedObject = undefined;
     if (intersected !== undefined) {
-      if (intersected.object.name) {
-        id = intersected.object.name;
-        _this.setHighlightedByObjects([intersected.object], true);
+      if (intersected.object.userData && 
+        intersected.object.userData.isMarker) {
+        intersectedObject = intersected.object.userData.parent.morph;
       } else {
-        var annotations = _this.getAnnotationsFromObjects([intersected.object]);
-        if (annotations && annotations[0]) {
-          id = annotations[0].data.group;
+        intersectedObject = intersected.object;
+      }
+      if (intersectedObject) {
+        if (intersectedObject.name) {
+          id = intersectedObject.name;
+        } else {
+          var annotations = _this.getAnnotationsFromObjects(
+            [intersectedObject]);
+          if (annotations && annotations[0]) {
+            id = annotations[0].data.group;
+          }
         }
       }
     }
-    return id;
+    return {"id":id, "object":intersectedObject};
   }
 	 
 	/**
@@ -174,17 +183,22 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	var _pickingCallback = function() {
 		return function(intersects, window_x, window_y) {
       var intersected = _this.getIntersectedObject(intersects);
-      var id = getIntersectedID(intersected);
-      if (id) {
+      var idObject = getIdObjectFromIntersect(intersected);
+      if (idObject.id) {
         if (_this.toolTip !== undefined) {
-          _this.toolTip.setText(id);
+          _this.toolTip.setText(idObject.id);
           _this.toolTip.show(window_x, window_y);
         }
-        _this.displayMessage(intersected.object.name + " selected.");
-        if (intersected.object.name)
-          _this.setSelectedByObjects([intersected.object], true);
-        else if (intersected.object.userData.isGlyph)
-          _this.setSelectedByZincObject(intersected.object.userData.getGlyphset(), true);
+        _this.displayMessage(idObject.object.name + " selected.");
+
+        if (idObject.object.userData.isGlyph) {
+          if (idObject.object.name)
+            _this.setSelectedByObjects([idObject.object], true);
+          else
+            _this.setSelectedByZincObject(idObject.object.userData.getGlyphset(), true);
+        } else {
+          _this.setSelectedByObjects([idObject.object], true);
+        }
         return;
       } else {
 				if (_this.toolTip !== undefined) {
@@ -204,14 +218,14 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	var _hoverCallback = function() {
 		return function(intersects, window_x, window_y) {
       var intersected = _this.getIntersectedObject(intersects);
-      var id = getIntersectedID(intersected);
-      if (id) {
+      var idObject = getIdObjectFromIntersect(intersected);
+      if (idObject.id) {
         _this.displayArea.style.cursor = "pointer";
         if (_this.toolTip !== undefined) {
-          _this.toolTip.setText(id);
+          _this.toolTip.setText(idObject.id);
           _this.toolTip.show(window_x, window_y);
         }
-        _this.setHighlightedByObjects([intersected.object], true);
+        _this.setHighlightedByObjects([idObject.object], true);
         return;
       }
       else {
@@ -403,13 +417,13 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	}
 
 	var addOrganPart = function(systemName, partName, useDefautColour, zincObject) {
+    for (var i = 0; i < organPartAddedCallbacks.length;i++) {
+      organPartAddedCallbacks[i](zincObject.groupName, _this.scene.isTimeVarying(), zincObject);
+    }
+    if (useDefautColour)
+      modelsLoader.setGeometryColour(zincObject, systemName, partName);
+    addOrganPartToSceneData(zincObject);
 		if (zincObject.groupName) {
-			for (var i = 0; i < organPartAddedCallbacks.length;i++) {
-				organPartAddedCallbacks[i](zincObject.groupName, _this.scene.isTimeVarying());
-			}
-			if (useDefautColour)
-				modelsLoader.setGeometryColour(zincObject, systemName, partName);
-			addOrganPartToSceneData(zincObject);
 			_this.displayMessage(zincObject.groupName + " loaded.");
 		} else {
 			_this.displayMessage("Resource loaded.");
