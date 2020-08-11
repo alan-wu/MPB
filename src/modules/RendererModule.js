@@ -43,21 +43,15 @@ RendererModule.prototype = Object.create((require('./BaseModule').BaseModule).pr
  */
 RendererModule.prototype.getIntersectedObject = function(intersects) {
 	if (intersects) {
-		var intersected = undefined;
 		for (var i = 0; i < intersects.length; i++) {
 			if (intersects[i] !== undefined) {
-				if (intersects[i].object) {
-          if (intersects[i].object.name)
-					  if (intersected === undefined)
-						  intersected = intersects[i];
-					if (intersects[i].object.userData && 
-					  (intersects[i].object.userData.isGlyph)) {
-						return intersects[i];
-					}
+				if (intersects[i].object &&
+            intersects[i].object.userData && 
+            intersects[i].object.userData.isZincObject) {
+					return intersects[i];
 				} 
 			}
 		}
-		return intersected;
 	}
 	return undefined;
 }
