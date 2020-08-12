@@ -47,9 +47,11 @@ RendererModule.prototype.getIntersectedObject = function(intersects) {
 			if (intersects[i] !== undefined) {
 				if (intersects[i].object &&
             intersects[i].object.userData && 
-            intersects[i].object.userData.isZincObject) {
+            intersects[i].object.userData.isZincObject && 
+            (intersects[i].object.name || 
+            intersects[i].object.userData.isGlyph ||
+            intersects[i].object.userData.isMarker))
 					return intersects[i];
-				} 
 			}
 		}
 	}
