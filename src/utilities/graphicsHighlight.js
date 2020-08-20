@@ -57,16 +57,16 @@ exports.GraphicsHighlight = function() {
     }
     return unmatchingObjects;
   }
-
   
   this.setHighlighted = function(objects) {
     var previousHighlightedObjects = currentHighlightedObjects;
     _this.resetHighlighted();
     // Selected object cannot be highlighted
     var array = getUnmatchingObjects(objects, currentSelectedObjects);
-    for (var i = 0; i < array.length; i++) {
-      if (array[i] && array[i].material && array[i].material.emissive)
-        array[i].material.emissive.setHex(_this.highlightColour);
+    var fullList = getFullListOfObjects(array);
+    for (var i = 0; i < fullList.length; i++) {
+      if (fullList[i] && fullList[i].material && fullList[i].material.emissive)
+        fullList[i].material.emissive.setHex(_this.highlightColour);
     }
     currentHighlightedObjects = array;
     return isDifferent(currentHighlightedObjects, previousHighlightedObjects);
@@ -78,33 +78,54 @@ exports.GraphicsHighlight = function() {
     var array = getUnmatchingObjects(currentHighlightedObjects, objects);
     currentHighlightedObjects = array;
     _this.resetSelected();
-    for (var i = 0; i < objects.length; i++) {
-    	if (objects[i] && objects[i].material && objects[i].material.emissive)
-    		objects[i].material.emissive.setHex(_this.selectColour);
+    var fullList = getFullListOfObjects(objects);
+    for (var i = 0; i < fullList.length; i++) {
+    	if (fullList[i] && fullList[i].material && fullList[i].material.emissive)
+        fullList[i].material.emissive.setHex(_this.selectColour);
     }
     currentSelectedObjects = objects;
     return isDifferent(currentSelectedObjects, previousHSelectedObjects);
   }
+
+  var getFullListOfObjects = function(objects) {
+    let fullList = [];
+    for (var i = 0; i < objects.length; i++) {
+      if (objects[i].userData.isGlyphset) {
+        var children = objects[i].children;
+        for (var j = 0; j < children.length; j++) {
+          for (var k = 0; k < children[j].children.length; k++) {
+            var graphicsObject = children[j].children[k];
+            if (graphicsObject.type == "Mesh" && graphicsObject.material)
+              fullList.push(graphicsObject);
+            }
+          }
+        } else if (objects[i].material)
+          fullList.push(objects[i]);
+    }
+    return fullList;
+  }
   
   this.resetHighlighted = function() {
-    for (var i = 0; i < currentHighlightedObjects.length; i++) {
-      if (currentHighlightedObjects[i] && currentHighlightedObjects[i].material) {
-        if (currentHighlightedObjects[i].material.emissive)
-          currentHighlightedObjects[i].material.emissive.setHex(_this.originalColour);
-        if (currentHighlightedObjects[i].material.depthFunc)
-          currentHighlightedObjects[i].material.depthFunc = THREE.LessEqualDepth;
+    let fullList = getFullListOfObjects(currentHighlightedObjects);
+    for (var i = 0; i < fullList.length; i++) {
+      if (fullList[i] && fullList[i].material) {
+        if (fullList[i].material.emissive)
+          fullList[i].material.emissive.setHex(_this.originalColour);
+        if (fullList[i].material.depthFunc)
+          fullList[i].material.depthFunc = THREE.LessEqualDepth;
       }
     }
     currentHighlightedObjects = [];
   }
   
   this.resetSelected = function() {
-    for (var i = 0; i < currentSelectedObjects.length; i++) {
-    	if (currentSelectedObjects[i] && currentSelectedObjects[i].material) {
-    		if (currentSelectedObjects[i].material.emissive)
-    			currentSelectedObjects[i].material.emissive.setHex(_this.originalColour);
-    		if (currentSelectedObjects[i].material.depthFunc)
-    			currentSelectedObjects[i].material.depthFunc = THREE.LessEqualDepth;
+    let fullList = getFullListOfObjects(currentSelectedObjects);
+    for (var i = 0; i < fullList.length; i++) {
+    	if (fullList[i] && fullList[i].material) {
+    		if (fullList[i].material.emissive)
+          fullList[i].material.emissive.setHex(_this.originalColour);
+    		if (fullList[i].material.depthFunc)
+          fullList[i].material.depthFunc = THREE.LessEqualDepth;
     	}
     }
     currentSelectedObjects = [];
