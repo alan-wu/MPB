@@ -100,20 +100,7 @@ RendererModule.prototype.setHighlightedByObjects = function(objects, propagateCh
 
 RendererModule.prototype.setHighlightedByZincObject = function(
   zincObject, propagateChanges) {
-  if (zincObject && zincObject.isGlyphset) {
-    var objects = [];
-    zincObject.forEachGlyph(addGlyphToArray(objects));
-    var changed = this.graphicsHighlight.setHighlighted(objects);
-    if (changed && propagateChanges) {
-      var eventType = require("../utilities/eventNotifier").EVENT_TYPE.HIGHLIGHTED;
-      var annotations = this.getAnnotationsFromObjects([objects[0]]);
-      this.publishChanges(annotations, eventType);
-    }
-    return changed;
-  }
-  else {
     return this.setHighlightedByObjects([zincObject ? zincObject.morph : undefined], propagateChanges);
-  }
 }
 
 RendererModule.prototype.setupLiveCoordinates = function(zincObjects) {
@@ -168,23 +155,7 @@ RendererModule.prototype.setSelectedByObjects = function(
 
 RendererModule.prototype.setSelectedByZincObject = function(
   zincObject, propagateChanges) {
-  if (zincObject && zincObject.isGlyphset) {
-    var objects = [];
-    zincObject.forEachGlyph(addGlyphToArray(objects));
-    var changed = this.graphicsHighlight.setSelected(objects);
-    if (changed) {
-      this.setupLiveCoordinates([zincObject]);
-      if (propagateChanges) {
-        var eventType = require("../utilities/eventNotifier").EVENT_TYPE.SELECTED;
-        var annotations = this.getAnnotationsFromObjects([objects[0]]);
-        this.publishChanges(annotations, eventType);
-      }
-    }
-    return changed;
-  }
-  else {
-    return this.setSelectedByObjects([zincObject ? zincObject.morph : undefined], propagateChanges);
-  }
+  return this.setSelectedByObjects([zincObject ? zincObject.morph : undefined], propagateChanges);
 }
 
 var addGlyphToArray = function(objects) {
