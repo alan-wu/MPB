@@ -90,17 +90,8 @@ exports.GraphicsHighlight = function() {
   var getFullListOfObjects = function(objects) {
     let fullList = [];
     for (var i = 0; i < objects.length; i++) {
-      if (objects[i].userData.isGlyphset) {
-        var children = objects[i].children;
-        for (var j = 0; j < children.length; j++) {
-          for (var k = 0; k < children[j].children.length; k++) {
-            var graphicsObject = children[j].children[k];
-            if (graphicsObject.type == "Mesh" && graphicsObject.material)
-              fullList.push(graphicsObject);
-            }
-          }
-        } else if (objects[i].material)
-          fullList.push(objects[i]);
+      if (objects[i].material)
+        fullList.push(objects[i]);
     }
     return fullList;
   }

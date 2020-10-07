@@ -57,13 +57,17 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	 * Used to update internal timer in scene when time slider has changed.
 	 */
 	this.updateTime = function(value) {
+    let duration = 3000;
+    if (_this.scene)
+      duration = _this.scene.getDuration();
+    var actualTime = value / 100.0 * duration;
 		if (!_this.sceneData.nerveMapIsActive) {
 			if (pickerScene)
-				pickerScene.setMorphsTime(value * 30);
+				pickerScene.setMorphsTime(actualTime);
 			if (_this.scene)
-				_this.scene.setMorphsTime(value * 30);
+				_this.scene.setMorphsTime(actualTime);
 		} else if (nerveMapScene) {
-				nerveMapScene.setMorphsTime(value * 30);
+				nerveMapScene.setMorphsTime(actualTime);
 				if (_this.sceneData.nerveMap && _this.sceneData.nerveMap.additionalReader)
 					_this.sceneData.nerveMap.additionalReader.setTime(value / 100.0);
 		}
@@ -74,6 +78,9 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	 * Update the time slider and other renderers/scenes when time has changed.
 	 */
 	var preRenderTimeUpdate = function() {
+    let duration = 3000;
+    if (_this.scene)
+      duration = _this.scene.getDuration();
 		var currentTime = _this.zincRenderer.getCurrentTime();
 		for (var i = 0; i < timeChangedCallbacks.length;i++) {
 			timeChangedCallbacks[i](currentTime);
@@ -81,8 +88,9 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 		if (!_this.sceneData.nerveMapIsActive && pickerScene)
 			pickerScene.setMorphsTime(currentTime);
 		if (_this.sceneData.nerveMap && _this.sceneData.nerveMap.additionalReader)
-			_this.sceneData.nerveMap.additionalReader.setTime(currentTime / 3000.0);
-		_this.sceneData.currentTime = currentTime / 30.0;
+      _this.sceneData.nerveMap.additionalReader.setTime(currentTime / 
+        duration);
+		_this.sceneData.currentTime = currentTime / duration * 100.0;
   }
   
   var postRenderSelectedCoordinatesUpdate = function() {
@@ -507,12 +515,12 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	  }
 	  
 	  var setSceneData = function(speciesName, systemName, partName, organsDetails) {
-	        _this.sceneData.nerveMapIsActive = false;
-	        _this.sceneData.nerveMap = undefined;
-	        _this.sceneData.metaURL = "";
-	        _this.sceneData.viewURL = "";
-	        _this.sceneData.currentSpecies = speciesName;
-	        _this.sceneData.currentSystem = systemName;
+      _this.sceneData.nerveMapIsActive = false;
+      _this.sceneData.nerveMap = undefined;
+      _this.sceneData.metaURL = "";
+      _this.sceneData.viewURL = "";
+      _this.sceneData.currentSpecies = speciesName;
+      _this.sceneData.currentSystem = systemName;
 			_this.sceneData.currentPart = partName;
 			_this.sceneData.currentTime = 0.0;
 			_this.sceneData.geometries.splice(0);
@@ -520,15 +528,15 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			_this.sceneData.glyphsets.splice(0);
 			_this.sceneData.pointsets.splice(0);
 			_this.sceneData.timeVarying = false;
-	        // This is used as title
-	        var name = "";
-	        if (speciesName)
-	        	name = speciesName + "/";
-	        if (systemName)
-	        	name = systemName + "/";
-	        if (partName)
-	        	name = partName;
-	        _this.sceneData.currentName = name;
+      // This is used as title
+      var name = "";
+      if (speciesName)
+        name = speciesName + "/";
+      if (systemName)
+        name = systemName + "/";
+      if (partName)
+        name = partName;
+      _this.sceneData.currentName = name;
 	  }
 
 	  this.loadOrgansFromURL = function(url, speciesName, systemName, partName, viewURL) {
