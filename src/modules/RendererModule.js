@@ -49,7 +49,6 @@ RendererModule.prototype.getIntersectedObject = function(intersects) {
             intersects[i].object.userData && 
             intersects[i].object.userData.isZincObject && 
             (intersects[i].object.name || 
-            intersects[i].object.userData.isGlyph ||
             intersects[i].object.userData.isMarker))
 					return intersects[i];
 			}
