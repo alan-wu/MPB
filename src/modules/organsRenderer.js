@@ -40,10 +40,10 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	var pickerScene = undefined;
 	var nerveMapScene = undefined;
 	this.sceneData = new OrgansSceneData();
-	/** new* */
 	var timeChangedCallbacks = new Array();
 	var sceneChangedCallbacks = new Array();
-	var organPartAddedCallbacks = new Array();
+  var organPartAddedCallbacks = new Array();
+  var finishDownloadCallback = undefined;
 	var layoutUpdateRequiredCallbacks = new Array();
 	var modelsLoader = ModelsLoaderIn;
 	var _this = this;
@@ -143,6 +143,15 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	this.addOrganPartAddedCallback = function(callback) {
     if (typeof(callback === "function"))
       organPartAddedCallbacks.push(callback);
+  }
+
+  this.setFinishDownloadCallback = function(callback) {
+    if (typeof(callback === "function"))
+      finishDownloadCallback = callback;
+  }
+
+  this.unsetFinishDownloadCallback = function() {
+    finishDownloadCallback = undefined;
   }
 
   this.getNamedObjectsToScreenCoordinates = function(name, camera) {
@@ -456,7 +465,9 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 			  _this.settingsChanged();
 			  _this.scene.viewAll();
 			  _this.sceneData.timeVarying = _this.scene.isTimeVarying();
-			  _this.displayMessage("All resources loaded.");
+        _this.displayMessage("All resources loaded.");
+        if (finishDownloadCallback)
+          finishDownloadCallback();
 		  }
 	  }
 	  
