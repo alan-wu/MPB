@@ -136,7 +136,7 @@ exports.csg = function(sceneIn, zincRendererIn) {
   var transformeBoxWithPath = function() {
 	if (currentClippingMode == ClippingModes.PATH) {
 		csgSceneCamera.playPath();
-		csgSceneCamera.setTime(guiControls.distance*3000.0);
+		csgSceneCamera.setTime(guiControls.distance*6000.0);
 		csgSceneCamera.calculatePathNow();
 		csgSceneCamera.stopPath();
 		csgScene.camera.updateProjectionMatrix();

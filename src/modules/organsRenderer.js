@@ -57,7 +57,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	 * Used to update internal timer in scene when time slider has changed.
 	 */
 	this.updateTime = function(value) {
-    let duration = 3000;
+    let duration = 6000;
     if (_this.scene)
       duration = _this.scene.getDuration();
     var actualTime = value / 100.0 * duration;
@@ -162,7 +162,7 @@ var OrgansViewer = function(ModelsLoaderIn)  {
     vector.project(camera);
     vector.x = ( vector.x * widthHalf ) + widthHalf;
     vector.y = - ( vector.y * heightHalf ) + heightHalf;
-    return vector;T
+    return vector;
   }
 
   var getIdObjectFromIntersect = function(intersected) {
@@ -463,7 +463,6 @@ var OrgansViewer = function(ModelsLoaderIn)  {
 	  var downloadCompletedCallback = function() {
 		  return function() {
 			  _this.settingsChanged();
-			  _this.scene.viewAll();
 			  _this.sceneData.timeVarying = _this.scene.isTimeVarying();
         _this.displayMessage("All resources loaded.");
         if (finishDownloadCallback)
